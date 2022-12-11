@@ -1,7 +1,7 @@
 /**
  * Task: downloadLibraries
  * Function: Downloads Minecraft's dependencies into a repository generated in the gradle cache.
- * This repository is called as a flatDir in the main build.gradle.
+ * This repository is called as an implementation in the main build.gradle.
  */
 
 package com.entropy.rcp.tasks;
@@ -54,6 +54,10 @@ public abstract class DownloadLibraries extends DefaultTask {
         String utilMac = "lwjgl_util-2.9.1-nightly";
         String utilOther = "lwjgl_util-2.9.0";
 
+        if(!repository.exists()) {
+            FileUtils.forceMkdir(repository);
+        }
+
         JsonArray libraries = object.getAsJsonObject().getAsJsonArray("libraries");
         for (int i = 0; i < libraries.size(); i++) {
             JsonObject entry = libraries.get(i).getAsJsonObject().getAsJsonObject("downloads");
@@ -69,7 +73,7 @@ public abstract class DownloadLibraries extends DefaultTask {
             }
 
             URL url = new URL(entry.getAsJsonObject("artifact").get("url").getAsString());
-            File file = new File(repository + path);
+            File file = new File(repository + "/" + path);
             FileUtils.copyURLToFile(url, file);
 
             System.out.println("Downloading library " + path + ".");

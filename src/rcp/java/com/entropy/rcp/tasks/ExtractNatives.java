@@ -20,11 +20,11 @@ public abstract class ExtractNatives extends DefaultTask {
         }
     }
 
-    public void extract(File zipFile) throws IOException {
-        ZipInputStream inputStream = new ZipInputStream(new FileInputStream(zipFile));
+    public void extract(File file) throws IOException {
+        ZipInputStream inputStream = new ZipInputStream(new FileInputStream(file));
         ZipEntry entry = inputStream.getNextEntry();
         while(entry != null) {
-            String output = zipFile.getParent() + File.separator + entry.getName();
+            String output = file.getParent() + File.separator + entry.getName();
             if(!entry.isDirectory()) {
                 BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(output));
                 byte[] buffer = new byte[4096];

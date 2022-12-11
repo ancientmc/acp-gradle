@@ -9,6 +9,7 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.jvm.toolchain.*;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -20,7 +21,7 @@ public class RCPPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final String minecraftRepo = project.getGradle().getGradleUserHomeDir().getAbsolutePath() + "/caches/retrocoderpack/mc_repo/";
+        final String minecraftRepo = project.getGradle().getGradleUserHomeDir().getAbsolutePath() + "/caches/retrocoderpack/mc_repo";
 
         project.getPluginManager().apply(JavaPlugin.class);
 
@@ -44,8 +45,6 @@ public class RCPPlugin implements Plugin<Project> {
         TaskProvider<DownloadLibraries> downloadJarLibraries = project.getTasks().register("downloadJarLibraries", DownloadLibraries.class);
         TaskProvider<DownloadNatives> downloadNatives = project.getTasks().register("downloadNatives", DownloadNatives.class);
         TaskProvider<ExtractNatives> extractNatives = project.getTasks().register("extractNatives", ExtractNatives.class);
-        TaskProvider<CleanTasks.CleanTemp> cleanTemp = project.getTasks().register("cleanTemp", CleanTasks.CleanTemp.class);
-        TaskProvider<CleanTasks.CleanAll> cleanAll = project.getTasks().register("cleanAll", CleanTasks.CleanAll.class);
 
         downloadJar.configure(task -> {
             try {
@@ -133,11 +132,10 @@ public class RCPPlugin implements Plugin<Project> {
             task.setGroup("rcp");
             task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
         });
-        cleanTemp.configure(task -> {
-            task.setGroup("rcp");
-        });
-        cleanAll.configure(task -> {
-            task.setGroup("rcp");
-        });
     }
+
+    /*
+     * TODO: figure out how to get Gradle to auto-refresh itself so the libraries appear. During tests I've had to
+     *  refresh the project to get the dependencies to show up.
+     */
 }
