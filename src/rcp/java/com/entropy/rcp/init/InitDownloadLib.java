@@ -1,10 +1,4 @@
-/**
- * Task: downloadLibraries
- * Function: Downloads Minecraft's dependencies into a repository generated in the gradle cache.
- * This repository is called as an implementation in the main build.gradle.
- */
-
-package com.entropy.rcp.tasks;
+package com.entropy.rcp.init;
 
 import com.entropy.rcp.utils.Paths;
 import com.google.gson.JsonArray;
@@ -13,10 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
@@ -25,30 +15,23 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
 
-public abstract class DownloadLibraries extends DefaultTask {
+public class InitDownloadLib {
 
-    @TaskAction
-    public void downloadLibraries() throws IOException {
-        File json = getJson().get().getAsFile();
-        parseJson(json);
+    public static void init(String urlPath, File json, File repository) throws IOException {
+        URL url = new URL(urlPath);
+        FileUtils.copyURLToFile(url, json);
+        init(json, repository);
     }
 
-    @InputFile
-    public abstract RegularFileProperty getJson();
-
-    @OutputDirectory
-    public abstract RegularFileProperty getRepository();
-
-    public void parseJson(File file) throws IOException {
+    public static void init(File json, File repository) throws IOException {
         JsonObject jsonFile;
-        Reader reader = Files.newBufferedReader(file.toPath());
+        Reader reader = Files.newBufferedReader(json.toPath());
         JsonElement element = JsonParser.parseReader(reader);
         jsonFile = element.getAsJsonObject();
-        getLibrary(jsonFile);
+        getLibrary(jsonFile, repository);
     }
 
-    public void getLibrary(JsonObject object) throws IOException {
-        File repository = getRepository().get().getAsFile();
+    public static void getLibrary(JsonObject object, File repository) throws IOException {
         String lwjglMac = "lwjgl-2.9.1-nightly";
         String lwjglOther = "lwjgl-2.9.0";
         String utilMac = "lwjgl_util-2.9.1-nightly";

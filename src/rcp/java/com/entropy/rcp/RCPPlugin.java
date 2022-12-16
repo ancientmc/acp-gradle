@@ -1,5 +1,6 @@
 package com.entropy.rcp;
 
+import com.entropy.rcp.init.InitDownloadLib;
 import com.entropy.rcp.tasks.*;
 import com.entropy.rcp.utils.Paths;
 import org.gradle.api.Plugin;
@@ -7,13 +8,17 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Copy;
+import org.gradle.api.tasks.GradleBuild;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.jvm.toolchain.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RCPPlugin implements Plugin<Project> {
 
@@ -32,7 +37,6 @@ public class RCPPlugin implements Plugin<Project> {
         Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
 
         TaskProvider<DownloadJar> downloadJar = project.getTasks().register("downloadJar", DownloadJar.class);
-        TaskProvider<DownloadJson> downloadJson = project.getTasks().register("downloadJson", DownloadJson.class);
         TaskProvider<JavaExec> deobfJar = project.getTasks().register("deobfJar", JavaExec.class);
         TaskProvider<JavaExec> injectExceptions = project.getTasks().register("injectExceptions", JavaExec.class);
         TaskProvider<JavaExec> addParams = project.getTasks().register("addParams", JavaExec.class);
@@ -41,25 +45,34 @@ public class RCPPlugin implements Plugin<Project> {
         TaskProvider<JavaExec> patchSourceFiles = project.getTasks().register("patchSourceFiles", JavaExec.class);
         TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
         TaskProvider<JavaExec> downloadMetaAssets = project.getTasks().register("downloadMetaAssets", JavaExec.class);
-        TaskProvider<DownloadLibraries> downloadLibraries = project.getTasks().register("downloadLibraries", DownloadLibraries.class);
-        TaskProvider<DownloadLibraries> downloadJarLibraries = project.getTasks().register("downloadJarLibraries", DownloadLibraries.class);
         TaskProvider<DownloadNatives> downloadNatives = project.getTasks().register("downloadNatives", DownloadNatives.class);
         TaskProvider<ExtractNatives> extractNatives = project.getTasks().register("extractNatives", ExtractNatives.class);
+
+        project.afterEvaluate(p -> {
+            try {
+                InitDownloadLib.init(Paths.MC_JSON, new File(p.getLayout().getProjectDirectory() + "/" + Paths.JSON_FILE), new File(minecraftRepo));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                InitDownloadLib.init(new File(p.getLayout().getProjectDirectory() + "/" + Paths.JAR_DEP_JSON), new File(minecraftRepo));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+
+        /**
+         * Internal
+         */
+        TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
 
         downloadJar.configure(task -> {
             try {
                 task.setGroup("rcp");
                 task.getURL().set(new URL(Paths.MC_JAR));
                 task.getOutput().set(new File(Paths.BASE_JAR));
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        downloadJson.configure(task -> {
-            try {
-                task.setGroup("rcp");
-                task.getURL().set(new URL(Paths.MC_JSON));
-                task.getOutput().set(new File(Paths.JSON_FILE));
             } catch (MalformedURLException e) {
                 throw new RuntimeException(e);
             }
@@ -81,6 +94,12 @@ public class RCPPlugin implements Plugin<Project> {
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
             task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.RCP_DIR_MAPPING + "params\\");
+
+
+            // Enigma needs Java 17 to run. This is here so we don't have to set the JDK version in the end-user gradle.
+            JavaToolchainService javaToolchainService = task.getProject().getExtensions().getByType(JavaToolchainService.class);
+            task.getJavaLauncher().set(javaToolchainService.launcherFor(javaToolchainSpec ->
+                    javaToolchainSpec.getLanguageVersion().set(JavaLanguageVersion.of(17))));
         });
         decompileClassFiles.configure(task -> {
             task.setGroup("rcp");
@@ -113,16 +132,6 @@ public class RCPPlugin implements Plugin<Project> {
             task.setClasspath(project.files(Paths.RCP_ASSET_EXTRACTOR));
             task.args(MC_VERSION, project.file(Paths.RCP_DIR_RUN));
         });
-        downloadLibraries.configure(task -> {
-            task.setGroup("rcp");
-            task.getJson().set(new File(Paths.JSON_FILE));
-            task.getRepository().set(new File(minecraftRepo));
-        });
-        downloadJarLibraries.configure(task -> {
-            task.setGroup("rcp");
-            task.getJson().set(new File(Paths.JAR_DEP_JSON));
-            task.getRepository().set(new File(minecraftRepo));
-        });
         downloadNatives.configure(task -> {
             task.setGroup("rcp");
             task.getJson().set(new File(Paths.NATIVES_JSON));
@@ -132,10 +141,26 @@ public class RCPPlugin implements Plugin<Project> {
             task.setGroup("rcp");
             task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
         });
-    }
 
-    /*
-     * TODO: figure out how to get Gradle to auto-refresh itself so the libraries appear. During tests I've had to
-     *  refresh the project to get the dependencies to show up.
-     */
+        /**
+         * Internal
+         */
+        execute.configure(task -> {
+            List<String> taskList = new ArrayList<>();
+
+            taskList.add(project.getTasks().getByName("downloadJar").getName());
+            taskList.add(project.getTasks().getByName("deobfJar").getName());
+            taskList.add(project.getTasks().getByName("injectExceptions").getName());
+            taskList.add(project.getTasks().getByName("addParams").getName());
+            taskList.add(project.getTasks().getByName("decompileClassFiles").getName());
+            taskList.add(project.getTasks().getByName("unzipJar").getName());
+            taskList.add(project.getTasks().getByName("patchSourceFiles").getName());
+            taskList.add(project.getTasks().getByName("copyJarAssets").getName());
+            taskList.add(project.getTasks().getByName("downloadMetaAssets").getName());
+            taskList.add(project.getTasks().getByName("downloadNatives").getName());
+            taskList.add(project.getTasks().getByName("extractNatives").getName());
+
+            task.setTasks(taskList);
+        });
+    }
 }

@@ -17,7 +17,7 @@ public class Paths {
     public static final String RCP_DIR_NATIVES = RCP_DIR_RUN + "bin\\natives\\" + OS_NAME + "\\";
     public static final String RCP_DIR_SRC = "src\\main\\java\\";
     public static final String RCP_DIR_RESOURCES = "src\\main\\resources\\";
-    public static final String RCP_ASSET_EXTRACTOR = RCP_DIR_PATCHES + "McAssetExtractor-1.0_03-all.jar";
+    public static final String RCP_ASSET_EXTRACTOR = RCP_DIR_PATCHES + "McAssetExtractor-1.0_03-1-all.jar";
     public static final String BASE_JAR = RCP_DIR_TEMP + MC_VERSION + ".jar";
     public static final String SRG_JAR = RCP_DIR_TEMP + MC_VERSION + "-srg.jar";
     public static final String EXC_JAR = RCP_DIR_TEMP + MC_VERSION + "-exc.jar";
