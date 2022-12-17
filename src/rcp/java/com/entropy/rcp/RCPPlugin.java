@@ -3,6 +3,7 @@ package com.entropy.rcp;
 import com.entropy.rcp.init.InitDownloadLib;
 import com.entropy.rcp.tasks.*;
 import com.entropy.rcp.utils.Paths;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -49,16 +50,27 @@ public class RCPPlugin implements Plugin<Project> {
         TaskProvider<ExtractNatives> extractNatives = project.getTasks().register("extractNatives", ExtractNatives.class);
 
         project.afterEvaluate(p -> {
-            try {
-                InitDownloadLib.init(Paths.MC_JSON, new File(p.getLayout().getProjectDirectory() + "/" + Paths.JSON_FILE), new File(minecraftRepo));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            File json = new File(p.getLayout().getProjectDirectory() + "/" + Paths.JSON_FILE);
+            if(!json.exists()) {
+                try {
+                    FileUtils.copyURLToFile(new URL(Paths.MC_JSON), json);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
-            try {
-                InitDownloadLib.init(new File(p.getLayout().getProjectDirectory() + "/" + Paths.JAR_DEP_JSON), new File(minecraftRepo));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if(!new File(minecraftRepo).exists()) {
+                try {
+                    InitDownloadLib.init(json, new File(minecraftRepo));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                try {
+                    InitDownloadLib.init(new File(p.getLayout().getProjectDirectory() + "/" + Paths.JAR_DEP_JSON), new File(minecraftRepo));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 

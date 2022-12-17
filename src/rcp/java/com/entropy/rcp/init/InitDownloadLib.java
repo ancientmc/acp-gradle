@@ -17,12 +17,6 @@ import java.nio.file.Files;
 
 public class InitDownloadLib {
 
-    public static void init(String urlPath, File json, File repository) throws IOException {
-        URL url = new URL(urlPath);
-        FileUtils.copyURLToFile(url, json);
-        init(json, repository);
-    }
-
     public static void init(File json, File repository) throws IOException {
         JsonObject jsonFile;
         Reader reader = Files.newBufferedReader(json.toPath());

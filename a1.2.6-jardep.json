@@ -31,22 +31,6 @@
           "path": "com/paulscode/librarylwjglopenal/20100824/librarylwjglopenal-20100824.jar"
         }
       }
-    },
-	{
-      "downloads": {
-        "artifact": {
-          "url": "https://www.beatunes.com/repo/maven2/com/jcraft/jogg/0.0.7/jogg-0.0.7.jar",
-          "path": "com/jcraft/jogg/0.0.7/jogg-0.0.7.jar"
-        }
-      }
-    },
-	{
-      "downloads": {
-        "artifact": {
-          "url": "https://www.beatunes.com/repo/maven2/com/jcraft/jorbis/0.0.17/jorbis-0.0.17.jar",
-          "path": "com/jcraft/jorbis/0.0.17/jorbis-0.0.17.jar"
-        }
-      }
     }
   ]
 }
