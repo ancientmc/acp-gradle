@@ -1,5 +1,6 @@
 package com.entropy.rcp.tasks;
 
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.InputDirectory;
@@ -17,6 +18,7 @@ public abstract class ExtractNatives extends DefaultTask {
         assert jars != null;
         for(File jar : jars) {
             extract(jar);
+            FileUtils.deleteQuietly(jar);
         }
     }
 
@@ -35,7 +37,7 @@ public abstract class ExtractNatives extends DefaultTask {
                 outputStream.close();
             } else {
                 File subdir = new File(output);
-                subdir.mkdirs();
+                subdir.mkdir();
             }
             inputStream.closeEntry();
             entry = inputStream.getNextEntry();

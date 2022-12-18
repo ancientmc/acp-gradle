@@ -49,8 +49,13 @@ public class RCPPlugin implements Plugin<Project> {
         TaskProvider<DownloadNatives> downloadNatives = project.getTasks().register("downloadNatives", DownloadNatives.class);
         TaskProvider<ExtractNatives> extractNatives = project.getTasks().register("extractNatives", ExtractNatives.class);
 
+        /**
+         * Internal
+         */
+        TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
+
         project.afterEvaluate(p -> {
-            File json = new File(p.getLayout().getProjectDirectory() + "/" + Paths.JSON_FILE);
+            File json = p.file(Paths.JSON_FILE);
             if(!json.exists()) {
                 try {
                     FileUtils.copyURLToFile(new URL(Paths.MC_JSON), json);
@@ -67,18 +72,12 @@ public class RCPPlugin implements Plugin<Project> {
                 }
 
                 try {
-                    InitDownloadLib.init(new File(p.getLayout().getProjectDirectory() + "/" + Paths.JAR_DEP_JSON), new File(minecraftRepo));
+                    InitDownloadLib.init(p.file(Paths.JAR_DEP_JSON), new File(minecraftRepo));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             }
         });
-
-
-        /**
-         * Internal
-         */
-        TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
 
         downloadJar.configure(task -> {
             try {
@@ -106,7 +105,6 @@ public class RCPPlugin implements Plugin<Project> {
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
             task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.RCP_DIR_MAPPING + "params\\");
-
 
             // Enigma needs Java 17 to run. This is here so we don't have to set the JDK version in the end-user gradle.
             JavaToolchainService javaToolchainService = task.getProject().getExtensions().getByType(JavaToolchainService.class);

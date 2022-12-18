@@ -16,6 +16,8 @@ import java.net.URL;
 import java.nio.file.Files;
 
 public class InitDownloadLib {
+    private static final String lwjglVersion = "2.9.0";
+    private static final String lwjglMacVersion = "2.9.1-nightly";
 
     public static void init(File json, File repository) throws IOException {
         JsonObject jsonFile;
@@ -26,10 +28,6 @@ public class InitDownloadLib {
     }
 
     public static void getLibrary(JsonObject object, File repository) throws IOException {
-        String lwjglMac = "lwjgl-2.9.1-nightly";
-        String lwjglOther = "lwjgl-2.9.0";
-        String utilMac = "lwjgl_util-2.9.1-nightly";
-        String utilOther = "lwjgl_util-2.9.0";
 
         if(!repository.exists()) {
             FileUtils.forceMkdir(repository);
@@ -44,9 +42,9 @@ public class InitDownloadLib {
             String path = entry.getAsJsonObject("artifact").get("path").getAsString();
 
             if(OperatingSystem.current().isMacOsX()) {
-                if(path.contains(lwjglOther) || path.contains(utilOther)) continue;
+                if(path.contains(lwjglVersion)) continue;
             } else {
-                if(path.contains(lwjglMac) || path.contains(utilMac)) continue;
+                if(path.contains(lwjglMacVersion)) continue;
             }
 
             URL url = new URL(entry.getAsJsonObject("artifact").get("url").getAsString());
