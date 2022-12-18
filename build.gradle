@@ -50,6 +50,12 @@ gradlePlugin {
     automatedPublishing = true
 }
 
+pluginBundle {
+    website = "https://github.com/moist-mason/rcp-gradle"
+    vcsUrl = "https://github.com/moist-mason/rcp-gradle.git"
+    tags = ['minecraft', 'mcp', 'rcp']
+}
+
 jar {
     from sourceSets.rcp.output
     manifest {
@@ -65,7 +71,7 @@ publishing {
     publications {
         pluginMaven(MavenPublication) {
             groupId = 'com.entropy.rcp'
-            artifactId = 'rcp'
+            artifactId = 'rcp-gradle'
             version = '0.1.0-beta'
         }
     }
