@@ -92,19 +92,19 @@ public class ACPPlugin implements Plugin<Project> {
             task.setGroup("acp");
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
-            task.args("-searge", Paths.RCP_DIR_MAPPING + "retroguard.cfg");
+            task.args("-searge", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
         });
         injectExceptions.configure(task -> {
             task.setGroup("acp");
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
-            task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.RCP_DIR_MAPPING + "exceptions.exc", "--log", Paths.RCP_DIR_LOGS + "exceptions.log");
+            task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.ACP_DIR_MAPPING + "exceptions.exc", "--log", Paths.ACP_DIR_LOGS + "exceptions.log");
         });
         addParams.configure(task -> {
             task.setGroup("acp");
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
-            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.RCP_DIR_MAPPING + "params\\");
+            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params\\");
 
             // Enigma needs Java 17 to run. This is here so we don't have to set the JDK version in the end-user gradle.
             JavaToolchainService javaToolchainService = task.getProject().getExtensions().getByType(JavaToolchainService.class);
@@ -120,36 +120,36 @@ public class ACPPlugin implements Plugin<Project> {
         unzipJar.configure(task -> {
             task.setGroup("acp");
             task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
-            task.into(project.file(Paths.RCP_DIR_SRC));
+            task.into(project.file(Paths.ACP_DIR_SRC));
             task.exclude("com/**", "paulscode/**");
         });
         patchSourceFiles.configure(task -> {
             task.setGroup("acp");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
-            task.args("--patch", Paths.RCP_DIR_SRC, Paths.RCP_PATCH_FILES, "--output", Paths.RCP_DIR_SRC,
-                    "--reject", Paths.RCP_DIR_LOGS + "patch_rejects\\", "--verbose");
+            task.args("--patch", Paths.ACP_DIR_SRC, Paths.ACP_PATCH_FILES, "--output", Paths.ACP_DIR_SRC,
+                    "--reject", Paths.ACP_DIR_LOGS + "patch_rejects\\", "--verbose");
         });
         copyJarAssets.configure(task -> {
             task.setGroup("acp");
             task.from(project.zipTree(project.file(Paths.BASE_JAR)));
-            task.into(project.file(Paths.RCP_DIR_RESOURCES));
+            task.into(project.file(Paths.ACP_DIR_RESOURCES));
             task.exclude("com/**", "net/**", "paulscode/**", "*.class");
         });
         downloadMetaAssets.configure(task -> {
             task.setGroup("acp");
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
-            task.setClasspath(project.files(Paths.RCP_ASSET_EXTRACTOR));
-            task.args(MC_VERSION, project.file(Paths.RCP_DIR_RUN));
+            task.setClasspath(project.files(Paths.ACP_ASSET_EXTRACTOR));
+            task.args(MC_VERSION, project.file(Paths.ACP_DIR_RUN));
         });
         downloadNatives.configure(task -> {
             task.setGroup("acp");
             task.getJson().set(new File(Paths.NATIVES_JSON));
-            task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
+            task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
         extractNatives.configure(task -> {
             task.setGroup("acp");
-            task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
+            task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
 
         /**

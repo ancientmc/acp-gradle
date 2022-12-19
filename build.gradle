@@ -97,7 +97,7 @@ publishing {
     repositories {
         maven {
             name = 'ancientmc-maven'
-            url = 'https://github.com/entropymc/entropy-maven/raw/maven'
+            url = 'D:\\Programs\\Projects\\AncientMC\\ancientmc-maven'
         }
     }
 }
