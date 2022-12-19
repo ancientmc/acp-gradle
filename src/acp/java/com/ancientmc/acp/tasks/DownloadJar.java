@@ -1,4 +1,4 @@
-package com.entropy.rcp.tasks;
+package com.ancientmc.acp.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;

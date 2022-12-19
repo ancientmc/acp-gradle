@@ -1,4 +1,4 @@
-package com.entropy.rcp.utils;
+package com.ancientmc.acp.utils;
 
 import org.gradle.internal.os.OperatingSystem;
 

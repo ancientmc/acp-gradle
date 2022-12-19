@@ -1,12 +1,10 @@
-package com.entropy.rcp.init;
+package com.ancientmc.acp.init;
 
-import com.entropy.rcp.utils.Paths;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.DefaultTask;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;

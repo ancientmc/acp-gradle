@@ -1,4 +1,4 @@
-package com.entropy.rcp.utils;
+package com.ancientmc.acp.utils;
 
 public class Paths {
     private static final String OS_NAME = OSName.getOSName();

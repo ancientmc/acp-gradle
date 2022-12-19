@@ -1,8 +1,8 @@
-package com.entropy.rcp;
+package com.ancientmc.acp;
 
-import com.entropy.rcp.init.InitDownloadLib;
-import com.entropy.rcp.tasks.*;
-import com.entropy.rcp.utils.Paths;
+import com.ancientmc.acp.init.InitDownloadLib;
+import com.ancientmc.acp.tasks.*;
+import com.ancientmc.acp.utils.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RCPPlugin implements Plugin<Project> {
+public class ACPPlugin implements Plugin<Project> {
 
     public static final String MC_VERSION = "a1.2.6";
 
@@ -81,7 +81,7 @@ public class RCPPlugin implements Plugin<Project> {
 
         downloadJar.configure(task -> {
             try {
-                task.setGroup("rcp");
+                task.setGroup("acp");
                 task.getURL().set(new URL(Paths.MC_JAR));
                 task.getOutput().set(new File(Paths.BASE_JAR));
             } catch (MalformedURLException e) {
@@ -89,19 +89,19 @@ public class RCPPlugin implements Plugin<Project> {
             }
         });
         deobfJar.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
             task.args("-searge", Paths.RCP_DIR_MAPPING + "retroguard.cfg");
         });
         injectExceptions.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
             task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.RCP_DIR_MAPPING + "exceptions.exc", "--log", Paths.RCP_DIR_LOGS + "exceptions.log");
         });
         addParams.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
             task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.RCP_DIR_MAPPING + "params\\");
@@ -112,43 +112,43 @@ public class RCPPlugin implements Plugin<Project> {
                     javaToolchainSpec.getLanguageVersion().set(JavaLanguageVersion.of(17))));
         });
         decompileClassFiles.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(quiltflower));
             task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", "-dec=0", Paths.FINAL_JAR, Paths.FINAL_JAR);
         });
         unzipJar.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
             task.into(project.file(Paths.RCP_DIR_SRC));
             task.exclude("com/**", "paulscode/**");
         });
         patchSourceFiles.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
             task.args("--patch", Paths.RCP_DIR_SRC, Paths.RCP_PATCH_FILES, "--output", Paths.RCP_DIR_SRC,
                     "--reject", Paths.RCP_DIR_LOGS + "patch_rejects\\", "--verbose");
         });
         copyJarAssets.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.from(project.zipTree(project.file(Paths.BASE_JAR)));
             task.into(project.file(Paths.RCP_DIR_RESOURCES));
             task.exclude("com/**", "net/**", "paulscode/**", "*.class");
         });
         downloadMetaAssets.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
             task.setClasspath(project.files(Paths.RCP_ASSET_EXTRACTOR));
             task.args(MC_VERSION, project.file(Paths.RCP_DIR_RUN));
         });
         downloadNatives.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getJson().set(new File(Paths.NATIVES_JSON));
             task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
         });
         extractNatives.configure(task -> {
-            task.setGroup("rcp");
+            task.setGroup("acp");
             task.getNativesDir().set(new File(Paths.RCP_DIR_NATIVES));
         });
 

@@ -4,7 +4,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'com.entropy.rcp'
+group 'com.ancientmc.acp'
 version '0.1.0-beta'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
@@ -20,11 +20,11 @@ repositories {
 }
 
 sourceSets {
-    rcp
+    acp
 }
 
 configurations {
-    rcpImplementation.extendsFrom implementation
+    acpImplementation.extendsFrom implementation
     retroguard
     mcinjector
     enigma
@@ -33,30 +33,30 @@ configurations {
 }
 
 dependencies {
-    rcpImplementation gradleApi()
-    rcpImplementation 'commons-io:commons-io:2.8.0'
-    rcpImplementation 'com.google.code.gson:gson:2.9.1'
+    acpImplementation gradleApi()
+    acpImplementation 'commons-io:commons-io:2.8.0'
+    acpImplementation 'com.google.code.gson:gson:2.9.1'
 }
 
 gradlePlugin {
     plugins {
-        rcp {
-            id = "com.entropy.rcp"
-            displayName = "RCP-Gradle"
-            description = "Gradle plugin for Retro Coder Pack processes."
-            implementationClass = "com.entropy.rcp.RCPPlugin"
+        acp {
+            id = "com.ancientmc.acp"
+            displayName = "ACP-Gradle"
+            description = "Gradle plugin for Ancient Coder Pack processes."
+            implementationClass = "com.ancientmc.acp.ACPPlugin"
         }
     }
     automatedPublishing = true
 }
 
 jar {
-    from sourceSets.rcp.output
+    from sourceSets.acp.output
     manifest {
         attributes(
-                'Implementation-Title': 'rcp-gradle',
+                'Implementation-Title': 'acp-gradle',
                 'Implementation-Version': version,
-                'Main-Class': 'com.entropy.rcp.RCPPlugin'
+                'Main-Class': 'com.ancientmc.acp.ACPPlugin'
         )
     }
 }
@@ -64,8 +64,8 @@ jar {
 publishing {
     publications {
         pluginMaven(MavenPublication) {
-            groupId = 'com.entropy.rcp'
-            artifactId = 'RCP-Gradle'
+            groupId = 'com.ancientmc.acp'
+            artifactId = 'ACP-Gradle'
             version = '0.1.0-beta'
             versionMapping {
                 usage('java-api') {
@@ -76,9 +76,9 @@ publishing {
                 }
             }
             pom {
-                name = 'RCP-Gradle'
-                description = 'Gradle plugin for Retro Coder Pack (RCP) processes.'
-                url = 'https://github.com/moist-mason/rcp-gradle'
+                name = 'ACP-Gradle'
+                description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
+                url = 'https://github.com/moist-mason/acp-gradle'
                 licenses {
                     license {
                         name = 'The GNU General Public License, v3.0'
@@ -96,7 +96,7 @@ publishing {
     }
     repositories {
         maven {
-            name = 'entropy-maven'
+            name = 'ancientmc-maven'
             url = 'https://github.com/entropymc/entropy-maven/raw/maven'
         }
     }

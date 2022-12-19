@@ -1,6 +1,6 @@
-package com.entropy.rcp.tasks;
+package com.ancientmc.acp.tasks;
 
-import com.entropy.rcp.utils.OSName;
+import com.ancientmc.acp.utils.OSName;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
