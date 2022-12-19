@@ -1,7 +1,7 @@
 plugins {
     id 'java-library'
     id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '1.0.0'
+    id 'maven-publish'
 }
 
 group 'com.entropy.rcp'
@@ -50,12 +50,6 @@ gradlePlugin {
     automatedPublishing = true
 }
 
-pluginBundle {
-    website = "https://github.com/moist-mason/rcp-gradle"
-    vcsUrl = "https://github.com/moist-mason/rcp-gradle.git"
-    tags = ['minecraft', 'mcp', 'rcp']
-}
-
 jar {
     from sourceSets.rcp.output
     manifest {
@@ -71,14 +65,39 @@ publishing {
     publications {
         pluginMaven(MavenPublication) {
             groupId = 'com.entropy.rcp'
-            artifactId = 'rcp-gradle'
+            artifactId = 'RCP-Gradle'
             version = '0.1.0-beta'
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'RCP-Gradle'
+                description = 'Gradle plugin for Retro Coder Pack (RCP) processes.'
+                url = 'https://github.com/moist-mason/rcp-gradle'
+                licenses {
+                    license {
+                        name = 'The GNU General Public License, v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'mason'
+                        name = 'Mason'
+                    }
+                }
+            }
         }
     }
     repositories {
         maven {
-            name = 'entropyMaven'
-            url = layout.buildDirectory.dir('maven')
+            name = 'entropy-maven'
+            url = 'https://github.com/entropymc/entropy-maven/raw/maven'
         }
     }
 }
