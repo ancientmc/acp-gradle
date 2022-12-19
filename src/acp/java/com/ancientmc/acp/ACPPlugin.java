@@ -27,7 +27,7 @@ public class ACPPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final String minecraftRepo = project.getGradle().getGradleUserHomeDir().getAbsolutePath() + "/caches/retrocoderpack/mc_repo";
+        final String minecraftRepo = project.getGradle().getGradleUserHomeDir().getAbsolutePath() + "/caches/ancientcoderpack/mc_repo";
 
         project.getPluginManager().apply(JavaPlugin.class);
 
