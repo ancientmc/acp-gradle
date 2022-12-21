@@ -8,10 +8,7 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.plugins.JavaPlugin;
-import org.gradle.api.tasks.Copy;
-import org.gradle.api.tasks.GradleBuild;
-import org.gradle.api.tasks.JavaExec;
-import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.*;
 import org.gradle.jvm.toolchain.*;
 
 import java.io.File;
@@ -54,6 +51,8 @@ public class ACPPlugin implements Plugin<Project> {
          */
         TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
 
+        TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
+
         project.afterEvaluate(p -> {
             File json = p.file(Paths.JSON_FILE);
             if(!json.exists()) {
@@ -81,7 +80,7 @@ public class ACPPlugin implements Plugin<Project> {
 
         downloadJar.configure(task -> {
             try {
-                task.setGroup("acp");
+                task.setGroup("acp-decomp");
                 task.getURL().set(new URL(Paths.MC_JAR));
                 task.getOutput().set(new File(Paths.BASE_JAR));
             } catch (MalformedURLException e) {
@@ -89,19 +88,19 @@ public class ACPPlugin implements Plugin<Project> {
             }
         });
         deobfJar.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
             task.args("-searge", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
         });
         injectExceptions.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
             task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.ACP_DIR_MAPPING + "exceptions.exc", "--log", Paths.ACP_DIR_LOGS + "exceptions.log");
         });
         addParams.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
             task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params\\");
@@ -112,49 +111,47 @@ public class ACPPlugin implements Plugin<Project> {
                     javaToolchainSpec.getLanguageVersion().set(JavaLanguageVersion.of(17))));
         });
         decompileClassFiles.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(quiltflower));
             task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", "-dec=0", Paths.FINAL_JAR, Paths.FINAL_JAR);
         });
         unzipJar.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
             task.into(project.file(Paths.ACP_DIR_SRC));
             task.exclude("com/**", "paulscode/**");
         });
         patchSourceFiles.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
             task.args("--patch", Paths.ACP_DIR_SRC, Paths.ACP_PATCH_FILES, "--output", Paths.ACP_DIR_SRC,
                     "--reject", Paths.ACP_DIR_LOGS + "patch_rejects\\", "--verbose");
         });
         copyJarAssets.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.from(project.zipTree(project.file(Paths.BASE_JAR)));
             task.into(project.file(Paths.ACP_DIR_RESOURCES));
             task.exclude("com/**", "net/**", "paulscode/**", "*.class");
         });
         downloadMetaAssets.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
             task.setClasspath(project.files(Paths.ACP_ASSET_EXTRACTOR));
             task.args(MC_VERSION, project.file(Paths.ACP_DIR_RUN));
         });
         downloadNatives.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getJson().set(new File(Paths.NATIVES_JSON));
             task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
         extractNatives.configure(task -> {
-            task.setGroup("acp");
+            task.setGroup("acp-decomp");
             task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
 
-        /**
-         * Internal
-         */
+        /** Internal **/
         execute.configure(task -> {
             List<String> taskList = new ArrayList<>();
 
@@ -171,6 +168,15 @@ public class ACPPlugin implements Plugin<Project> {
             taskList.add(project.getTasks().getByName("extractNatives").getName());
 
             task.setTasks(taskList);
+        });
+
+        reobfJar.configure(task -> {
+            task.setGroup("acp-reobf");
+            task.dependsOn(project.getTasks().getByName("jar"));
+            task.getMainClass().set("RetroGuard");
+            task.setClasspath(project.files(retroguard));
+            task.args("-notch", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
+            task.doLast(c -> c.getProject().delete("build\\libs\\interm-client-a1.2.6.jar"));
         });
     }
 }
