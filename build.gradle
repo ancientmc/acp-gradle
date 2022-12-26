@@ -52,6 +52,7 @@ gradlePlugin {
 
 jar {
     from sourceSets.acp.output
+    destinationDirectory = file("D:\\Programs\\Projects\\AncientMC\\ancientmc-maven\\com\\ancientmc\\acp\\ACP-Gradle\\0.1.0-beta")
     manifest {
         attributes(
                 'Implementation-Title': 'acp-gradle',

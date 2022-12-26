@@ -20,11 +20,10 @@ import java.util.List;
 
 public class ACPPlugin implements Plugin<Project> {
 
-    public static final String MC_VERSION = "a1.2.6";
-
     @Override
     public void apply(Project project) {
-        final String minecraftRepo = project.getGradle().getGradleUserHomeDir().getAbsolutePath() + "/caches/ancientcoderpack/mc_repo";
+        final String minecraftVersion = project.getExtensions().getExtraProperties().get("MC_VERSION").toString();
+        final String minecraftRepo = project.getExtensions().getExtraProperties().get("MC_REPO").toString();
 
         project.getPluginManager().apply(JavaPlugin.class);
 
@@ -139,7 +138,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
             task.setClasspath(project.files(Paths.ACP_ASSET_EXTRACTOR));
-            task.args(MC_VERSION, project.file(Paths.ACP_DIR_RUN));
+            task.args(minecraftVersion, project.file(Paths.ACP_DIR_RUN));
         });
         downloadNatives.configure(task -> {
             task.setGroup("acp-decomp");
