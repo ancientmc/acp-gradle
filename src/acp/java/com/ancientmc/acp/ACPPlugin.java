@@ -102,7 +102,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
-            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params\\");
+            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params.mapping");
 
             // Enigma needs Java 17 to run. This is here so we don't have to set the JDK version in the end-user gradle.
             JavaToolchainService javaToolchainService = task.getProject().getExtensions().getByType(JavaToolchainService.class);
