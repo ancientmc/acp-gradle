@@ -9,11 +9,6 @@ version '0.1.0-beta'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
-tasks.named('wrapper', Wrapper).configure {
-    gradleVersion = '7.4'
-    distributionType = Wrapper.DistributionType.ALL
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -24,35 +19,29 @@ sourceSets {
 }
 
 configurations {
-    acpImplementation.extendsFrom implementation
-    retroguard
-    mcinjector
-    enigma
-    quiltflower
-    diffpatch
+    acpImplementation
+    implementation.extendsFrom acpImplementation
 }
 
 dependencies {
     acpImplementation gradleApi()
-    acpImplementation 'commons-io:commons-io:2.8.0'
-    acpImplementation 'com.google.code.gson:gson:2.9.1'
+    acpImplementation 'commons-io:commons-io:2.11.0'
+    acpImplementation 'com.google.code.gson:gson:2.10.1'
 }
 
 gradlePlugin {
     plugins {
         acp {
-            id = "com.ancientmc.acp"
-            displayName = "ACP-Gradle"
-            description = "Gradle plugin for Ancient Coder Pack processes."
-            implementationClass = "com.ancientmc.acp.ACPPlugin"
+            id = 'com.ancientmc.acp'
+            displayName = 'acp-plugin'
+            description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
+            implementationClass = 'com.ancientmc.acp.ACPPlugin'
         }
     }
-    automatedPublishing = true
 }
 
 jar {
     from sourceSets.acp.output
-    destinationDirectory = file("D:\\Programs\\Projects\\AncientMC\\ancientmc-maven\\com\\ancientmc\\acp\\ACP-Gradle\\0.1.0-beta")
     manifest {
         attributes(
                 'Implementation-Title': 'acp-gradle',
@@ -66,24 +55,16 @@ publishing {
     publications {
         pluginMaven(MavenPublication) {
             groupId = 'com.ancientmc.acp'
-            artifactId = 'ACP-Gradle'
+            artifactId = 'acp-gradle'
             version = '0.1.0-beta'
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
-            }
             pom {
-                name = 'ACP-Gradle'
+                name = 'acp-gradle'
                 description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
-                url = 'https://github.com/moist-mason/acp-gradle'
+                url = 'https://github.com/ancientmc/acp-gradle'
                 licenses {
                     license {
-                        name = 'The GNU General Public License, v3.0'
-                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                        name = 'AncientMC License'
+                        url = 'https://github.com/ancientmc/license/blob/master/LICENSE'
                     }
                 }
                 developers {
@@ -98,7 +79,7 @@ publishing {
     repositories {
         maven {
             name = 'ancientmc-maven'
-            url = 'D:\\Programs\\Projects\\AncientMC\\ancientmc-maven'
+            url = 'C:\\Users\\mason\\Desktop\\ACP\\ancientmc-maven\\'
         }
     }
 }
