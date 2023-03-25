@@ -79,7 +79,7 @@ publishing {
     repositories {
         maven {
             name = 'ancientmc-maven'
-            url = 'C:\\Users\\mason\\Desktop\\ACP\\ancientmc-maven\\'
+            url = 'D:\\Programs\\Projects\\AncientMC\\ancientmc-maven\\'
         }
     }
 }
