@@ -1,9 +1,7 @@
 package com.ancientmc.acp;
 
-import com.ancientmc.acp.init.InitDownloadLib;
-import com.ancientmc.acp.tasks.*;
+import com.ancientmc.acp.init.ACPInitialization;
 import com.ancientmc.acp.utils.Paths;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -22,14 +20,15 @@ public class ACPPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        final String minecraftVersion = project.getExtensions().getExtraProperties().get("MC_VERSION").toString();
-        final String minecraftRepo = project.getExtensions().getExtraProperties().get("MC_REPO").toString();
+        String minecraftVersion = project.getExtensions().getExtraProperties().get("MC_VERSION").toString();
+        ACPExtension extension = project.getExtensions().create("acp", ACPExtension.class, project);
 
         project.getPluginManager().apply(JavaPlugin.class);
 
-        Configuration retroguard = project.getConfigurations().getByName("retroguard");
+        /** Old stuff
+        Configuration retroguard = project.getConfigurations().getByName("jarsplitter");
         Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
-        Configuration enigma = project.getConfigurations().getByName("enigma");
+        Configuration enigma = project.getConfigurations().getByName("forgeart");
         Configuration quiltflower = project.getConfigurations().getByName("quiltflower");
         Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
 
@@ -45,38 +44,20 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<DownloadNatives> downloadNatives = project.getTasks().register("downloadNatives", DownloadNatives.class);
         TaskProvider<ExtractNatives> extractNatives = project.getTasks().register("extractNatives", ExtractNatives.class);
 
-        /**
-         * Internal
-         */
         TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
 
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
+        */
 
-        project.afterEvaluate(p -> {
-            File json = p.file(Paths.JSON_FILE);
-            if(!json.exists()) {
-                try {
-                    FileUtils.copyURLToFile(new URL(Paths.MC_JSON), json);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            if(!new File(minecraftRepo).exists()) {
-                try {
-                    InitDownloadLib.init(json, new File(minecraftRepo));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-                try {
-                    InitDownloadLib.init(p.file(Paths.JAR_DEP_JSON), new File(minecraftRepo));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        project.afterEvaluate(proj -> {
+            try {
+                ACPInitialization.init(proj, extension, minecraftVersion);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
+        /** Old stuff
         downloadJar.configure(task -> {
             try {
                 task.setGroup("acp-decomp");
@@ -90,19 +71,19 @@ public class ACPPlugin implements Plugin<Project> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
-            task.args("-searge", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
+            task.args("-searge", Paths.DIR_MAPPINGS + "retroguard.cfg");
         });
         injectExceptions.configure(task -> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
-            task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.ACP_DIR_MAPPING + "exceptions.exc", "--log", Paths.ACP_DIR_LOGS + "exceptions.log");
+            task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.exc", "--log", Paths.DIR_LOGS + "exceptions.log");
         });
         addParams.configure(task -> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
-            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params.mapping");
+            task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.DIR_MAPPINGS + "params.mapping");
 
             // Enigma needs Java 17 to run. This is here so we don't have to set the JDK version in the end-user gradle.
             JavaToolchainService javaToolchainService = task.getProject().getExtensions().getByType(JavaToolchainService.class);
@@ -126,7 +107,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
             task.args("--patch", Paths.ACP_DIR_SRC, Paths.ACP_PATCH_FILES, "--output", Paths.ACP_DIR_SRC,
-                    "--reject", Paths.ACP_DIR_LOGS + "patch_rejects\\", "--verbose");
+                    "--reject", Paths.DIR_LOGS + "patch_rejects\\", "--verbose");
         });
         copyJarAssets.configure(task -> {
             task.setGroup("acp-decomp");
@@ -138,19 +119,18 @@ public class ACPPlugin implements Plugin<Project> {
             task.setGroup("acp-decomp");
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
             task.setClasspath(project.files(Paths.ACP_ASSET_EXTRACTOR));
-            task.args(minecraftVersion, project.file(Paths.ACP_DIR_RUN));
+            task.args(minecraftVersion, project.file(Paths.DIR_RUN));
         });
         downloadNatives.configure(task -> {
             task.setGroup("acp-decomp");
             task.getJson().set(new File(Paths.NATIVES_JSON));
-            task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
+            task.getNativesDir().set(new File(Paths.DIR_NATIVES));
         });
         extractNatives.configure(task -> {
             task.setGroup("acp-decomp");
-            task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
+            task.getNativesDir().set(new File(Paths.DIR_NATIVES));
         });
 
-        /** Internal **/
         execute.configure(task -> {
             List<String> taskList = new ArrayList<>();
 
@@ -174,8 +154,9 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(project.getTasks().getByName("jar"));
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
-            task.args("-notch", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
+            task.args("-notch", Paths.DIR_MAPPINGS + "retroguard.cfg");
             task.doLast(c -> c.getProject().delete("build\\libs\\interm-client-a1.2.6.jar"));
         });
+        */
     }
 }
