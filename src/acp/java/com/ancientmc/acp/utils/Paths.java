@@ -17,7 +17,11 @@ public class Paths {
     public static final String DIR_SRC = "src\\main\\java\\";
     public static final String DIR_RESOURCES = "src\\main\\resources\\";
     public static final String BASE_JAR = DIR_TEMP + MC_VERSION + ".jar";
+    public static final String SLIM_JAR = DIR_TEMP + MC_VERSION + "-slim.jar";
+    public static final String EXTRA_JAR = DIR_TEMP + MC_VERSION + "-extra.jar";
     public static final String SRG_JAR = DIR_TEMP + MC_VERSION + "-srg.jar";
-    public static final String EXC_JAR = DIR_TEMP + MC_VERSION + "-exc.jar";
+    public static final String INJECT_JAR = DIR_TEMP + MC_VERSION + "-inj.jar";
     public static final String FINAL_JAR = DIR_TEMP + MC_VERSION + "-final.jar";
+
+    public static final String SRG = DIR_MAPPINGS + MC_VERSION + ".tsrg";
 }

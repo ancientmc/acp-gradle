@@ -16,7 +16,7 @@ public class DownloadJar {
 
         String version = jsonObj.get("id").getAsString();
         URL url = new URL(sideObj.get("url").getAsString());
-        File file = new File(dest, version + "-" + side + ".jar");
+        File file = new File(dest, version + (side.equals("client") ? "" : "-server") + ".jar");
         if(!file.exists()) {
             logger.lifecycle("Downloading " + side + " JAR");
             FileUtils.copyURLToFile(url, file);
