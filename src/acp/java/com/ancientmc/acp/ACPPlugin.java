@@ -5,6 +5,7 @@ import com.ancientmc.acp.utils.Paths;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.GradleBuild;
@@ -55,6 +56,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.getMainClass().set("net.minecraftforge.jarsplitter.ConsoleTool");
             task.setClasspath(project.files(jarsplitter));
             task.args("--input", Paths.BASE_JAR, "--slim", Paths.SLIM_JAR, "--extra", Paths.EXTRA_JAR, "--srg", Paths.SRG);
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         // Mod loader class injection/binpatching will be sandwiched in here. Not worrying about it right now.
@@ -62,30 +64,37 @@ public class ACPPlugin implements Plugin<Project> {
         mcinject.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Injects the slim JAR with local variables, exceptions, and other stuff to eliminate errors.");
+            task.dependsOn(stripJar);
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
-            task.args("--in", Paths.SLIM_JAR, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt", "--log", Paths.DIR_LOGS + "mcinjector.log");
+            task.args("--in", Paths.SLIM_JAR, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt");
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         deobfJar.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Deobfuscates the JAR with human-readable names.");
+            task.dependsOn(mcinject);
             task.getMainClass().set("net.minecraftforge.fart.Main");
             task.setClasspath(project.files(forgeart));
             task.args("--input", Paths.INJECT_JAR, "--output", Paths.SRG_JAR, "--map", Paths.SRG);
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         decompile.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Decompiles the JAR.");
+            task.dependsOn(deobfJar);
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(fernflower));
             task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         unzip.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Unzips the java source files into the src directory.");
+            task.dependsOn(decompile);
             task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
             task.into(project.file(Paths.DIR_SRC));
         });
@@ -93,15 +102,18 @@ public class ACPPlugin implements Plugin<Project> {
         patch.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Patches the source files to make the game able to compile.");
+            task.dependsOn(unzip);
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
             task.args("--patch", Paths.DIR_SRC, Paths.DIR_PATCHES, "--output", Paths.DIR_SRC,
                     "--reject", Paths.DIR_TEMP + "patch_rejects\\");
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         copyJarAssets.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Copies the JAR assets into the src/main/resources folder.");
+            task.dependsOn(patch);
             task.from(project.zipTree(project.file(Paths.EXTRA_JAR)));
             task.into(project.file(Paths.DIR_RESOURCES));
             task.exclude("com/**", "paulscode/**");
@@ -109,23 +121,9 @@ public class ACPPlugin implements Plugin<Project> {
 
         copySrc.configure(task -> {
            task.setGroup("decomp");
+           task.dependsOn(copyJarAssets);
            task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
            task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\backupSrc\\"));
-        });
-
-        execute.configure(task -> {
-            List<String> taskList = new ArrayList<>();
-
-            taskList.add(project.getTasks().getByName("stripJar").getName());
-            taskList.add(project.getTasks().getByName("mcinject").getName());
-            taskList.add(project.getTasks().getByName("deobfJar").getName());
-            taskList.add(project.getTasks().getByName("decompile").getName());
-            taskList.add(project.getTasks().getByName("unzip").getName());
-            taskList.add(project.getTasks().getByName("patch").getName());
-            taskList.add(project.getTasks().getByName("copyJarAssets").getName());
-            taskList.add(project.getTasks().getByName("copySrc").getName());
-
-            task.setTasks(taskList);
         });
     }
 }
