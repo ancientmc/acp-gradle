@@ -12,6 +12,7 @@ public class Paths {
     public static final String DIR_LOGS = DIR_CFG + "logs\\";
     public static final String DIR_TEMP = DIR_CFG + "temp\\";
     public static final String DIR_PATCHES = DIR_CFG + "patches\\";
+    public static final String DIR_MODLOADER_PATCHES = DIR_CFG + "modloader\\";
     public static final String DIR_RUN = "run\\";
     public static final String DIR_NATIVES = DIR_RUN + "bin\\natives\\";
     public static final String DIR_SRC = "src\\main\\java\\";
@@ -19,6 +20,7 @@ public class Paths {
     public static final String BASE_JAR = DIR_TEMP + MC_VERSION + ".jar";
     public static final String SLIM_JAR = DIR_TEMP + MC_VERSION + "-slim.jar";
     public static final String EXTRA_JAR = DIR_TEMP + MC_VERSION + "-extra.jar";
+    public static final String MODLOADER_JAR = DIR_TEMP + MC_VERSION + "-mod.jar";
     public static final String SRG_JAR = DIR_TEMP + MC_VERSION + "-srg.jar";
     public static final String INJECT_JAR = DIR_TEMP + MC_VERSION + "-inj.jar";
     public static final String FINAL_JAR = DIR_TEMP + MC_VERSION + "-final.jar";

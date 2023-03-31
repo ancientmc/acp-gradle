@@ -1,7 +1,9 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.ACPInitialization;
+import com.ancientmc.acp.tasks.InjectModLoader;
 import com.ancientmc.acp.utils.Paths;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -12,6 +14,7 @@ import org.gradle.api.tasks.GradleBuild;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskProvider;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +29,14 @@ public class ACPPlugin implements Plugin<Project> {
         project.getPluginManager().apply(JavaPlugin.class);
 
         Configuration jarsplitter = project.getConfigurations().getByName("jarsplitter");
+        Configuration binpatcher = project.getConfigurations().getByName("binpatcher");
         Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
         Configuration forgeart = project.getConfigurations().getByName("forgeart");
         Configuration fernflower = project.getConfigurations().getByName("fernflower");
         Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
 
         TaskProvider<JavaExec> stripJar = project.getTasks().register("stripJar", JavaExec.class);
+        TaskProvider<InjectModLoader> injectModloader = project.getTasks().register("injectModloader", InjectModLoader.class);
         TaskProvider<JavaExec> mcinject = project.getTasks().register("mcinject", JavaExec.class);
         TaskProvider<JavaExec> deobfJar = project.getTasks().register("deobfJar", JavaExec.class);
         TaskProvider<JavaExec> decompile = project.getTasks().register("decompile", JavaExec.class);
@@ -61,13 +66,27 @@ public class ACPPlugin implements Plugin<Project> {
 
         // Mod loader class injection/binpatching will be sandwiched in here. Not worrying about it right now.
 
+        File loaderPatches = project.file(Paths.DIR_MODLOADER_PATCHES);
+
+        injectModloader.configure(task -> {
+            task.setGroup("decomp");
+            task.dependsOn(stripJar);
+            task.getInputJar().set(project.file(Paths.SLIM_JAR));
+            task.getPatchDir().set(loaderPatches);
+            task.getOutputJar().set(project.file(Paths.MODLOADER_JAR));
+        });
+
+        boolean vanilla = isVanilla(loaderPatches);
+        String toInject = (vanilla ? Paths.SLIM_JAR : Paths.MODLOADER_JAR);
+        String dependent = (vanilla ? "stripJar" : "injectModloader");
+
         mcinject.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Injects the slim JAR with local variables, exceptions, and other stuff to eliminate errors.");
-            task.dependsOn(stripJar);
+            task.dependsOn(project.getTasks().getByName(dependent));
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
-            task.args("--in", Paths.SLIM_JAR, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt");
+            task.args("--in", toInject, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
@@ -123,7 +142,20 @@ public class ACPPlugin implements Plugin<Project> {
            task.setGroup("decomp");
            task.dependsOn(copyJarAssets);
            task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
-           task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\backupSrc\\"));
+           task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\modding\\backupSrc\\"));
         });
+    }
+
+    public boolean isVanilla(File file) {
+        try {
+            return file.exists() && FileUtils.isEmptyDirectory(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public String getLoaderInject(boolean vanilla) {
+        return (vanilla ? "" : "injectModloader");
     }
 }
