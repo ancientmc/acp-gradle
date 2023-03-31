@@ -64,7 +64,8 @@ public class ACPPlugin implements Plugin<Project> {
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        // Mod loader class injection/binpatching will be sandwiched in here. Not worrying about it right now.
+        // The modloader will be injected via a binpatch archive, in the LZMA format. The binpatch for Risugami's Modloader will
+        // be uploaded to maven and downloadable through a task.
 
         File loaderPatches = project.file(Paths.DIR_MODLOADER_PATCHES);
 
