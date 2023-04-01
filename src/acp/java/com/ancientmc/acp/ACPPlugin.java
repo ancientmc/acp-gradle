@@ -67,7 +67,7 @@ public class ACPPlugin implements Plugin<Project> {
         // The modloader will be injected via a binpatch archive, in the LZMA format. The binpatch for Risugami's Modloader will
         // be uploaded to maven and downloadable through a task.
 
-        File loaderPatches = project.file(Paths.DIR_MODLOADER_PATCHES);
+        File loaderPatches = new File(Paths.DIR_MODLOADER_PATCHES);
 
         injectModloader.configure(task -> {
             task.setGroup("decomp");
@@ -77,7 +77,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.getOutputJar().set(project.file(Paths.MODLOADER_JAR));
         });
 
-        boolean vanilla = isVanilla(loaderPatches);
+        boolean vanilla = !loaderPatches.exists();
         String toInject = (vanilla ? Paths.SLIM_JAR : Paths.MODLOADER_JAR);
         String dependent = (vanilla ? "stripJar" : "injectModloader");
 
@@ -107,7 +107,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(deobfJar);
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(fernflower));
-            task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
+            task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=0", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
@@ -145,18 +145,5 @@ public class ACPPlugin implements Plugin<Project> {
            task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
            task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\modding\\backupSrc\\"));
         });
-    }
-
-    public boolean isVanilla(File file) {
-        try {
-            return file.exists() && FileUtils.isEmptyDirectory(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public String getLoaderInject(boolean vanilla) {
-        return (vanilla ? "" : "injectModloader");
     }
 }
