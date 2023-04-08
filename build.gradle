@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.ancientmc.acp'
-version '0.2.0-beta-SNAPSHOT'
+version '0.2.0-beta-dev'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
