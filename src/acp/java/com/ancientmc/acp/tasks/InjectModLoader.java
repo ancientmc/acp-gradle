@@ -39,10 +39,6 @@ public abstract class InjectModLoader extends DefaultTask {
         });
     }
 
-    public void java() {
-
-    }
-
     @InputFile
     public abstract RegularFileProperty getInputJar();
 
