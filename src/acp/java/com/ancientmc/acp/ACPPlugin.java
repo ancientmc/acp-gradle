@@ -75,6 +75,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.getInputJar().set(project.file(Paths.SLIM_JAR));
             task.getPatchDir().set(loaderPatches);
             task.getOutputJar().set(project.file(Paths.MODLOADER_JAR));
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         boolean vanilla = !loaderPatches.exists();

@@ -34,7 +34,6 @@ public abstract class InjectModLoader extends DefaultTask {
                     action.getMainClass().set("net.minecraftforge.binarypatcher.ConsoleTool");
                     action.setClasspath(project.files(binpatcher));
                     action.args("--clean", input.getAbsolutePath(), "--apply", file.getAbsolutePath(), "--output", output.getAbsolutePath(), "--unpatched");
-                    project.getLogging().captureStandardOutput(LogLevel.DEBUG);
                 });
             }
         });
