@@ -54,9 +54,9 @@ jar {
 publishing {
     publications {
         pluginMaven(MavenPublication) {
-            groupId = 'com.ancientmc.acp'
+            groupId = project.group
             artifactId = 'acp-gradle'
-            version = '0.2.0-beta'
+            version = project.version
             pom {
                 name = 'acp-gradle'
                 description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
