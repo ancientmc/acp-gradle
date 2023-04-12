@@ -1,29 +1,49 @@
 package com.ancientmc.acp.utils;
 
 public class Paths {
-    private static final String OS_NAME = OSName.getOSName();
-
-    public static final String MC_VERSION = "a1.2.6";
-    public static final String MC_JAR = "https://piston-data.mojang.com/v1/objects/a68c817afd6c05c253ba5462287c2c19bbb57935/client.jar";
-    public static final String MC_JSON = "https://piston-meta.mojang.com/v1/packages/b539c8b7baabb3ab8886fa634310de51aeea60fc/a1.2.6.json";
-
-    public static final String DIR_CFG = "cfg\\";
-    public static final String DIR_MAPPINGS = DIR_CFG + "mappings\\";
-    public static final String DIR_LOGS = DIR_CFG + "logs\\";
-    public static final String DIR_TEMP = DIR_CFG + "temp\\";
-    public static final String DIR_PATCHES = DIR_CFG + "patches\\";
-    public static final String DIR_MODLOADER_PATCHES = DIR_CFG + "modloader\\";
-    public static final String DIR_RUN = "run\\";
-    public static final String DIR_NATIVES = DIR_RUN + "bin\\natives\\";
-    public static final String DIR_SRC = "src\\main\\java\\";
-    public static final String DIR_RESOURCES = "src\\main\\resources\\";
-    public static final String BASE_JAR = DIR_TEMP + MC_VERSION + ".jar";
-    public static final String SLIM_JAR = DIR_TEMP + MC_VERSION + "-slim.jar";
-    public static final String EXTRA_JAR = DIR_TEMP + MC_VERSION + "-extra.jar";
-    public static final String MODLOADER_JAR = DIR_TEMP + MC_VERSION + "-mod.jar";
-    public static final String SRG_JAR = DIR_TEMP + MC_VERSION + "-srg.jar";
-    public static final String INJECT_JAR = DIR_TEMP + MC_VERSION + "-inj.jar";
-    public static final String FINAL_JAR = DIR_TEMP + MC_VERSION + "-final.jar";
-
-    public static final String SRG = DIR_MAPPINGS + MC_VERSION + ".tsrg";
+    public static String DIR_CFG;
+    public static String DIR_MAPPINGS;
+    public static String DIR_LOGS;
+    public static String DIR_TEMP;
+    public static String DIR_PATCHES;
+    public static String DIR_MODLOADER_PATCHES;
+    public static String DIR_RUN;
+    public static String DIR_NATIVES;
+    public static String DIR_SRC;
+    public static String DIR_BACKUP_SRC;
+    public static String DIR_RESOURCES;
+    public static String BASE_JAR;
+    public static String SLIM_JAR;
+    public static String EXTRA_JAR;
+    public static String MODLOADER_JAR;
+    public static String SRG_JAR;
+    public static String INJECT_JAR;
+    public static String FINAL_JAR;
+    public static String INTERM_JAR;
+    public static String REOBF_JAR;
+    public static String SRG;
+    
+    public static void init(String version) {
+        DIR_CFG = "cfg\\";
+        DIR_MAPPINGS = DIR_CFG + "mappings\\";
+        DIR_LOGS = DIR_CFG + "logs\\";
+        DIR_TEMP = DIR_CFG + "temp\\";
+        DIR_PATCHES = DIR_CFG + "patches\\";
+        DIR_MODLOADER_PATCHES = DIR_CFG + "modloader\\";
+        DIR_RUN = "run\\";
+        DIR_NATIVES = DIR_RUN + "bin\\natives\\";
+        DIR_SRC = "src\\main\\java\\";
+        DIR_BACKUP_SRC = "build\\modding\\backupSrc";
+        DIR_RESOURCES = "src\\main\\resources\\";
+        BASE_JAR = DIR_TEMP + version + ".jar";
+        SLIM_JAR = DIR_TEMP + version + "-slim.jar";
+        EXTRA_JAR = DIR_TEMP + version + "-extra.jar";
+        MODLOADER_JAR = DIR_TEMP + version + "-mod.jar";
+        SRG_JAR = DIR_TEMP + version + "-srg.jar";
+        INJECT_JAR = DIR_TEMP + version + "-inj.jar";
+        FINAL_JAR = DIR_TEMP + version + "-final.jar";
+        INTERM_JAR = "build\\libs\\interm-" + version + ".jar";
+        REOBF_JAR = "build\\libs\\minecraft-" + version + ".jar";
+        SRG = DIR_MAPPINGS + version + ".tsrg";
+    }
 }

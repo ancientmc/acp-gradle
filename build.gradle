@@ -16,17 +16,21 @@ repositories {
 
 sourceSets {
     acp
+    modtools
 }
 
 configurations {
     acpImplementation
-    implementation.extendsFrom acpImplementation
+    modtoolsImplementation.extendsFrom acpImplementation
+    implementation.extendsFrom acpImplementation, modtoolsImplementation
 }
 
 dependencies {
     acpImplementation gradleApi()
     acpImplementation 'commons-io:commons-io:2.11.0'
     acpImplementation 'com.google.code.gson:gson:2.10.1'
+
+    modtoolsImplementation sourceSets.acp.output
 }
 
 gradlePlugin {
@@ -37,16 +41,22 @@ gradlePlugin {
             description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
             implementationClass = 'com.ancientmc.acp.ACPPlugin'
         }
+        modtools {
+            id = 'com.ancientmc.modtools'
+            displayName = 'modtools'
+            description = 'Gradle plugin containing useful modding tools for users working with ACP.'
+            implementationClass = 'com.ancientmc.modtools.ModToolsPlugin'
+        }
     }
 }
 
 jar {
     from sourceSets.acp.output
+    from sourceSets.modtools.output
     manifest {
         attributes(
                 'Implementation-Title': 'acp-gradle',
                 'Implementation-Version': version,
-                'Main-Class': 'com.ancientmc.acp.ACPPlugin'
         )
     }
 }

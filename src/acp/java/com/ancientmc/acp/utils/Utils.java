@@ -1,5 +1,6 @@
 package com.ancientmc.acp.utils;
 
+import com.ancientmc.acp.ACPExtension;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

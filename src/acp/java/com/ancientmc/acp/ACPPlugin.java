@@ -3,21 +3,17 @@ package com.ancientmc.acp;
 import com.ancientmc.acp.init.ACPInitialization;
 import com.ancientmc.acp.tasks.InjectModLoader;
 import com.ancientmc.acp.utils.Paths;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Copy;
-import org.gradle.api.tasks.GradleBuild;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.TaskProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ACPPlugin implements Plugin<Project> {
 
@@ -26,10 +22,12 @@ public class ACPPlugin implements Plugin<Project> {
         String minecraftVersion = project.getExtensions().getExtraProperties().get("MC_VERSION").toString();
         ACPExtension extension = project.getExtensions().create("acp", ACPExtension.class, project);
 
+        // Set the Minecraft version for the various directory/file paths to utilize.
+        Paths.init(minecraftVersion);
+
         project.getPluginManager().apply(JavaPlugin.class);
 
         Configuration jarsplitter = project.getConfigurations().getByName("jarsplitter");
-        Configuration binpatcher = project.getConfigurations().getByName("binpatcher");
         Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
         Configuration forgeart = project.getConfigurations().getByName("forgeart");
         Configuration fernflower = project.getConfigurations().getByName("fernflower");
@@ -45,7 +43,7 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
 
-        TaskProvider<GradleBuild> execute = project.getTasks().register("execute", GradleBuild.class);
+        TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
 
         project.afterEvaluate(proj -> {
             try {
@@ -145,6 +143,14 @@ public class ACPPlugin implements Plugin<Project> {
            task.dependsOn(copyJarAssets);
            task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
            task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\modding\\backupSrc\\"));
+        });
+
+        reobfJar.configure(task -> {
+            task.dependsOn(":jar");
+            task.getMainClass().set("net.minecraftforge.fart.Main");
+            task.setClasspath(project.files(forgeart));
+            task.args("--input", Paths.INTERM_JAR, "--output", Paths.REOBF_JAR, "--map", Paths.SRG, "--reverse");
+            task.getLogging().captureStandardError(LogLevel.DEBUG);
         });
     }
 }
