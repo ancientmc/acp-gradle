@@ -12,6 +12,8 @@ public class Paths {
     public static String DIR_SRC;
     public static String DIR_BACKUP_SRC;
     public static String DIR_RESOURCES;
+    public static String DIR_ORIGINAL_CLASSES;
+    public static String DIR_MODDED_CLASSES;
     public static String BASE_JAR;
     public static String SLIM_JAR;
     public static String EXTRA_JAR;
@@ -35,6 +37,8 @@ public class Paths {
         DIR_SRC = "src\\main\\java\\";
         DIR_BACKUP_SRC = "build\\modding\\backupSrc";
         DIR_RESOURCES = "src\\main\\resources\\";
+        DIR_ORIGINAL_CLASSES = "build\\modding\\classes\\original\\";
+        DIR_MODDED_CLASSES = "build\\modding\\classes\\modded\\";
         BASE_JAR = DIR_TEMP + version + ".jar";
         SLIM_JAR = DIR_TEMP + version + "-slim.jar";
         EXTRA_JAR = DIR_TEMP + version + "-extra.jar";

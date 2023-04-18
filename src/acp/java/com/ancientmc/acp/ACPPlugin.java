@@ -1,16 +1,18 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.ACPInitialization;
+import com.ancientmc.acp.tasks.GenerateOriginalHashes;
 import com.ancientmc.acp.tasks.InjectModLoader;
 import com.ancientmc.acp.utils.Paths;
-import org.gradle.api.Plugin;
-import org.gradle.api.Project;
+import org.gradle.api.*;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.JavaExec;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +44,8 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<JavaExec> patch = project.getTasks().register("patch", JavaExec.class);
         TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
+        TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
+        TaskProvider<GenerateOriginalHashes> generateHashes = project.getTasks().register("generateHashes", GenerateOriginalHashes.class);
 
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
 
@@ -96,7 +100,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(mcinject);
             task.getMainClass().set("net.minecraftforge.fart.Main");
             task.setClasspath(project.files(forgeart));
-            task.args("--input", Paths.INJECT_JAR, "--output", Paths.SRG_JAR, "--map", Paths.SRG);
+            task.args("--input", Paths.INJECT_JAR, "--output", Paths.SRG_JAR, "--map", Paths.SRG, "--src-fix", "--strip-sigs");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
@@ -141,16 +145,33 @@ public class ACPPlugin implements Plugin<Project> {
         copySrc.configure(task -> {
            task.setGroup("decomp");
            task.dependsOn(copyJarAssets);
-           task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
+           task.from(project.file(Paths.DIR_SRC)).exclude("acp\\");
            task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\modding\\backupSrc\\"));
+        });
+
+        testCompile.configure(task -> {
+            task.setGroup("decomp");
+            task.dependsOn(copySrc);
+            task.setSource(project.file(Paths.DIR_SRC));
+            task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
+            task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
+            task.exclude("acp\\");
+        });
+
+        generateHashes.configure(task -> {
+            task.setGroup("decomp");
+            task.dependsOn(testCompile);
+            task.getClassesDirectory().set(project.file(Paths.DIR_ORIGINAL_CLASSES));
+            task.getOutput().set(project.file("build\\modding\\hashes\\vanilla.md5"));
         });
 
         reobfJar.configure(task -> {
             task.dependsOn(":jar");
             task.getMainClass().set("net.minecraftforge.fart.Main");
             task.setClasspath(project.files(forgeart));
-            task.args("--input", Paths.INTERM_JAR, "--output", Paths.REOBF_JAR, "--map", Paths.SRG, "--reverse");
+            task.args("--input", Paths.INTERM_JAR, "--output", Paths.REOBF_JAR, "--map", Paths.SRG, "--ff-line-numbers", Paths.FINAL_JAR, "--strip-sigs", "--reverse");
             task.getLogging().captureStandardError(LogLevel.DEBUG);
         });
+
     }
 }

@@ -64,6 +64,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setClasspath(project.files(diffpatch));
             task.args("--diff", Paths.DIR_BACKUP_SRC, Paths.DIR_SRC, "--output", diffPatches);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
+            task.setIgnoreExitValue(true);
         });
 
         genBinPatches.configure(task -> {
