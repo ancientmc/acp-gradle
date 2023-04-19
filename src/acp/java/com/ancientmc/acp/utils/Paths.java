@@ -10,10 +10,10 @@ public class Paths {
     public static String DIR_RUN;
     public static String DIR_NATIVES;
     public static String DIR_SRC;
-    public static String DIR_BACKUP_SRC;
+    public static String DIR_ORIGINAL_SRC;
     public static String DIR_RESOURCES;
-    public static String DIR_ORIGINAL_CLASSES;
-    public static String DIR_MODDED_CLASSES;
+    public static String DIR_MAPPED_CLASSES;
+    public static String DIR_REOBF_CLASSES;
     public static String BASE_JAR;
     public static String SLIM_JAR;
     public static String EXTRA_JAR;
@@ -35,10 +35,10 @@ public class Paths {
         DIR_RUN = "run\\";
         DIR_NATIVES = DIR_RUN + "bin\\natives\\";
         DIR_SRC = "src\\main\\java\\";
-        DIR_BACKUP_SRC = "build\\modding\\backupSrc";
+        DIR_ORIGINAL_SRC = "build\\modding\\originalSrc";
         DIR_RESOURCES = "src\\main\\resources\\";
-        DIR_ORIGINAL_CLASSES = "build\\modding\\classes\\original\\";
-        DIR_MODDED_CLASSES = "build\\modding\\classes\\modded\\";
+        DIR_MAPPED_CLASSES = "build\\modding\\classes\\mapped\\";
+        DIR_REOBF_CLASSES = "build\\modding\\classes\\obf\\";
         BASE_JAR = DIR_TEMP + version + ".jar";
         SLIM_JAR = DIR_TEMP + version + "-slim.jar";
         EXTRA_JAR = DIR_TEMP + version + "-extra.jar";

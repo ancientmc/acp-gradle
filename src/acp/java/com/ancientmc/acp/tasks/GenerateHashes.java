@@ -1,20 +1,35 @@
-package com.ancientmc.acp.utils;
-
+package com.ancientmc.acp.tasks;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.tasks.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-import static java.nio.file.Paths.get;
+public abstract class GenerateHashes extends DefaultTask {
+    @TaskAction
+    public void exec() {
+        File directory = getClassesDirectory().get().getAsFile();
+        File output = getOutput().get().getAsFile();
+        try {
+            run(directory, output);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
-public class GenerateHashesFunction {
     public static void run(File directory, File out) throws IOException {
         Map<String, String> map = new HashMap<>();
         Collection<File> classes = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
@@ -49,4 +64,11 @@ public class GenerateHashesFunction {
         }
         return null;
     }
+
+    @InputDirectory
+    public abstract RegularFileProperty getClassesDirectory();
+
+    @OutputFile
+    public abstract RegularFileProperty getOutput();
+
 }

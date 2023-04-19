@@ -1,7 +1,7 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.ACPInitialization;
-import com.ancientmc.acp.tasks.GenerateOriginalHashes;
+import com.ancientmc.acp.tasks.GenerateHashes;
 import com.ancientmc.acp.tasks.InjectModLoader;
 import com.ancientmc.acp.utils.Paths;
 import org.gradle.api.*;
@@ -45,7 +45,7 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
-        TaskProvider<GenerateOriginalHashes> generateHashes = project.getTasks().register("generateHashes", GenerateOriginalHashes.class);
+        TaskProvider<GenerateHashes> generateOriginalHashes = project.getTasks().register("generateOriginalHashes", GenerateHashes.class);
 
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
 
@@ -146,7 +146,7 @@ public class ACPPlugin implements Plugin<Project> {
            task.setGroup("decomp");
            task.dependsOn(copyJarAssets);
            task.from(project.file(Paths.DIR_SRC)).exclude("acp\\");
-           task.into(project.file(project.getBuildDir().getAbsolutePath() + "\\modding\\backupSrc\\"));
+           task.into(project.file(Paths.DIR_ORIGINAL_SRC));
         });
 
         testCompile.configure(task -> {
@@ -154,14 +154,14 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(copySrc);
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
-            task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
+            task.getDestinationDirectory().set(new File(Paths.DIR_MAPPED_CLASSES));
             task.exclude("acp\\");
         });
 
-        generateHashes.configure(task -> {
+        generateOriginalHashes.configure(task -> {
             task.setGroup("decomp");
             task.dependsOn(testCompile);
-            task.getClassesDirectory().set(project.file(Paths.DIR_ORIGINAL_CLASSES));
+            task.getClassesDirectory().set(project.file(Paths.DIR_MAPPED_CLASSES));
             task.getOutput().set(project.file("build\\modding\\hashes\\vanilla.md5"));
         });
 
