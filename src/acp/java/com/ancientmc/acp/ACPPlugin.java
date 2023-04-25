@@ -16,6 +16,9 @@ import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ACPPlugin implements Plugin<Project> {
 
@@ -46,8 +49,6 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
         TaskProvider<GenerateHashes> generateOriginalHashes = project.getTasks().register("generateOriginalHashes", GenerateHashes.class);
-
-        TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
 
         project.afterEvaluate(proj -> {
             try {
@@ -90,7 +91,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(project.getTasks().getByName(dependent));
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
-            task.args("--in", toInject, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt");
+            task.args("--in", toInject, "--out", Paths.INJECT_JAR, "--exc", Paths.DIR_MAPPINGS + "exceptions.txt", "--blacklist", Paths.DIR_MAPPINGS + "blacklist.txt");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
@@ -154,24 +155,16 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(copySrc);
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
-            task.getDestinationDirectory().set(new File(Paths.DIR_MAPPED_CLASSES));
+            task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
             task.exclude("acp\\");
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
         generateOriginalHashes.configure(task -> {
             task.setGroup("decomp");
             task.dependsOn(testCompile);
-            task.getClassesDirectory().set(project.file(Paths.DIR_MAPPED_CLASSES));
+            task.getClassesDirectory().set(project.file(Paths.DIR_ORIGINAL_CLASSES));
             task.getOutput().set(project.file("build\\modding\\hashes\\vanilla.md5"));
         });
-
-        reobfJar.configure(task -> {
-            task.dependsOn(":jar");
-            task.getMainClass().set("net.minecraftforge.fart.Main");
-            task.setClasspath(project.files(forgeart));
-            task.args("--input", Paths.INTERM_JAR, "--output", Paths.REOBF_JAR, "--map", Paths.SRG, "--ff-line-numbers", Paths.FINAL_JAR, "--strip-sigs", "--reverse");
-            task.getLogging().captureStandardError(LogLevel.DEBUG);
-        });
-
     }
 }

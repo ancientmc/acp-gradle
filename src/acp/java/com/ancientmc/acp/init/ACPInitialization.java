@@ -18,6 +18,7 @@ import java.util.List;
 public class ACPInitialization {
     private static final String maven = Utils.getAncientMCMaven();
 
+    // TODO: Make this nicer.
     public static void init(Project proj, ACPExtension extension, String version) throws IOException {
         Logger logger = proj.getLogger();
 

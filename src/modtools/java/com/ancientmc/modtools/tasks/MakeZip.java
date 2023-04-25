@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public abstract class MakeZip extends DefaultTask {
     @TaskAction
     public void exec() {
-        // TODO: simplify inputs somehow? Six is a lot.
+        // TODO: simplify inputs somehow? Five is a lot.
         File mappedDirectory = getClassDirectory().get().getAsFile();
         File originalHash = getOriginalHash().get().getAsFile();
         File moddedHash = getModdedHash().get().getAsFile();
@@ -87,7 +87,7 @@ public abstract class MakeZip extends DefaultTask {
      */
     public String getObfName(String name, Map<String, String> map) {
         for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (name.contains(entry.getValue())) {
+            if (name.equals(entry.getValue())) {
                 return entry.getKey();
             }
         }
