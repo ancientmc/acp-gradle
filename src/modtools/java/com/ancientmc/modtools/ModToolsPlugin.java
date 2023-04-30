@@ -76,13 +76,6 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setIgnoreExitValue(true);
         });
 
-        generateModdedHashes.configure(task -> {
-            task.setGroup("modtools");
-            task.dependsOn(":compileJava");
-            task.getClassesDirectory().set(project.file(project.getBuildDir().getPath() + "\\classes\\java\\main\\"));
-            task.getOutput().set(new File("build\\modding\\hashes\\modded.md5"));
-        });
-
         reobfJar.configure(task -> {
             task.setGroup("modtools");
             task.dependsOn(":jar");
@@ -94,7 +87,7 @@ public class ModToolsPlugin implements Plugin<Project> {
 
         extractReobfClasses.configure(task -> {
             task.setGroup("modtools");
-            task.dependsOn(":reobfJar");
+            task.dependsOn(reobfJar);
             task.from(project.zipTree(project.file(Paths.REOBF_JAR))).include("*.class", "net\\");
             task.into(Paths.DIR_REOBF_CLASSES);
         });
@@ -106,10 +99,16 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.getClassDirectoryOut().set(project.file(Paths.DIR_REOBF_CLASSES));
         });
 
+        generateModdedHashes.configure(task -> {
+            task.setGroup("modtools");
+            task.dependsOn(stripPackages);
+            task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
+            task.getOutput().set(new File("build\\modding\\hashes\\modded.md5"));
+        });
+
         makeZip.configure(task -> {
             task.setGroup("modtools");
             task.dependsOn(generateModdedHashes, stripPackages);
-            task.getClassDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
             task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
             task.getOriginalHash().set(project.file("build\\modding\\hashes\\vanilla.md5"));
             task.getModdedHash().set(project.file("build\\modding\\hashes\\modded.md5"));

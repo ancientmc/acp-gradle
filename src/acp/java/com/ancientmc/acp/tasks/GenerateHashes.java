@@ -36,8 +36,9 @@ public abstract class GenerateHashes extends DefaultTask {
         classes.forEach(cls -> {
             String hash = getHash(cls);
             String name = cls.getAbsolutePath();
-            name = name.replace(".class", "");
-            name = name.replace(directory.getAbsolutePath() + File.separator, "");
+            name = name.replace(".class", "")
+                    .replace(directory.getAbsolutePath() + File.separator, "")
+                    .replace(File.separator, "/");
             map.put(name, hash);
         });
 

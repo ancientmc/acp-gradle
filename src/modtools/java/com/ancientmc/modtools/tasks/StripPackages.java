@@ -58,8 +58,7 @@ public abstract class StripPackages extends DefaultTask {
                 FileOutputStream out = new FileOutputStream(new File(outputDir, cls.getName()));
                 out.write(writer.toByteArray());
                 out.flush();
-
-                cls.delete();
+                out.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -17,7 +17,6 @@ public abstract class MakeZip extends DefaultTask {
     @TaskAction
     public void exec() {
         // TODO: simplify inputs somehow? Five is a lot.
-        File mappedDirectory = getClassDirectory().get().getAsFile();
         File originalHash = getOriginalHash().get().getAsFile();
         File moddedHash = getModdedHash().get().getAsFile();
         File srg = getSrg().get().getAsFile();
@@ -28,19 +27,24 @@ public abstract class MakeZip extends DefaultTask {
             // Retrieve hash maps.
             Map<String, String> originalMap = getHashMap(originalHash);
             Map<String, String> moddedMap = getHashMap(moddedHash);
+            Map<String, String> classMap = Utils.getClassMap(srg);
 
             // Remove ACP start class from map.
-            moddedMap.remove("acp\\client\\Start");
+            moddedMap.remove("acp/client/Start");
 
             List<File> moddedClasses = new ArrayList<>();
             moddedMap.forEach((name, hash) -> {
                 if (!originalMap.containsValue(hash)) {
-                    File moddedClass = new File(mappedDirectory, name + ".class");
+                    // Get the class file names without packages.
+                    String strippedName = name.substring(name.lastIndexOf('\\') + 1);
+
+                    String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
+                    File moddedClass = new File(obfDirectory, className + ".class");
                     moddedClasses.add(moddedClass);
                 }
             });
 
-            make(zip, moddedClasses, obfDirectory, mappedDirectory, srg);
+            Utils.compress(moddedClasses, zip);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -63,26 +67,6 @@ public abstract class MakeZip extends DefaultTask {
     }
 
     /**
-     * Creates the Zip file.
-     */
-    public void make(File zip, List<File> classes, File obfDirectory, File mappedDirectory, File srg) throws IOException {
-        List<File> files = new ArrayList<>();
-        Map<String, String> classMap = Utils.getClassMap(srg);
-        classes.forEach(cls -> {
-            // Shrink the class name to its bare necessities, i.e. without full buildpath and .class suffix, and replace file separator with '/' character.
-            String shrunkName = mappedDirectory.toPath().relativize(cls.toPath()).toString().replace(".class", "").replace(File.separator, "/");
-
-            // Try to retrieve obfuscated class name only if the shrunk name is present in the class map. Accounts for mod classes which don't have values in the class map.
-            String className = classMap.containsValue(shrunkName) ? getObfName(shrunkName, classMap) : shrunkName;
-
-            // Retrieve class file currently being parsed from compiled re-obfuscated class directory.
-            String clazz = obfDirectory.getAbsolutePath() + "/" + className + ".class";
-            files.add(new File(clazz));
-        });
-        Utils.compress(files, zip);
-    }
-
-    /**
      * Get obfuscated class name.
      */
     public String getObfName(String name, Map<String, String> map) {
@@ -93,9 +77,6 @@ public abstract class MakeZip extends DefaultTask {
         }
         return null;
     }
-
-    @InputDirectory
-    public abstract DirectoryProperty getClassDirectory();
 
     @InputDirectory
     public abstract DirectoryProperty getObfuscatedClassDirectory();
