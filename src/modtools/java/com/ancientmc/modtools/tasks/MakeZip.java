@@ -36,7 +36,7 @@ public abstract class MakeZip extends DefaultTask {
             moddedMap.forEach((name, hash) -> {
                 if (!originalMap.containsValue(hash)) {
                     // Get the class file names without packages.
-                    String strippedName = name.substring(name.lastIndexOf('\\') + 1);
+                    String strippedName = name.substring(name.lastIndexOf('/') + 1);
 
                     String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
                     File moddedClass = new File(obfDirectory, className + ".class");
