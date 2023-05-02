@@ -17,6 +17,7 @@ import org.gradle.api.tasks.compile.JavaCompile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -156,6 +157,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
             task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
+            task.getOptions().setCompilerArgs(Collections.singletonList("-g:none"));
             task.exclude("acp\\");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
