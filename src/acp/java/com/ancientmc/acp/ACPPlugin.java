@@ -111,7 +111,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(deobfJar);
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(fernflower));
-            task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=0", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
+            task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
