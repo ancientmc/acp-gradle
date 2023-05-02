@@ -40,17 +40,9 @@ public class ModToolsPlugin implements Plugin<Project> {
 
         project.afterEvaluate(proj -> {
             String diffPatches = extension.getDiffPatchesDir().get();
-            String binPatches = extension.getBinPatchesDir().get();
             try {
                 if (!proj.file(diffPatches).exists()) {
                     FileUtils.forceMkdir(proj.file(diffPatches));
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            try {
-                if (!proj.file(binPatches).exists()) {
-                    FileUtils.forceMkdir(proj.file(binPatches));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
