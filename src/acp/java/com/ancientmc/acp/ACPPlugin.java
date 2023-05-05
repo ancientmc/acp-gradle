@@ -16,10 +16,7 @@ import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class ACPPlugin implements Plugin<Project> {
 
@@ -33,12 +30,6 @@ public class ACPPlugin implements Plugin<Project> {
 
         project.getPluginManager().apply(JavaPlugin.class);
 
-        Configuration jarsplitter = project.getConfigurations().getByName("jarsplitter");
-        Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
-        Configuration forgeart = project.getConfigurations().getByName("forgeart");
-        Configuration fernflower = project.getConfigurations().getByName("fernflower");
-        Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
-
         TaskProvider<JavaExec> stripJar = project.getTasks().register("stripJar", JavaExec.class);
         TaskProvider<InjectModLoader> injectModloader = project.getTasks().register("injectModloader", InjectModLoader.class);
         TaskProvider<JavaExec> mcinject = project.getTasks().register("mcinject", JavaExec.class);
@@ -50,6 +41,12 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
         TaskProvider<GenerateHashes> generateOriginalHashes = project.getTasks().register("generateOriginalHashes", GenerateHashes.class);
+
+        Configuration jarsplitter = project.getConfigurations().getByName("jarsplitter");
+        Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
+        Configuration forgeart = project.getConfigurations().getByName("forgeart");
+        Configuration fernflower = project.getConfigurations().getByName("fernflower");
+        Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
 
         project.afterEvaluate(proj -> {
             try {
@@ -67,9 +64,6 @@ public class ACPPlugin implements Plugin<Project> {
             task.args("--input", Paths.BASE_JAR, "--slim", Paths.SLIM_JAR, "--extra", Paths.EXTRA_JAR, "--srg", Paths.SRG);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
-
-        // The modloader will be injected via a binpatch archive, in the LZMA format. The binpatch for Risugami's Modloader will
-        // be uploaded to maven and downloadable through a task.
 
         File loaderPatches = new File(Paths.DIR_MODLOADER_PATCHES);
 
@@ -157,7 +151,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
             task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
-            task.getOptions().setCompilerArgs(Collections.singletonList("-g:none"));
+            task.getOptions().setCompilerArgs(Arrays.asList("-g:none", "-source", "1.6", "-target", "1.6"));
             task.exclude("acp\\");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });

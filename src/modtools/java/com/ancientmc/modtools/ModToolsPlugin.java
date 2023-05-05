@@ -3,8 +3,8 @@ package com.ancientmc.modtools;
 import com.ancientmc.acp.tasks.GenerateHashes;
 import com.ancientmc.acp.utils.Paths;
 import com.ancientmc.modtools.tasks.DownloadModLoader;
+import com.ancientmc.modtools.tasks.MakeReobfSrg;
 import com.ancientmc.modtools.tasks.MakeZip;
-import com.ancientmc.modtools.tasks.StripPackages;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -28,15 +28,15 @@ public class ModToolsPlugin implements Plugin<Project> {
         project.getPluginManager().apply(JavaPlugin.class);
 
         Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
-        Configuration forgeart = project.getConfigurations().getByName("forgeart");
+        Configuration specialsource = project.getConfigurations().getByName("specialsource");
 
         TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
         TaskProvider<JavaExec> genDiffPatches = project.getTasks().register("genDiffPatches", JavaExec.class);
         TaskProvider<GenerateHashes> generateModdedHashes = project.getTasks().register("generateModdedHashes", GenerateHashes.class);
+        TaskProvider<MakeReobfSrg> makeReobfSrg = project.getTasks().register("makeReobfSrg", MakeReobfSrg.class);
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
         TaskProvider<Copy> extractReobfClasses = project.getTasks().register("extractReobfClasses", Copy.class);
         TaskProvider<MakeZip> makeZip = project.getTasks().register("makeZip", MakeZip.class);
-        TaskProvider<StripPackages> stripPackages = project.getTasks().register("stripPackages", StripPackages.class);
 
         project.afterEvaluate(proj -> {
             String diffPatches = extension.getDiffPatchesDir().get();
@@ -68,12 +68,18 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setIgnoreExitValue(true);
         });
 
+        makeReobfSrg.configure(task -> {
+            task.setGroup("modtools");
+            task.getInputSrg().set(project.file(Paths.SRG));
+            task.getOutputSrg().set(project.file(Paths.REOBF_SRG));
+        });
+
         reobfJar.configure(task -> {
             task.setGroup("modtools");
-            task.dependsOn(":jar");
-            task.getMainClass().set("net.minecraftforge.fart.Main");
-            task.setClasspath(project.files(forgeart));
-            task.args("--input", Paths.INTERM_JAR, "--output", Paths.REOBF_JAR, "--map", Paths.SRG, "--ff-line-numbers", Paths.FINAL_JAR, "--reverse");
+            task.dependsOn(":jar", makeReobfSrg);
+            task.getMainClass().set("net.md_5.specialsource.SpecialSource");
+            task.setClasspath(project.files(specialsource));
+            task.args("--in-jar", Paths.INTERM_JAR, "--out-jar", Paths.REOBF_JAR, "--srg-in", Paths.REOBF_SRG, "--reverse");
             task.getLogging().captureStandardError(LogLevel.DEBUG);
         });
 
@@ -84,23 +90,16 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.into(Paths.DIR_REOBF_CLASSES);
         });
 
-        stripPackages.configure(task -> {
-            task.setGroup("modtools");
-            task.dependsOn(extractReobfClasses);
-            task.getClassDirectoryIn().set(project.file(Paths.DIR_REOBF_CLASSES));
-            task.getClassDirectoryOut().set(project.file(Paths.DIR_REOBF_CLASSES));
-        });
-
         generateModdedHashes.configure(task -> {
             task.setGroup("modtools");
-            task.dependsOn(stripPackages);
+            task.dependsOn(extractReobfClasses);
             task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
             task.getOutput().set(new File("build\\modding\\hashes\\modded.md5"));
         });
 
         makeZip.configure(task -> {
             task.setGroup("modtools");
-            task.dependsOn(generateModdedHashes, stripPackages);
+            task.dependsOn(generateModdedHashes);
             task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
             task.getOriginalHash().set(project.file("build\\modding\\hashes\\vanilla.md5"));
             task.getModdedHash().set(project.file("build\\modding\\hashes\\modded.md5"));

@@ -25,6 +25,7 @@ public class Paths {
     public static String INTERM_JAR;
     public static String REOBF_JAR;
     public static String SRG;
+    public static String REOBF_SRG;
     
     public static void init(String version) {
         DIR_CFG = "cfg\\";
@@ -51,5 +52,6 @@ public class Paths {
         INTERM_JAR = "build\\libs\\interm-" + version + ".jar";
         REOBF_JAR = "build\\libs\\minecraft-" + version + ".jar";
         SRG = DIR_MAPPINGS + version + ".tsrg";
+        REOBF_SRG = "build\\modding\\reobf.srg";
     }
 }
