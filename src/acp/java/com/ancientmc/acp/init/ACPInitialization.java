@@ -1,89 +1,71 @@
 package com.ancientmc.acp.init;
 
 import com.ancientmc.acp.ACPExtension;
+import com.ancientmc.acp.init.step.*;
+import com.ancientmc.acp.utils.Json;
 import com.ancientmc.acp.utils.Paths;
 import com.ancientmc.acp.utils.Utils;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.DependencyResolutionListener;
-import org.gradle.api.artifacts.DependencySet;
-import org.gradle.api.artifacts.ResolvableDependencies;
 import org.gradle.api.logging.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 public class ACPInitialization {
-    private static final String maven = Utils.getAncientMCMaven();
 
-    // TODO: Make this nicer.
-    public static void init(Project proj, ACPExtension extension, String version) throws IOException {
-        Logger logger = proj.getLogger();
-
-        // Download ACP data
+    public static void init(Project project, ACPExtension extension, String version) throws IOException {
+        String maven = Utils.getAncientMCMaven();
         String data = extension.getData().get();
-        File dataZip = new File(Paths.DIR_CFG + "\\data.zip");
-        if (!dataZip.exists()) {
-            logger.lifecycle("Initializing ACP environment");
-            logger.lifecycle("Downloading ACP data");
-            FileUtils.copyURLToFile(new URL(Utils.toMavenUrl(maven, data, "zip")), dataZip);
-            logger.lifecycle("Extracting ACP data");
-        }
+        Logger logger = project.getLogger();
 
-        // Extract ACP data into cfg directory
-        proj.copy(action -> {
-            action.from(proj.zipTree(dataZip));
-            action.into(proj.file(Paths.DIR_CFG));
-        });
+        DownloadFileStep downloadACPData = new DownloadFileStep()
+                .setInput(new URL(Utils.toMavenUrl(maven, data, "zip")))
+                .setOutput(project.file(Paths.DIR_CFG + "data.zip"));
+        downloadACPData.printMessage(logger, "Downloading ACP data", !downloadACPData.getOutput().exists());
+        downloadACPData.exec();
 
-        // Download version manifest
-        URL manifestURL = new URL("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json");
-        File manifest = proj.file(Paths.DIR_TEMP + "version_manifest.json");
-        if(!manifest.exists()) {
-            logger.lifecycle("Downloading version manifest");
-            FileUtils.copyURLToFile(manifestURL, manifest);
-        }
+        ExtractFileStep extractACPData = new ExtractFileStep()
+                .setInput(downloadACPData.getOutput())
+                .setOutput(project.file(Paths.DIR_CFG))
+                .setProject(project);
+        extractACPData.printMessage(logger, "Extracting ACP data", !downloadACPData.getOutput().exists());
+        extractACPData.exec();
 
-        // Download version JSON
-        File json = proj.file(Paths.DIR_TEMP + version + ".json");
-        File jarDepJson = proj.file(Paths.DIR_CFG + "jardep.json");
-        File[] jsons = { json, jarDepJson };
-        if(!json.exists()) {
-            logger.lifecycle("Downloading version JSON");
-            DownloadJson.download(manifest, json, version);
-        }
+        DownloadFileStep downloadVersionManifest = new DownloadFileStep()
+                .setInput(new URL("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json"))
+                .setOutput(project.file(Paths.DIR_TEMP + "version_manifest.json"));
+        downloadVersionManifest.printMessage(logger, "Downloading version manifest", !downloadVersionManifest.getOutput().exists());
+        downloadVersionManifest.exec();
 
-        // Add libraries as resolved dependencies
-        List<String> libraries = GetLibraries.getLibraries(jsons);
-        DependencySet deps = proj.getConfigurations().getByName("implementation").getDependencies();
-        proj.getGradle().addListener(new DependencyResolutionListener() {
-            @Override
-            public void beforeResolve(ResolvableDependencies resolvableDependencies) {
-                for(String library : libraries) {
-                    deps.add(proj.getDependencies().create(library));
-                }
-                proj.getGradle().removeListener(this);
-            }
+        DownloadFileStep downloadJson = new DownloadFileStep()
+                .setInput(Json.getJsonUrl(downloadVersionManifest.getOutput(), version))
+                .setOutput(project.file(Paths.DIR_TEMP + version + ".json"));
+        downloadJson.printMessage(logger, "Downloading version JSON", !downloadJson.getOutput().exists());
+        downloadJson.exec();
 
-            @Override
-            public void afterResolve(ResolvableDependencies resolvableDependencies) { }
-        });
+        DownloadLibrariesStep downloadLibraries = new DownloadLibrariesStep()
+                .setLibraries(Json.getLibraries(downloadJson.getOutput(), project.file(Paths.DIR_CFG + "jardep.json")))
+                .setProject(project);
+        downloadLibraries.exec();
 
-        // Extract natives
-        File nativesDir = proj.file(Paths.DIR_NATIVES);
-        if (!nativesDir.exists()) {
-            logger.lifecycle("Extracting natives");
-            FileUtils.forceMkdir(nativesDir);
-        }
-        ExtractNatives.extract(json, nativesDir, proj);
+        ExtractNativesStep extractNatives = new ExtractNativesStep()
+                .setUrls(Json.getNativeUrls(downloadJson.getOutput()))
+                .setProject(project)
+                .setOutput(project.file(Paths.DIR_NATIVES));
+        extractNatives.printMessage(logger, "Extracting natives", !extractNatives.getOutput().exists());
+        extractNatives.exec();
 
-        // Download assets
-        File runDir = proj.file(Paths.DIR_RUN);
-        DownloadAssets.exec(json, runDir, logger);
+        DownloadAssetsStep downloadAssets = new DownloadAssetsStep()
+                .setJson(downloadJson.getOutput())
+                .setOutput(project.file(Paths.DIR_RUN));
+        downloadAssets.printMessage(logger, "Downloading assets", !project.file(Paths.DIR_RUN + "resources\\").exists());
+        downloadAssets.exec();
 
-        // Download Minecraft JAR(s)
-        DownloadJar.download("client", json, new File(Paths.DIR_TEMP), logger);
+        DownloadJarStep downloadJar = new DownloadJarStep()
+                .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
+                .setOutput(project.file(Paths.DIR_TEMP))
+                .setVersion(version);
+        downloadJar.printMessage(logger, "Downloading client JAR", !(project.file(Paths.BASE_JAR).exists()));
+        downloadJar.exec();
     }
 }

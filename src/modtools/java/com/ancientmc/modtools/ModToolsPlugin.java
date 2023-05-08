@@ -98,13 +98,14 @@ public class ModToolsPlugin implements Plugin<Project> {
         });
 
         makeZip.configure(task -> {
+            String name = extension.getModName().get();
             task.setGroup("modtools");
             task.dependsOn(generateModdedHashes);
             task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
             task.getOriginalHash().set(project.file("build\\modding\\hashes\\vanilla.md5"));
             task.getModdedHash().set(project.file("build\\modding\\hashes\\modded.md5"));
             task.getSrg().set(project.file(Paths.SRG));
-            task.getZip().set(project.file("build\\modding\\zip\\mod.zip"));
+            task.getZip().set(project.file("build\\modding\\zip\\" + name + ".zip"));
         });
     }
 }

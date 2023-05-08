@@ -22,7 +22,7 @@ public abstract class MakeReobfSrg extends DefaultTask {
         try {
             File input = getInputSrg().get().getAsFile();
             File output = getOutputSrg().get().getAsFile();
-            File temp = new File(Paths.DIR_TEMP + "temp.srg");
+            File temp = new File(Paths.DIR_TEMP, "temp.srg");
 
             IMappingFile.load(input).write(temp.toPath(), IMappingFile.Format.SRG, false);
 

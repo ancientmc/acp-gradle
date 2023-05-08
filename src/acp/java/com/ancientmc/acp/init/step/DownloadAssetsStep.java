@@ -1,34 +1,40 @@
-package com.ancientmc.acp.init;
+package com.ancientmc.acp.init.step;
 
 import com.ancientmc.acp.utils.Utils;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.logging.Logger;
 
 import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DownloadAssets {
-    public static void exec(File json, File dest, Logger logger) throws IOException {
-        if (!dest.exists()) FileUtils.forceMkdir(dest);
+public class DownloadAssetsStep extends Step {
+    private File json;
+    private File output;
 
-        JsonObject jsonObj = Utils.getJsonAsObject(json);
-        JsonObject assetIndex = jsonObj.getAsJsonObject("assetIndex");
-        String indexURL = assetIndex.get("url").getAsString();
-        String path = indexURL.substring(indexURL.lastIndexOf('/') + 1);
-        File file = new File(dest, path);
-        if(!file.exists()) {
-            FileUtils.copyURLToFile(new URL(indexURL), file);
-            getAssets(file, dest, logger);
+    @Override
+    public void exec() {
+        try {
+            if (!output.exists()) FileUtils.forceMkdir(output);
+
+            JsonObject jsonObj = Utils.getJsonAsObject(json);
+            JsonObject assetIndex = jsonObj.getAsJsonObject("assetIndex");
+            String indexURL = assetIndex.get("url").getAsString();
+            String path = indexURL.substring(indexURL.lastIndexOf('/') + 1);
+            File file = new File(output, path);
+            if(!file.exists()) {
+                FileUtils.copyURLToFile(new URL(indexURL), file);
+                getAssets(file, output);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public static void getAssets(File index, File dest, Logger logger) throws IOException {
+    public static void getAssets(File index, File dest) throws IOException {
         File resources = new File(dest, "resources\\");
         if(!resources.exists()) {
-            logger.lifecycle("Downloading assets");
             FileUtils.forceMkdir(resources);
 
             JsonObject indexObj = Utils.getJsonAsObject(index);
@@ -64,5 +70,19 @@ public class DownloadAssets {
         }
         in.close();
         out.close();
+    }
+
+    public File getOutput() {
+        return output;
+    }
+
+    public DownloadAssetsStep setJson(File json) {
+        this.json = json;
+        return this;
+    }
+
+    public DownloadAssetsStep setOutput(File output) {
+        this.output = output;
+        return this;
     }
 }
