@@ -33,7 +33,7 @@ public class Json {
         return null;
     }
 
-    public static List<String> getLibraries(File... jsons) throws IOException {
+    public static List<String> getLibraries(List<File> jsons) throws IOException {
         List<String> libList = new ArrayList<>();
 
         for(File json : jsons) {
@@ -77,7 +77,12 @@ public class Json {
         return new URL(sideObj.get("url").getAsString());
     }
 
+    /**
+     * Filters through the correct LWJGL version to download. All libraries are passed through this method in above methods, but any non-LWJGL library
+     * will get skipped through the first if statement.
+     */
     public static boolean isAllowed(String name) {
+        if (!name.contains("org.lwjgl")) return true;
         if (OperatingSystem.current().isMacOsX()) {
             return name.contains(LWJGL_MAC_VERSION);
         } else return name.contains(LWJGL_VERSION);

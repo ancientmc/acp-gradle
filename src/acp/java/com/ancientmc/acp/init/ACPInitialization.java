@@ -8,8 +8,10 @@ import com.ancientmc.acp.utils.Utils;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 public class ACPInitialization {
 
@@ -44,7 +46,7 @@ public class ACPInitialization {
         downloadJson.exec();
 
         DownloadLibrariesStep downloadLibraries = new DownloadLibrariesStep()
-                .setLibraries(Json.getLibraries(downloadJson.getOutput(), project.file(Paths.DIR_CFG + "jardep.json")))
+                .setLibraries(Json.getLibraries(Arrays.asList(downloadJson.getOutput(), project.file(Paths.DIR_CFG + "jardep.json"))))
                 .setProject(project);
         downloadLibraries.exec();
 
