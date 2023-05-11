@@ -31,9 +31,6 @@ dependencies {
     acpImplementation 'commons-io:commons-io:2.11.0'
     acpImplementation 'com.google.code.gson:gson:2.10.1'
     acpImplementation 'net.minecraftforge:srgutils:0.4.13'
-    acpImplementation 'org.ow2.asm:asm-commons:9.5'
-    acpImplementation 'org.ow2.asm:asm-tree:9.5'
-
 
     modtoolsImplementation sourceSets.acp.output
 }
@@ -84,7 +81,7 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = 'mason'
+                        id = 'moist-mason'
                         name = 'Mason'
                     }
                 }

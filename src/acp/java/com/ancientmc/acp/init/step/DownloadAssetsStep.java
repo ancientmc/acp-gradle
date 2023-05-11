@@ -1,5 +1,6 @@
 package com.ancientmc.acp.init.step;
 
+import com.ancientmc.acp.utils.Paths;
 import com.ancientmc.acp.utils.Utils;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
@@ -10,55 +11,52 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DownloadAssetsStep extends Step {
-    private File json;
+    private URL index;
     private File output;
 
     @Override
     public void exec() {
         try {
             if (!output.exists()) FileUtils.forceMkdir(output);
-
-            JsonObject jsonObj = Utils.getJsonAsObject(json);
-            JsonObject assetIndex = jsonObj.getAsJsonObject("assetIndex");
-            String indexURL = assetIndex.get("url").getAsString();
-            String path = indexURL.substring(indexURL.lastIndexOf('/') + 1);
+            String path = index.getPath().substring(index.getPath().lastIndexOf('/') + 1);
             File file = new File(output, path);
-            if(!file.exists()) {
-                FileUtils.copyURLToFile(new URL(indexURL), file);
-                getAssets(file, output);
+            if (!file.exists()) {
+                FileUtils.copyURLToFile(index, file);
             }
+
+            getAssets(file, output);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void getAssets(File index, File dest) throws IOException {
-        File resources = new File(dest, "resources\\");
-        if(!resources.exists()) {
-            FileUtils.forceMkdir(resources);
+    public static void getAssets(File index, File output) throws IOException {
+        JsonObject indexObj = Utils.getJsonAsObject(index);
+        Map<String, String> assets = new HashMap<>();
+        JsonObject objects = indexObj.getAsJsonObject("objects");
+        objects.keySet().forEach(name -> {
+            String hash = objects.getAsJsonObject(name).get("hash").getAsString();
+            assets.put(name, hash);
+        });
 
-            JsonObject indexObj = Utils.getJsonAsObject(index);
-            Map<String, String> assets = new HashMap<>();
-            JsonObject objects = indexObj.getAsJsonObject("objects");
-            objects.keySet().forEach(name -> {
-                String hash = objects.getAsJsonObject(name).get("hash").getAsString();
-                assets.put(name, hash);
-            });
+        downloadAssets(assets, new File(output, "resources\\"));
+    }
 
-            assets.forEach((key, value) -> {
-                try {
-                    String path = value.substring(0, 2) + '/' + value;
-                    String url = "https://resources.download.minecraft.net/" + path;
-                    File file = new File(resources, key);
-                    if(!file.getParentFile().exists()) {
-                        FileUtils.forceMkdir(file.getParentFile());
-                    }
-                    writeToFile(new URL(url).openStream(), new FileOutputStream(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
+    public static void downloadAssets(Map<String, String> map, File dest) throws IOException {
+        if(!dest.exists()) FileUtils.forceMkdir(dest);
+        map.forEach((key, value) -> {
+            try {
+                String path = value.substring(0, 2) + '/' + value;
+                String url = "https://resources.download.minecraft.net/" + path;
+                File file = new File(dest, key);
+                if(!file.getParentFile().exists()) {
+                    FileUtils.forceMkdir(file.getParentFile());
                 }
-            });
-        }
+                writeToFile(new URL(url).openStream(), new FileOutputStream(file));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static void writeToFile(InputStream in, OutputStream out) throws IOException {
@@ -76,8 +74,8 @@ public class DownloadAssetsStep extends Step {
         return output;
     }
 
-    public DownloadAssetsStep setJson(File json) {
-        this.json = json;
+    public DownloadAssetsStep setIndex(URL index) {
+        this.index = index;
         return this;
     }
 

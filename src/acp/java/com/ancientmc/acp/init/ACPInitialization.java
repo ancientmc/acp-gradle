@@ -30,7 +30,7 @@ public class ACPInitialization {
                 .setInput(downloadACPData.getOutput())
                 .setOutput(project.file(Paths.DIR_CFG))
                 .setProject(project);
-        extractACPData.printMessage(logger, "Extracting ACP data", !downloadACPData.getOutput().exists());
+        extractACPData.printMessage(logger, "Extracting ACP data", !project.file(Paths.SRG).exists());
         extractACPData.exec();
 
         DownloadFileStep downloadVersionManifest = new DownloadFileStep()
@@ -58,7 +58,7 @@ public class ACPInitialization {
         extractNatives.exec();
 
         DownloadAssetsStep downloadAssets = new DownloadAssetsStep()
-                .setJson(downloadJson.getOutput())
+                .setIndex(Json.getAssetIndexUrl(downloadJson.getOutput()))
                 .setOutput(project.file(Paths.DIR_RUN));
         downloadAssets.printMessage(logger, "Downloading assets", !project.file(Paths.DIR_RUN + "resources\\").exists());
         downloadAssets.exec();
@@ -67,7 +67,7 @@ public class ACPInitialization {
                 .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
                 .setOutput(project.file(Paths.DIR_TEMP))
                 .setVersion(version);
-        downloadJar.printMessage(logger, "Downloading client JAR", !(project.file(Paths.BASE_JAR).exists()));
+        downloadJar.printMessage(logger, "Downloading client JAR", !project.file(Paths.BASE_JAR).exists());
         downloadJar.exec();
     }
 }

@@ -71,6 +71,11 @@ public class Json {
         return urls;
     }
 
+    public static URL getAssetIndexUrl(File json) throws IOException {
+        JsonObject jsonObj = Utils.getJsonAsObject(json);
+        return new URL(jsonObj.getAsJsonObject("assetIndex").get("url").getAsString());
+    }
+
     public static URL getJarUrl(File json, String side) throws IOException {
         JsonObject jsonObj = Utils.getJsonAsObject(json);
         JsonObject sideObj = jsonObj.getAsJsonObject("downloads").getAsJsonObject(side);
