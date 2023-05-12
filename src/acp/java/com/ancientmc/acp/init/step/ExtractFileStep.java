@@ -1,6 +1,7 @@
 package com.ancientmc.acp.init.step;
 
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 
@@ -10,15 +11,14 @@ public class ExtractFileStep extends Step {
     private Project project;
 
     @Override
-    public void exec() {
-        project.copy(action -> {
-           action.from(project.zipTree(input));
-           action.into(output);
-        });
-    }
-
-    public File getInput() {
-        return input;
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+        if (condition) {
+            project.copy(action -> {
+                action.from(project.zipTree(input));
+                action.into(output);
+            });
+        }
     }
 
     public File getOutput() {

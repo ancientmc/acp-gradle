@@ -1,6 +1,7 @@
 package com.ancientmc.acp.init.step;
 
 import org.apache.commons.io.FileUtils;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,16 +12,15 @@ public class DownloadFileStep extends Step {
     protected File output;
 
     @Override
-    public void exec() {
-        try {
-            FileUtils.copyURLToFile(input, output);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+        if (condition) {
+            try {
+                FileUtils.copyURLToFile(input, output);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    }
-
-    public URL getInput() {
-        return input;
     }
 
     public File getOutput() {

@@ -4,6 +4,7 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.DependencyResolutionListener;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ResolvableDependencies;
+import org.gradle.api.logging.Logger;
 
 import java.util.List;
 
@@ -18,9 +19,7 @@ public class DownloadLibrariesStep extends Step {
         project.getGradle().addListener(new DependencyResolutionListener() {
             @Override
             public void beforeResolve(ResolvableDependencies resolvableDependencies) {
-                libraries.forEach(lib -> {
-                    dependencies.add(project.getDependencies().create(lib));
-                });
+                libraries.forEach(lib -> dependencies.add(project.getDependencies().create(lib)));
                 project.getGradle().removeListener(this);
             }
 

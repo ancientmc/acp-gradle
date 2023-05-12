@@ -4,6 +4,7 @@ import com.ancientmc.acp.utils.Paths;
 import com.ancientmc.acp.utils.Utils;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
+import org.gradle.api.logging.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -15,18 +16,21 @@ public class DownloadAssetsStep extends Step {
     private File output;
 
     @Override
-    public void exec() {
-        try {
-            if (!output.exists()) FileUtils.forceMkdir(output);
-            String path = index.getPath().substring(index.getPath().lastIndexOf('/') + 1);
-            File file = new File(output, path);
-            if (!file.exists()) {
-                FileUtils.copyURLToFile(index, file);
-            }
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+        if (condition) {
+            try {
+                if (!output.exists()) FileUtils.forceMkdir(output);
+                String path = index.getPath().substring(index.getPath().lastIndexOf('/') + 1);
+                File file = new File(output, path);
+                if (!file.exists()) {
+                    FileUtils.copyURLToFile(index, file);
+                }
 
-            getAssets(file, output);
-        } catch (IOException e) {
-            e.printStackTrace();
+                getAssets(file, output);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

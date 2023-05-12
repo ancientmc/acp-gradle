@@ -2,6 +2,7 @@ package com.ancientmc.acp.init.step;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,23 +16,26 @@ public class ExtractNativesStep extends Step {
     private Project project;
 
     @Override
-    public void exec() {
-        try {
-            List<File> jars = new ArrayList<>();
-            for(URL url : urls) {
-                String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-                FileUtils.copyURLToFile(url, new File(output, path));
-                jars.add(new File(output, path));
-            }
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+        if (condition) {
+            try {
+                List<File> jars = new ArrayList<>();
+                for(URL url : urls) {
+                    String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+                    FileUtils.copyURLToFile(url, new File(output, path));
+                    jars.add(new File(output, path));
+                }
 
-            jars.forEach(jar -> {
-                project.copy(action -> {
-                   action.from(project.zipTree(jar));
-                   action.into(project.file(output));
+                jars.forEach(jar -> {
+                    project.copy(action -> {
+                        action.from(project.zipTree(jar));
+                        action.into(project.file(output));
+                    });
                 });
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

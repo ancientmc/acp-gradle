@@ -1,6 +1,7 @@
 package com.ancientmc.acp.init.step;
 
 import org.apache.commons.io.FileUtils;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,15 +11,17 @@ public class DownloadJarStep extends DownloadFileStep {
     private String version;
 
     @Override
-    public void exec() {
-        try {
-            File jar = new File(output, version + (input.getPath().contains("client") ? ".jar" : "-server.jar"));
-            FileUtils.copyURLToFile(input, jar);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void exec(Logger logger, boolean condition) {
+        printMessage(logger, message, condition);
+        if (condition) {
+            try {
+                File jar = new File(output, version + (input.getPath().contains("client") ? ".jar" : "-server.jar"));
+                FileUtils.copyURLToFile(input, jar);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-
 
     public DownloadJarStep setVersion(String version) {
         this.version = version;
@@ -34,6 +37,4 @@ public class DownloadJarStep extends DownloadFileStep {
         super.setOutput(output);
         return this;
     }
-
-
 }
