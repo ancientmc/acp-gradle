@@ -7,10 +7,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * Downloads a file from a URL link.
+ */
 public class DownloadFileStep extends Step {
+    /**
+     * The input URL.
+     */
     protected URL input;
+    /**
+     * The downloaded file.
+     */
     protected File output;
 
+    /**
+     * This method uses a method from
+     * @param logger The gradle logger.
+     * @param condition Boolean condition that determines if the step gets executed.
+     */
     @Override
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);

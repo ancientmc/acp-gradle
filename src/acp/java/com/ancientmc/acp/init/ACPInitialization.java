@@ -12,7 +12,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 
+/**
+ * Initialization class for events that occur upon launching ACP for the first time.
+ */
 public class ACPInitialization {
+
+    /**
+     * Initialization method.
+     * @param project The gradle project.
+     * @param extension The ACP plugin extension. Contains the maven path for the ACP data, which is converted into a URL.
+     * @param version The minecraft version, specified in the ACP end-user workspace.
+     * @throws IOException
+     */
     public static void init(Project project, ACPExtension extension, String version) throws IOException {
         String maven = Utils.getAncientMCMaven();
         String data = extension.getData().get();
