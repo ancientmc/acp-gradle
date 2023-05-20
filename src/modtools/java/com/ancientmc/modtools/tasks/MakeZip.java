@@ -70,8 +70,8 @@ public abstract class MakeZip extends DefaultTask {
      * Get obfuscated class name.
      */
     public String getObfName(String name, Map<String, String> map) {
-        return map.entrySet()
-                .stream().filter(entry -> name.equals(entry.getValue()))
+        return map.entrySet().stream()
+                .filter(entry -> name.equals(entry.getValue()))
                 .map(Map.Entry::getKey).findAny().get();
     }
 
