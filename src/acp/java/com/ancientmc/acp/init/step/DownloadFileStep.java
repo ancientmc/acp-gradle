@@ -21,7 +21,7 @@ public class DownloadFileStep extends Step {
     protected File output;
 
     /**
-     * This method uses a method from
+     * This method uses a function from Apache Commons-IO to download a file from a URL.
      * @param logger The gradle logger.
      * @param condition Boolean condition that determines if the step gets executed.
      */

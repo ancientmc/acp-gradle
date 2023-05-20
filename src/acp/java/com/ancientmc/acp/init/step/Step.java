@@ -8,7 +8,8 @@ import org.gradle.api.logging.Logger;
  */
 public class Step {
     /**
-     * The message that is printed in the console upon the step's execution.  */
+     * The message that is printed in the console upon the step's execution.
+     */
     protected String message;
 
     /**

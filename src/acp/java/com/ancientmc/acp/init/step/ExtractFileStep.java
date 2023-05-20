@@ -23,7 +23,7 @@ public class ExtractFileStep extends Step {
     private Project project;
 
     /**
-     * Main execution method for all inheritors of the Step class.
+     * Main extraction method. Uses Gradle's copy task and zip-tree function.
      * @param logger The gradle logger.
      * @param condition Boolean condition that determines if the step gets executed.
      */

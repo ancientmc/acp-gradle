@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.Arrays;
 
 /**
- * Initialization class for events that occur upon launching ACP for the first time.
+ * Initialization class for events that occur upon launching ACP for the first time, or upon a gradle refresh if needed.
  */
 public class ACPInitialization {
 

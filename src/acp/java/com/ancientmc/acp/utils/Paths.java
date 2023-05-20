@@ -1,5 +1,8 @@
 package com.ancientmc.acp.utils;
 
+/**
+ * File containing all paths used by ACP.
+ */
 public class Paths {
     public static String DIR_CFG;
     public static String DIR_MAPPINGS;
@@ -26,7 +29,12 @@ public class Paths {
     public static String REOBF_JAR;
     public static String SRG;
     public static String REOBF_SRG;
-    
+
+    /**
+     * After defining each path, this method is used to initialize them.
+     * @param version The Minecraft version, specified in the ACP end-user gradle. This is done since several
+     *                files use the version in their names.
+     */
     public static void init(String version) {
         DIR_CFG = "cfg\\";
         DIR_MAPPINGS = DIR_CFG + "mappings\\";

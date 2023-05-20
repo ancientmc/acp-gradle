@@ -18,6 +18,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Generates a text file containing md5 hashes corresponding to the compiled Minecraft classes.
+ * The text file is formatted as such:
+ *      pkg\class1 hash1
+ *      pkg\class2 hash2
+ *      etc...
+ * These hash values are used to determine whether a compiled class file has been modified.
+ */
 public abstract class GenerateHashes extends DefaultTask {
     @TaskAction
     public void exec() {
@@ -66,9 +74,15 @@ public abstract class GenerateHashes extends DefaultTask {
         return null;
     }
 
+    /**
+     * The directory containing the class files.
+     */
     @InputDirectory
     public abstract RegularFileProperty getClassesDirectory();
 
+    /**
+     * The output text file containing the hash values.
+     */
     @OutputFile
     public abstract RegularFileProperty getOutput();
 

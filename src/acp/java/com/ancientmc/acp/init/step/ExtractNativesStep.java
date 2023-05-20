@@ -30,8 +30,8 @@ public class ExtractNativesStep extends Step {
     private Project project;
 
     /**
-     * To extract the natives, we first download the files in the URLS. Then for each file, we extract the native libraries
-     * into the output folder.
+     * To extract the natives, we first download the JAR files in the URLS. Then for each file, we extract the native libraries
+     * from their JAR files into the output folder.
      * @param logger The gradle logger.
      * @param condition Boolean condition that determines if the step gets executed.
      */

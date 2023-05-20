@@ -14,6 +14,10 @@ import org.gradle.api.tasks.*;
 import java.io.File;
 import java.util.Collection;
 
+/**
+ * Injects LZMA files found within a specified directory into the Minecraft JAR.
+ * Binary injection is done via Minecraft Forge's Binary Patcher.
+ */
 public abstract class InjectModLoader extends DefaultTask {
 
     @TaskAction
@@ -39,12 +43,21 @@ public abstract class InjectModLoader extends DefaultTask {
         });
     }
 
+    /**
+     * The input JAR.
+     */
     @InputFile
     public abstract RegularFileProperty getInputJar();
 
+    /**
+     * The directory containing the LZMA archive(s).
+     */
     @InputDirectory
     public abstract RegularFileProperty getPatchDir();
 
+    /**
+     * The output JAR.
+     */
     @OutputFile
     public abstract RegularFileProperty getOutputJar();
 }
