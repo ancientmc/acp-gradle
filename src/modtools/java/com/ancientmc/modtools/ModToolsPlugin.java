@@ -27,9 +27,6 @@ public class ModToolsPlugin implements Plugin<Project> {
 
         project.getPluginManager().apply(JavaPlugin.class);
 
-        Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
-        Configuration specialsource = project.getConfigurations().getByName("specialsource");
-
         TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
         TaskProvider<JavaExec> genDiffPatches = project.getTasks().register("genDiffPatches", JavaExec.class);
         TaskProvider<GenerateHashes> generateModdedHashes = project.getTasks().register("generateModdedHashes", GenerateHashes.class);
@@ -37,6 +34,9 @@ public class ModToolsPlugin implements Plugin<Project> {
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
         TaskProvider<Copy> extractReobfClasses = project.getTasks().register("extractReobfClasses", Copy.class);
         TaskProvider<MakeZip> makeZip = project.getTasks().register("makeZip", MakeZip.class);
+
+        Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
+        Configuration specialsource = project.getConfigurations().getByName("specialsource");
 
         project.afterEvaluate(proj -> {
             String diffPatches = extension.getDiffPatchesDir().get();

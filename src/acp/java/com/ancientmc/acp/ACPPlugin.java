@@ -42,11 +42,13 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
         TaskProvider<GenerateHashes> generateOriginalHashes = project.getTasks().register("generateOriginalHashes", GenerateHashes.class);
 
-        Configuration jarsplitter = project.getConfigurations().getByName("jarsplitter");
-        Configuration mcinjector = project.getConfigurations().getByName("mcinjector");
-        Configuration forgeart = project.getConfigurations().getByName("forgeart");
-        Configuration fernflower = project.getConfigurations().getByName("fernflower");
-        Configuration diffpatch = project.getConfigurations().getByName("diffpatch");
+        Configuration jarsplitter = project.getConfigurations().create("jarsplitter");
+        Configuration mcinjector = project.getConfigurations().create("mcinjector");
+        Configuration forgeart = project.getConfigurations().create("forgeart");
+        Configuration fernflower = project.getConfigurations().create("fernflower");
+        Configuration diffpatch = project.getConfigurations().create("diffpatch");
+        Configuration specialsource = project.getConfigurations().create("specialsource");
+        Configuration binpatcher = project.getConfigurations().create("binpatcher");
 
         project.afterEvaluate(proj -> {
             try {

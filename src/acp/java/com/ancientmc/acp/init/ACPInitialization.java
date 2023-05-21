@@ -59,6 +59,11 @@ public class ACPInitialization {
                 .setProject(project);
         downloadLibraries.exec();
 
+        Step downloadToolsStep = (DownloadToolsStep) new DownloadToolsStep()
+                .setProject(project)
+                .setProperties(project.file("gradle.properties"));
+        downloadToolsStep.exec();
+
         ExtractNativesStep extractNatives = (ExtractNativesStep) new ExtractNativesStep()
                 .setUrls(Json.getNativeUrls(downloadJson.getOutput()))
                 .setProject(project)
