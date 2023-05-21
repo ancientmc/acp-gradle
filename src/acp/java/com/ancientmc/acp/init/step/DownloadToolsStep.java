@@ -49,9 +49,11 @@ public class DownloadToolsStep extends Step {
     private Map<String, String> getConfigMap(List<String> lines) {
         Map<String, String> map = new HashMap<>();
         lines.forEach(line -> {
-            String[] split = line.split("=");
-            String name = split[0].substring(5);
-            map.put(name, split[1]);
+            if (line.contains("tool_")) {
+                String[] split = line.split("=");
+                String name = split[0].substring(5);
+                map.put(name, split[1]);
+            }
         });
         return map;
     }
