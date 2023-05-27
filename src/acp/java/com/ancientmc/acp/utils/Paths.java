@@ -9,7 +9,7 @@ public class Paths {
     public static String DIR_LOGS;
     public static String DIR_TEMP;
     public static String DIR_PATCHES;
-    public static String DIR_MODLOADER_PATCHES;
+    public static String DIR_MODPATCHES;
     public static String DIR_RUN;
     public static String DIR_NATIVES;
     public static String DIR_SRC;
@@ -41,7 +41,7 @@ public class Paths {
         DIR_LOGS = DIR_CFG + "logs\\";
         DIR_TEMP = DIR_CFG + "temp\\";
         DIR_PATCHES = DIR_CFG + "patches\\";
-        DIR_MODLOADER_PATCHES = DIR_CFG + "modloader\\";
+        DIR_MODPATCHES = DIR_CFG + "modpatches\\";
         DIR_RUN = "run\\";
         DIR_NATIVES = DIR_RUN + "bin\\natives\\";
         DIR_SRC = "src\\main\\java\\";

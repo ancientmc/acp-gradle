@@ -42,9 +42,7 @@ public class Utils {
     public static Map<String, String> getClassMap(File srg) throws IOException {
         Map<String, String> map = new HashMap<>();
         IMappingFile mapping = IMappingFile.load(srg);
-        mapping.getClasses().forEach(cls -> {
-            map.put(cls.getOriginal(), cls.getMapped());
-        });
+        mapping.getClasses().forEach(cls -> map.put(cls.getOriginal(), cls.getMapped()));
         return map;
     }
 

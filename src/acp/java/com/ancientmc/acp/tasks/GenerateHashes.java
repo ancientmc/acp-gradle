@@ -62,6 +62,11 @@ public abstract class GenerateHashes extends DefaultTask {
         }
     }
 
+    /**
+     * Calculates an MD5 hash from the given class.
+     * @param cls The class file.
+     * @return The hash.
+     */
     public static String getHash(File cls) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");

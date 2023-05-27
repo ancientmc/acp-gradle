@@ -2,7 +2,7 @@ package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.ACPInitialization;
 import com.ancientmc.acp.tasks.GenerateHashes;
-import com.ancientmc.acp.tasks.InjectModLoader;
+import com.ancientmc.acp.tasks.InjectModPatches;
 import com.ancientmc.acp.utils.Paths;
 import org.gradle.api.*;
 import org.gradle.api.artifacts.Configuration;
@@ -31,7 +31,7 @@ public class ACPPlugin implements Plugin<Project> {
         project.getPluginManager().apply(JavaPlugin.class);
 
         TaskProvider<JavaExec> stripJar = project.getTasks().register("stripJar", JavaExec.class);
-        TaskProvider<InjectModLoader> injectModloader = project.getTasks().register("injectModloader", InjectModLoader.class);
+        TaskProvider<InjectModPatches> injectModPatches = project.getTasks().register("injectModPatches", InjectModPatches.class);
         TaskProvider<JavaExec> mcinject = project.getTasks().register("mcinject", JavaExec.class);
         TaskProvider<JavaExec> deobfJar = project.getTasks().register("deobfJar", JavaExec.class);
         TaskProvider<JavaExec> decompile = project.getTasks().register("decompile", JavaExec.class);
@@ -67,20 +67,20 @@ public class ACPPlugin implements Plugin<Project> {
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        File loaderPatches = new File(Paths.DIR_MODLOADER_PATCHES);
+        File modPatches = new File(Paths.DIR_MODPATCHES);
 
-        injectModloader.configure(task -> {
+        injectModPatches.configure(task -> {
             task.setGroup("decomp");
             task.dependsOn(stripJar);
             task.getInputJar().set(project.file(Paths.SLIM_JAR));
-            task.getPatchDir().set(loaderPatches);
+            task.getPatchDir().set(modPatches);
             task.getOutputJar().set(project.file(Paths.MODLOADER_JAR));
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        boolean vanilla = !loaderPatches.exists();
+        boolean vanilla = !modPatches.exists();
         String toInject = (vanilla ? Paths.SLIM_JAR : Paths.MODLOADER_JAR);
-        String dependent = (vanilla ? "stripJar" : "injectModloader");
+        String dependent = (vanilla ? "stripJar" : "injectModPatches");
 
         mcinject.configure(task -> {
             task.setGroup("decomp");

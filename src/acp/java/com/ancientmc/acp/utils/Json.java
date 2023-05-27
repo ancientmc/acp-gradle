@@ -124,9 +124,13 @@ public class Json {
      * will get skipped through the first if statement.
      */
     public static boolean isAllowed(String name) {
-        if (!name.contains("org.lwjgl")) return true;
+        if (!name.contains("org.lwjgl")) {
+            return true;
+        }
         if (OperatingSystem.current().isMacOsX()) {
             return name.contains(LWJGL_MAC_VERSION);
-        } else return name.contains(LWJGL_VERSION);
+        } else {
+            return name.contains(LWJGL_VERSION);
+        }
     }
 }
