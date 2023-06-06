@@ -1,1 +1,3 @@
 rootProject.name = 'acp-gradle'
+
+include(':test_data')

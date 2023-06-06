@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+    }
+    dependencies {
+        classpath files('plugins\\acp.jar')
+        classpath 'commons-io:commons-io:2.11.0'
+        classpath 'com.google.code.gson:gson:2.10.1'
+        classpath 'net.minecraftforge:srgutils:0.4.13'
+    }
+}
+
+plugins {
+    id 'java-library'
+}
+
+ext {
+    MC_VERSION = 'a1.2.6'
+}
+
+version = MC_VERSION
+
+// Older versions of Minecraft run Java 6. You should still set your JDK in your IDE to Java 8.
+sourceCompatibility = '1.6'
+targetCompatibility = '1.6'
+
+repositories {
+    maven { url = 'https://libraries.minecraft.net' }
+    maven { url = 'https://maven.minecraftforge.net/' }
+    maven { url = 'https://github.com/ancientmc/ancientmc-maven/raw/maven/' }
+}
+
+sourceSets {
+    main
+}
+
+apply plugin: 'com.ancientmc.acp'
+apply plugin: 'com.ancientmc.modtools'
+
+import com.ancientmc.acp.utils.*
+
+acp {
+    data = "com.ancientmc.acp:acp-data:${MC_VERSION}"
+}
+
+modtools {
+    loader = 'risugami'
+    diffPatchesDir = project.buildDir.absolutePath + '\\modding\\patches\\diff'
+    modName = 'mod'
+}
+
+tasks.withType(JavaExec) {
+    systemProperty 'java.library.path', Paths.DIR_NATIVES
+}
+
+task setup() {
+    dependsOn(':generateOriginalHashes')
+}
+
+task runClient(type: JavaExec) {
+    group = 'acp-run'
+    mainClass = 'acp.client.Start'
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+compileJava {
+    options.compilerArgs = ['-g:none']
+}
+
+jar {
+    archiveBaseName = 'interm'
+    exclude ('acp\\')
+    from(zipTree(file(Paths.EXTRA_JAR))) {
+        include('com\\')
+        include('paulscode\\')
+    }
+}
+
+FileFilter gitIgnoreFilter = (File file) -> !file.name.endsWith(".gitignore")
+FileFilter tempFilter = (File file) -> !file.name.equals(MC_VERSION + '.jar') && !file.name.endsWith('.json')
+FileFilter runFilter = (File file1) -> !file1.name.contains('resources') && !file1.name.contains('bin')
+
+clean {
+    delete(file("${Paths.DIR_SRC}\\net\\"))
+    delete(file("${Paths.DIR_SRC}\\risugami\\"))
+    delete(file("src\\main\\resources\\").listFiles(gitIgnoreFilter))
+    delete(file(Paths.DIR_ORIGINAL_SRC))
+    if(file("cfg\\temp\\").exists()) delete(file("cfg\\temp\\").listFiles(tempFilter))
+    if(file("run\\").exists()) delete(file("run").listFiles(runFilter))
+}

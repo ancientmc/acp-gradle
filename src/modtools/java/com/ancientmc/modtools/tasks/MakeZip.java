@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public abstract class MakeZip extends DefaultTask {
     @TaskAction

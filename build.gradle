@@ -33,6 +33,9 @@ dependencies {
     acpImplementation 'net.minecraftforge:srgutils:0.4.13'
 
     modtoolsImplementation sourceSets.acp.output
+
+    testImplementation gradleTestKit()
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 
 gradlePlugin {
@@ -61,6 +64,17 @@ jar {
                 'Implementation-Version': version,
         )
     }
+}
+
+task testJar(type: Copy, dependsOn: jar) {
+    from jar
+    into ('acp_test\\plugins\\')
+    rename { 'acp.jar' }
+}
+
+test {
+    dependsOn(':testJar')
+    useJUnitPlatform()
 }
 
 publishing {

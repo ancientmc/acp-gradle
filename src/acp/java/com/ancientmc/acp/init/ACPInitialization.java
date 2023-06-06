@@ -59,7 +59,7 @@ public class ACPInitialization {
                 .setProject(project);
         downloadLibraries.exec();
 
-        Step downloadToolsStep = (DownloadToolsStep) new DownloadToolsStep()
+        DownloadToolsStep downloadToolsStep = (DownloadToolsStep) new DownloadToolsStep()
                 .setProject(project)
                 .setProperties(project.file("gradle.properties"));
         downloadToolsStep.exec();
