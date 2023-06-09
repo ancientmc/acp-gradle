@@ -16,6 +16,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+/**
+ * Makes the SRG file for reobfuscation. It's not a TSRGv2, just a regular SRG, because then it can be read by SpecialSource,
+ * which is what's used for reobfuscation. The SRG is made via converting from the main TSRGv2 found in the ACP data.
+ * The conversion process is done using SRGUtils.
+ */
 public abstract class MakeReobfSrg extends DefaultTask {
     @TaskAction
     public void exec() {
@@ -28,7 +33,14 @@ public abstract class MakeReobfSrg extends DefaultTask {
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(output));
             List<String> lines = Files.readAllLines(temp.toPath());
+
+            /*
+             Adds a line to strip the package of any straggling classes with the "net/minecraft/src" package; since the
+             vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
+             into the net/minecraft/src path.
+             */
             writer.write("PK: . net/minecraft/src\n");
+
             for(String line : lines) {
                 writer.write(line + '\n');
             }

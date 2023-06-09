@@ -1,8 +1,9 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.ACPInitialization;
-import com.ancientmc.acp.tasks.GenerateHashes;
+import com.ancientmc.acp.tasks.MakeHashes;
 import com.ancientmc.acp.tasks.InjectModPatches;
+import com.ancientmc.acp.tasks.RepackageDefaults;
 import com.ancientmc.acp.utils.Paths;
 import org.gradle.api.*;
 import org.gradle.api.artifacts.Configuration;
@@ -37,10 +38,11 @@ public class ACPPlugin implements Plugin<Project> {
         TaskProvider<JavaExec> decompile = project.getTasks().register("decompile", JavaExec.class);
         TaskProvider<Copy> unzip = project.getTasks().register("unzip", Copy.class);
         TaskProvider<JavaExec> patch = project.getTasks().register("patch", JavaExec.class);
+        TaskProvider<RepackageDefaults> repackageDefaults = project.getTasks().register("repackageDefaults", RepackageDefaults.class);
         TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
         TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
-        TaskProvider<GenerateHashes> generateOriginalHashes = project.getTasks().register("generateOriginalHashes", GenerateHashes.class);
+        TaskProvider<MakeHashes> makeOriginalHashes = project.getTasks().register("makeOriginalHashes", MakeHashes.class);
 
         Configuration jarsplitter = project.getConfigurations().create("jarsplitter");
         Configuration mcinjector = project.getConfigurations().create("mcinjector");
@@ -67,7 +69,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        File modPatches = new File(Paths.DIR_MODPATCHES);
+        File modPatches = project.file(Paths.DIR_MODPATCHES);
 
         injectModPatches.configure(task -> {
             task.setGroup("decomp");
@@ -108,7 +110,7 @@ public class ACPPlugin implements Plugin<Project> {
             task.dependsOn(deobfJar);
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(fernflower));
-            task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
+            task.args("-rbr=0", "-rsy=0", "-asc=1", "-din=1", "-dgs=0", "-jvn=1", Paths.SRG_JAR, Paths.FINAL_JAR);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
@@ -131,10 +133,18 @@ public class ACPPlugin implements Plugin<Project> {
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
+        repackageDefaults.configure(task -> {
+            task.setGroup("decomp");
+            task.setDescription("Repackages any default source files into the net/minecraft/src directory.");
+            task.dependsOn(patch);
+            task.getSourceDirIn().set(project.file(Paths.DIR_SRC));
+            task.getSourceDirOut().set(project.file(Paths.DIR_SRC));
+        });
+
         copyJarAssets.configure(task -> {
             task.setGroup("decomp");
             task.setDescription("Copies the JAR assets into the src/main/resources folder.");
-            task.dependsOn(patch);
+            task.dependsOn(repackageDefaults);
             task.from(project.zipTree(project.file(Paths.EXTRA_JAR)));
             task.into(project.file(Paths.DIR_RESOURCES));
             task.exclude("com/**", "paulscode/**");
@@ -158,11 +168,11 @@ public class ACPPlugin implements Plugin<Project> {
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        generateOriginalHashes.configure(task -> {
+        makeOriginalHashes.configure(task -> {
             task.setGroup("decomp");
             task.dependsOn(testCompile);
             task.getClassesDirectory().set(project.file(Paths.DIR_ORIGINAL_CLASSES));
-            task.getOutput().set(project.file("build\\modding\\hashes\\vanilla.md5"));
+            task.getOutput().set(project.file("build\\modding\\hashes\\original.md5"));
         });
     }
 }

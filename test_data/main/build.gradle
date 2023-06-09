@@ -55,7 +55,7 @@ tasks.withType(JavaExec) {
 }
 
 task setup() {
-    dependsOn(':generateOriginalHashes')
+    dependsOn(':makeOriginalHashes')
 }
 
 task runClient(type: JavaExec) {
@@ -77,15 +77,14 @@ jar {
     }
 }
 
-FileFilter gitIgnoreFilter = (File file) -> !file.name.endsWith(".gitignore")
+FileFilter srcFilter = (File file) -> !file.name.contains("acp")
 FileFilter tempFilter = (File file) -> !file.name.equals(MC_VERSION + '.jar') && !file.name.endsWith('.json')
-FileFilter runFilter = (File file1) -> !file1.name.contains('resources') && !file1.name.contains('bin')
+FileFilter runFilter = (File file) -> !file.name.contains('resources') && !file.name.contains('bin')
 
 clean {
-    delete(file("${Paths.DIR_SRC}\\net\\"))
-    delete(file("${Paths.DIR_SRC}\\risugami\\"))
-    delete(file("src\\main\\resources\\").listFiles(gitIgnoreFilter))
+    delete(file(Paths.DIR_SRC).listFiles(srcFilter))
+    delete(file(Paths.DIR_RESOURCES).listFiles())
     delete(file(Paths.DIR_ORIGINAL_SRC))
-    if(file("cfg\\temp\\").exists()) delete(file("cfg\\temp\\").listFiles(tempFilter))
-    if(file("run\\").exists()) delete(file("run").listFiles(runFilter))
+    if(file(Paths.DIR_TEMP).exists()) delete(file(Paths.DIR_TEMP).listFiles(tempFilter))
+    if(file(Paths.DIR_RUN).exists()) delete(file(Paths.DIR_RUN).listFiles(runFilter))
 }

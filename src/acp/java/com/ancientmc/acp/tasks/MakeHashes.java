@@ -26,18 +26,24 @@ import java.util.Map;
  *      etc...
  * These hash values are used to determine whether a compiled class file has been modified.
  */
-public abstract class GenerateHashes extends DefaultTask {
+public abstract class MakeHashes extends DefaultTask {
     @TaskAction
     public void exec() {
-        File directory = getClassesDirectory().get().getAsFile();
-        File output = getOutput().get().getAsFile();
         try {
+            File directory = getClassesDirectory().get().getAsFile();
+            File output = getOutput().get().getAsFile();
             run(directory, output);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Main execution method for the text file generation. A map gets generated and is then written out as a text file.
+     * @param directory The directory containing the class files.
+     * @param out The output text file containing the hash values.
+     * @throws IOException
+     */
     public static void run(File directory, File out) throws IOException {
         Map<String, String> map = new HashMap<>();
         Collection<File> classes = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);

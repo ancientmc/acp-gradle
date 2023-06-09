@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 
 /**
  * Injects LZMA files found within a specified directory into the Minecraft JAR.
- * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files
+ * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files can be injected, as this task
+ * makes temporary JAR files.
  */
 public abstract class InjectModPatches extends DefaultTask {
 
@@ -35,9 +36,12 @@ public abstract class InjectModPatches extends DefaultTask {
     }
 
     /**
-     * @param input
-     * @param dir
-     * @param output
+     * Main execution method. The folder containing the LZMA patch files are parsed, and a list is created; this list is then iterated
+     * to determine which LZMA files have yet to be injected. For each LZMA file, except the last in the list, the output JAR after injection
+     * is a temporary file, stored in a folder that gets deleted after all the LZMAs have been processed.
+     * @param input The vanilla input JAR file (${version}-slim.jar).
+     * @param dir The directory containing the LZMA patches (cfg\modpatches).
+     * @param output The final output JAR file (${version}-mod.jar).
      */
     public void run(File input, File dir, File output) throws IOException {
         Project project = getProject();
@@ -65,13 +69,13 @@ public abstract class InjectModPatches extends DefaultTask {
     /**
      * Gets the currently iterated input JAR. If the index value of the current LZMA in the LZMA list getting injected is 0, that indicates that no injection has ocurred,
      * meaning the input is simply the original vanilla jar input. If not, a temporary file is created with the current index value of the LZMA.
-     * @param input The vanilla input file (ver-srg.jar)
-     * @param files The LZMA list.
+     * @param input The vanilla input JAR file (${version}-slim.jar).
+     * @param files The list of LZMA patch files.
      * @param lzma The currently iterated LZMA.
      * @return The current input for injection.
      */
-    public static File getCurrentInput(File input, List<File> files, File lzma) {
-        File temp = new File(Paths.DIR_TEMP, "modjars//temp" + files.indexOf(lzma) + ".jar");
+    public File getCurrentInput(File input, List<File> files, File lzma) {
+        File temp = getProject().file(Paths.DIR_TEMP + "modjars\\temp" + files.indexOf(lzma) + ".jar");
         return files.indexOf(lzma) == 0 ? input : temp;
     }
 
@@ -79,13 +83,13 @@ public abstract class InjectModPatches extends DefaultTask {
      * Similar to getCurrentInput(), we want to find the currently iterated value of the jar getting output.
      * If the index value in the lZMA list of the current LZMA getting injected is one less than the total size of the LZMA list,
      * that means that all LZMA files have been injected, and the final output can be returned. Otherwise, a new temp file is returned.
-     * @param output
-     * @param files
-     * @param lzma
-     * @return
+     * @param output The final output JAR file containing mod classes (${version}-mod.jar).
+     * @param files The list of LZMA patch files.
+     * @param lzma The currently iterated LZMA.
+     * @return The current output after injection.
      */
-    public static File getCurrentOutput(File output, List<File> files, File lzma) {
-        File temp = new File(Paths.DIR_TEMP, "modjars//temp" + (files.indexOf(lzma) + 1) + ".jar");
+    public File getCurrentOutput(File output, List<File> files, File lzma) {
+        File temp = getProject().file(Paths.DIR_TEMP + "modjars\\temp" + (files.indexOf(lzma) + 1) + ".jar");
         return files.indexOf(lzma) == files.size() - 1 ? output : temp;
     }
 
@@ -101,19 +105,19 @@ public abstract class InjectModPatches extends DefaultTask {
     }
 
     /**
-     * The input JAR.
+     * The vanilla input JAR (${version}-slim.jar).
      */
     @InputFile
     public abstract RegularFileProperty getInputJar();
 
     /**
-     * The directory containing the LZMA archive(s).
+     * The directory containing the LZMA archive(s) (cfg\modpatches).
      */
     @InputDirectory
     public abstract RegularFileProperty getPatchDir();
 
     /**
-     * The output JAR.
+     * The output JAR containing the mod classes (${version}-mod.jar).
      */
     @OutputFile
     public abstract RegularFileProperty getOutputJar();

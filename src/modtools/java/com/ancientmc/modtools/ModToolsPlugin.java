@@ -1,6 +1,6 @@
 package com.ancientmc.modtools;
 
-import com.ancientmc.acp.tasks.GenerateHashes;
+import com.ancientmc.acp.tasks.MakeHashes;
 import com.ancientmc.acp.utils.Paths;
 import com.ancientmc.modtools.tasks.DownloadModLoader;
 import com.ancientmc.modtools.tasks.MakeReobfSrg;
@@ -28,8 +28,8 @@ public class ModToolsPlugin implements Plugin<Project> {
         project.getPluginManager().apply(JavaPlugin.class);
 
         TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
-        TaskProvider<JavaExec> genDiffPatches = project.getTasks().register("genDiffPatches", JavaExec.class);
-        TaskProvider<GenerateHashes> generateModdedHashes = project.getTasks().register("generateModdedHashes", GenerateHashes.class);
+        TaskProvider<JavaExec> makeDiffPatches = project.getTasks().register("makeDiffPatches", JavaExec.class);
+        TaskProvider<MakeHashes> makeModdedHashes = project.getTasks().register("makeModdedHashes", MakeHashes.class);
         TaskProvider<MakeReobfSrg> makeReobfSrg = project.getTasks().register("makeReobfSrg", MakeReobfSrg.class);
         TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
         TaskProvider<Copy> extractReobfClasses = project.getTasks().register("extractReobfClasses", Copy.class);
@@ -58,7 +58,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.getModLoader().set(loaderType);
         });
 
-        genDiffPatches.configure(task -> {
+        makeDiffPatches.configure(task -> {
             String diffPatches = extension.getDiffPatchesDir().get();
             task.setGroup("modtools");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
@@ -90,7 +90,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.into(Paths.DIR_REOBF_CLASSES);
         });
 
-        generateModdedHashes.configure(task -> {
+        makeModdedHashes.configure(task -> {
             task.setGroup("modtools");
             task.dependsOn(extractReobfClasses);
             task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
@@ -100,9 +100,9 @@ public class ModToolsPlugin implements Plugin<Project> {
         makeZip.configure(task -> {
             String name = extension.getModName().get();
             task.setGroup("modtools");
-            task.dependsOn(generateModdedHashes);
+            task.dependsOn(makeModdedHashes);
             task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
-            task.getOriginalHash().set(project.file("build\\modding\\hashes\\vanilla.md5"));
+            task.getOriginalHash().set(project.file("build\\modding\\hashes\\original.md5"));
             task.getModdedHash().set(project.file("build\\modding\\hashes\\modded.md5"));
             task.getSrg().set(project.file(Paths.SRG));
             task.getZip().set(project.file("build\\modding\\zip\\" + name + ".zip"));
