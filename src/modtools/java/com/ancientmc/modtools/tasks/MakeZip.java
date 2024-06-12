@@ -38,7 +38,7 @@ public abstract class MakeZip extends DefaultTask {
                     String strippedName = name.substring(name.lastIndexOf('/') + 1);
 
                     String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
-                    File moddedClass = new File(obfDirectory, className + ".class");
+                    File moddedClass = getProject().file(obfDirectory.getPath() + "\\" + className + ".class");
                     moddedClasses.add(moddedClass);
                 }
             });

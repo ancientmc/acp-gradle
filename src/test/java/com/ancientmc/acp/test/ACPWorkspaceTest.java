@@ -17,7 +17,6 @@ import java.util.List;
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
 import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ACPWorkspaceTest {

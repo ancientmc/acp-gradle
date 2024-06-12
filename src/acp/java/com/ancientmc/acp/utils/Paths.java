@@ -18,6 +18,9 @@ public class Paths {
     public static String DIR_ORIGINAL_CLASSES;
     public static String DIR_REOBF_CLASSES;
     public static String DIR_MODDED_CLASSES;
+    public static String ACP_DATA;
+    public static String VERSION_MANIFEST;
+    public static String JSON;
     public static String BASE_JAR;
     public static String SLIM_JAR;
     public static String EXTRA_JAR;
@@ -50,6 +53,9 @@ public class Paths {
         DIR_ORIGINAL_CLASSES = "build\\modding\\classes\\original\\";
         DIR_MODDED_CLASSES = "build\\classes\\java\\main\\";
         DIR_REOBF_CLASSES = "build\\modding\\classes\\reobf\\";
+        ACP_DATA = DIR_CFG + "data.zip";
+        VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
+        JSON = DIR_TEMP + version + ".json";
         BASE_JAR = DIR_TEMP + version + ".jar";
         SLIM_JAR = DIR_TEMP + version + "-slim.jar";
         EXTRA_JAR = DIR_TEMP + version + "-extra.jar";

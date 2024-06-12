@@ -1,9 +1,6 @@
 package com.ancientmc.acp.tasks;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.RegularFileProperty;
 import org.gradle.api.tasks.InputDirectory;
@@ -12,8 +9,6 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**

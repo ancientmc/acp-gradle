@@ -27,7 +27,7 @@ public abstract class MakeReobfSrg extends DefaultTask {
         try {
             File input = getInputSrg().get().getAsFile();
             File output = getOutputSrg().get().getAsFile();
-            File temp = new File(Paths.DIR_TEMP, "temp.srg");
+            File temp = getProject().file(Paths.DIR_TEMP + "temp.srg");
 
             IMappingFile.load(input).write(temp.toPath(), IMappingFile.Format.SRG, false);
 
@@ -42,7 +42,7 @@ public abstract class MakeReobfSrg extends DefaultTask {
             writer.write("PK: . net/minecraft/src\n");
 
             for(String line : lines) {
-                writer.write(line + '\n');
+                writer.write(line + "\n");
             }
             writer.close();
             FileUtils.forceDelete(temp);

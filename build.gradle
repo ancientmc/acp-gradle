@@ -28,7 +28,7 @@ configurations {
 
 dependencies {
     acpImplementation gradleApi()
-    acpImplementation 'commons-io:commons-io:2.11.0'
+    acpImplementation 'commons-io:commons-io:2.16.0'
     acpImplementation 'com.google.code.gson:gson:2.10.1'
     acpImplementation 'net.minecraftforge:srgutils:0.4.13'
 

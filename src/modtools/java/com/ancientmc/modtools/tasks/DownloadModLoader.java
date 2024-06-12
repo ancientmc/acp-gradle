@@ -34,7 +34,7 @@ public abstract class DownloadModLoader extends DefaultTask {
             if (!output.exists()) {
                 FileUtils.forceMkdir(output);
             }
-            FileUtils.copyURLToFile(url, new File(output, "modloader.lzma"));
+            FileUtils.copyURLToFile(url, getProject().file(output.getPath() + "\\modloader.lzma"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -52,8 +52,7 @@ public abstract class DownloadModLoader extends DefaultTask {
         String ml = getModLoaderPath(loader);
 
         String mavenPath = ml + ":" + version;
-        String urlPath = Utils.toMavenUrl(repo, mavenPath, "lzma");
-        return new URL(urlPath);
+        return Utils.toMavenUrl(repo, mavenPath, "lzma");
     }
 
     /**

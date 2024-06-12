@@ -7,8 +7,10 @@ import com.google.gson.JsonParser;
 import net.minecraftforge.srgutils.IMappingFile;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.internal.os.OperatingSystem;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,11 +55,16 @@ public class Utils {
      * @param ext The file extension.
      * @return The maven URL.
      */
-    public static String toMavenUrl(String repo, String path, String ext) {
-        String[] split = path.split(":");
-        String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
-        String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
-        return repo + newPath;
+    public static URL toMavenUrl(String repo, String path, String ext) {
+        try {
+            String[] split = path.split(":");
+            String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
+            String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
+            return new URL(repo + newPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -81,6 +88,23 @@ public class Utils {
             in.close();
         }
         zipOut.close();
+    }
+
+    /**
+     * Gets a shortened version of the operating system's name. This class is used in getting the native URLs,
+     * as different versions for LWJGL's natives are needed depending on the operating system.
+     * @see Json#getNativeUrls(File)
+     */
+    public static String getOSName() {
+        OperatingSystem os = OperatingSystem.current();
+        if(os.isWindows()) {
+            return "windows";
+        } else if (os.isMacOsX()) {
+            return "osx";
+        } else if (os.isLinux() || os.isUnix()) {
+            return "linux";
+        }
+        return "unknown";
     }
 
     public static String getAncientMCMaven() {

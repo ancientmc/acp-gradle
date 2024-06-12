@@ -82,7 +82,7 @@ public class Json {
             String name = libraries.get(i).getAsJsonObject().get("name").getAsString();
             JsonObject entry = libraries.get(i).getAsJsonObject().getAsJsonObject("downloads");
             if(entry.has("classifiers")) {
-                String os = OSName.get();
+                String os = Utils.getOSName();
                 JsonObject natives = entry.getAsJsonObject("classifiers").getAsJsonObject("natives-" + os);
                 if (natives != null && isAllowed(name)) {
                     URL url = new URL(natives.get("url").getAsString());
@@ -127,10 +127,6 @@ public class Json {
         if (!name.contains("org.lwjgl")) {
             return true;
         }
-        if (OperatingSystem.current().isMacOsX()) {
-            return name.contains(LWJGL_MAC_VERSION);
-        } else {
-            return name.contains(LWJGL_VERSION);
-        }
+        return (OperatingSystem.current().isMacOsX()) ? name.contains(LWJGL_MAC_VERSION) : name.contains(LWJGL_VERSION);
     }
 }
