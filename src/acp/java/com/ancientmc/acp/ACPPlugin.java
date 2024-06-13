@@ -130,6 +130,7 @@ public class ACPPlugin implements Plugin<Project> {
         });
         copyJarAssets.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(downloadJar);
             task.from(project.zipTree(project.file(Paths.BASE_JAR)));
             task.into(project.file(Paths.ACP_DIR_RESOURCES));
             task.exclude("com/**", "net/**", "paulscode/**", "*.class");
