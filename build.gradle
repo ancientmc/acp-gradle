@@ -22,7 +22,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url = 'https://maven.minecraftforge.net/'}
+    maven { url = 'https://maven.minecraftforge.net/'} // switch to NeoForge eventually. Not worrying about it right now.
 }
 
 apply plugin: 'io.github.moist-mason.license-importer'
