@@ -15,7 +15,7 @@ plugins {
 }
 
 group 'com.ancientmc.acp'
-version '0.1.1-beta'
+version '0.1.1-beta' + new Date().format('yyyyMMdd.HHmmss')
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
