@@ -15,7 +15,7 @@ plugins {
 }
 
 group 'com.ancientmc.acp'
-version '0.1.1-beta' + new Date().format('yyyyMMdd.HHmmss')
+version '0.1.1-beta-' + new Date().format('yyyyMMdd.HHmmss')
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
@@ -74,7 +74,7 @@ publishing {
         pluginMaven(MavenPublication) {
             groupId = 'com.ancientmc.acp'
             artifactId = 'acp-gradle'
-            version = '0.1.1-beta'
+            version = project.version
             pom {
                 name = 'acp-gradle'
                 description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
