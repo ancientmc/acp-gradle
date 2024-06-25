@@ -88,18 +88,21 @@ public class ACPPlugin implements Plugin<Project> {
         });
         deobfJar.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(downloadJar);
             task.getMainClass().set("RetroGuard");
             task.setClasspath(project.files(retroguard));
             task.args("-searge", Paths.ACP_DIR_MAPPING + "retroguard.cfg");
         });
         injectExceptions.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(deobfJar);
             task.getMainClass().set("de.oceanlabs.mcp.mcinjector.MCInjector");
             task.setClasspath(project.files(mcinjector));
             task.args("--in", Paths.SRG_JAR, "--out", Paths.EXC_JAR, "--exc", Paths.ACP_DIR_MAPPING + "exceptions.exc", "--log", Paths.ACP_DIR_LOGS + "exceptions.log");
         });
         addParams.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(injectExceptions);
             task.getMainClass().set("cuchaz.enigma.command.Main");
             task.setClasspath(project.files(enigma));
             task.args("deobfuscate", Paths.EXC_JAR, Paths.FINAL_JAR, Paths.ACP_DIR_MAPPING + "params.mapping");
@@ -111,18 +114,21 @@ public class ACPPlugin implements Plugin<Project> {
         });
         decompileClassFiles.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(addParams);
             task.getMainClass().set("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler");
             task.setClasspath(project.files(quiltflower));
             task.args("-rbr=0", "-rsy=0", "-asc=1", "-dgs=1", "-jvn=1", "-dec=0", Paths.FINAL_JAR, Paths.FINAL_JAR);
         });
         unzipJar.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(decompileClassFiles);
             task.from(project.zipTree(project.file(Paths.FINAL_JAR)));
             task.into(project.file(Paths.ACP_DIR_SRC));
             task.exclude("com/**", "paulscode/**");
         });
         patchSourceFiles.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(unzipJar);
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
             task.args("--patch", Paths.ACP_DIR_SRC, Paths.ACP_PATCH_FILES, "--output", Paths.ACP_DIR_SRC,
@@ -130,24 +136,27 @@ public class ACPPlugin implements Plugin<Project> {
         });
         copyJarAssets.configure(task -> {
             task.setGroup("acp-decomp");
-            task.dependsOn(downloadJar);
+            task.dependsOn(patchSourceFiles, downloadJar);
             task.from(project.zipTree(project.file(Paths.BASE_JAR)));
             task.into(project.file(Paths.ACP_DIR_RESOURCES));
             task.exclude("com/**", "net/**", "paulscode/**", "*.class");
         });
         downloadMetaAssets.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(copyJarAssets);
             task.getMainClass().set("com.github.rmheuer.mcasset.McAssetExtractor");
             task.setClasspath(project.files(Paths.ACP_ASSET_EXTRACTOR));
             task.args(minecraftVersion, project.file(Paths.ACP_DIR_RUN));
         });
         downloadNatives.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(downloadMetaAssets);
             task.getJson().set(new File(Paths.NATIVES_JSON));
             task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
         extractNatives.configure(task -> {
             task.setGroup("acp-decomp");
+            task.dependsOn(downloadNatives);
             task.getNativesDir().set(new File(Paths.ACP_DIR_NATIVES));
         });
 
