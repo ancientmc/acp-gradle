@@ -66,22 +66,22 @@ public class Json {
      * @throws IOException
      */
     public static List<String> getLibraries(List<File> jsons) throws IOException {
-        List<String> libList = new ArrayList<>();
+        List<String> libraries = new ArrayList<>();
 
         for (File json : jsons) {
             JsonObject object = get(json);
-            JsonArray libraries = object.getAsJsonArray("libraries");
+            JsonArray libArray = object.getAsJsonArray("libraries");
 
-            for (JsonElement entry : libraries.asList()) {
+            for (JsonElement entry : libArray.asList()) {
                 String name = entry.getAsJsonObject().getAsJsonPrimitive("name").getAsString();
 
                 if (!name.startsWith("net.minecraft:launchwrapper") && isAllowed(name)) {
-                    libList.add(name);
+                    libraries.add(name);
                 }
             }
         }
 
-        return libList;
+        return libraries;
     }
 
     /**

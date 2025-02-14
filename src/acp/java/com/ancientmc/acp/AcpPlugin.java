@@ -40,10 +40,11 @@ public class AcpPlugin implements Plugin<Project> {
         TaskProvider<Copy> unzip = project.getTasks().register("unzip", Copy.class);
         TaskProvider<JavaExec> patch = project.getTasks().register("patch", JavaExec.class);
         TaskProvider<RepackageDefaults> repackageDefaults = project.getTasks().register("repackageDefaults", RepackageDefaults.class);
-        TaskProvider<Copy> copyJarAssets = project.getTasks().register("copyJarAssets", Copy.class);
-        TaskProvider<Copy> copySrc = project.getTasks().register("copySrc", Copy.class);
+        TaskProvider<Copy> copyResources = project.getTasks().register("copyResources", Copy.class);
+        TaskProvider<Copy> backupSrc = project.getTasks().register("backupSrc", Copy.class);
+        TaskProvider<Copy> backupResources = project.getTasks().register("backupResources", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
-        TaskProvider<MakeHashes> makeOriginalHashes = project.getTasks().register("makeOriginalHashes", MakeHashes.class);
+        TaskProvider<MakeHashes> makeVanillaHashes = project.getTasks().register("makeVanillaHashes", MakeHashes.class);
 
         Configuration jarsplitter = project.getConfigurations().create("jarsplitter");
         Configuration mcinjector = project.getConfigurations().create("mcinjector");
@@ -81,8 +82,8 @@ public class AcpPlugin implements Plugin<Project> {
         });
 
         boolean vanilla = !modPatches.exists(); // has the downloadModLoader task been run (and thus the modpatches dir created)? If not, assume vanilla workspace
-        String toInject = (vanilla ? Paths.SLIM_JAR : Paths.MODLOADER_JAR); // the JAR path to inject with MCInjector, depending on the vanilla status
-        String dependent = (vanilla ? "stripJar" : "injectModPatches"); // the task to run before the MCInject task, depending on the vanilla status.
+        String toInject = vanilla ? Paths.SLIM_JAR : Paths.MODLOADER_JAR; // the JAR path to inject with MCInjector, depending on the vanilla status
+        String dependent = vanilla ? "stripJar" : "injectModPatches"; // the task to run before the MCInject task, depending on the vanilla status.
 
         mcinject.configure(task -> {
             task.setGroup("decompile");
@@ -141,38 +142,46 @@ public class AcpPlugin implements Plugin<Project> {
             task.getSourceDirOut().set(project.file(Paths.DIR_SRC));
         });
 
-        copyJarAssets.configure(task -> {
+        copyResources.configure(task -> {
             task.setGroup("decompile");
             task.setDescription("Copies the JAR assets into the src/main/resources folder.");
             task.dependsOn(repackageDefaults);
             task.from(project.zipTree(project.file(Paths.EXTRA_JAR)));
             task.into(project.file(Paths.DIR_RESOURCES));
-            task.exclude("com/**", "paulscode/**");
+            task.exclude("com/**", "paulscode/**", "META-INF/**");
         });
 
-        copySrc.configure(task -> {
+        backupSrc.configure(task -> {
            task.setGroup("decompile");
-           task.dependsOn(copyJarAssets);
+           task.dependsOn(copyResources);
            task.from(project.file(Paths.DIR_SRC)).exclude("acp/");
-           task.into(project.file(Paths.DIR_ORIGINAL_SRC));
+           task.into(project.file(Paths.DIR_VANILLA_SRC));
+        });
+
+        backupResources.configure(task -> {
+            task.setGroup("decompile");
+            task.dependsOn(backupSrc);
+            task.from(project.file(Paths.DIR_RESOURCES));
+            task.into(project.file(Paths.DIR_VANILLA_RESOURCES));
         });
 
         testCompile.configure(task -> {
             task.setGroup("decompile");
-            task.dependsOn(copySrc);
+            task.dependsOn(backupResources);
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
-            task.getDestinationDirectory().set(new File(Paths.DIR_ORIGINAL_CLASSES));
+            task.getDestinationDirectory().set(new File(Paths.DIR_VANILLA_CLASSES));
             task.getOptions().setCompilerArgs(Arrays.asList("-g:none", "-source", "1.6", "-target", "1.6"));
             task.exclude("acp/");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
         });
 
-        makeOriginalHashes.configure(task -> {
+        makeVanillaHashes.configure(task -> {
             task.setGroup("decompile");
             task.dependsOn(testCompile);
-            task.getClassesDirectory().set(project.file(Paths.DIR_ORIGINAL_CLASSES));
-            task.getOutput().set(project.file("build/modding/hashes/original.md5"));
+            task.getClassesDirectory().set(project.file(Paths.DIR_VANILLA_CLASSES));
+            task.getResourcesDirectory().set(project.file(Paths.DIR_VANILLA_RESOURCES));
+            task.getOutput().set(project.file("build/modding/hashes/vanilla.md5"));
         });
     }
 }

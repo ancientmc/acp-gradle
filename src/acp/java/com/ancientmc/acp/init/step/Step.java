@@ -14,6 +14,9 @@ public class Step {
      */
     protected String message;
 
+    /**
+     * A generic output file. Allows a step to call the output of a previous step as its input.
+     */
     protected File output;
 
     /**
@@ -24,7 +27,7 @@ public class Step {
      */
     public void printMessage(Logger logger, String message, boolean condition) {
         if (condition) {
-            logger.lifecycle(message);
+            System.out.println(message);
         }
     }
 

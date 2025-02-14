@@ -42,7 +42,7 @@ public class ResolveToolsStep extends Step {
     }
 
     /**
-     * Resolves (adds) the dependency of the given tool configuration.
+     * Resolves (adds) the dependency of the given tool configuration to the project.
      * @param cfg The tool configuration.
      * @param tool The name of the tool dependency.
      */
@@ -59,6 +59,13 @@ public class ResolveToolsStep extends Step {
         });
     }
 
+    /**
+     * The following format is found for the tools listed in the gradle.properties file:
+     *          tool_(cfg_name)=(maven_name)
+     *          Where cfg_name is the configuration of the tool, and maven_name is the maven path for the tool.
+     * @param lines The lines of the gradle.properties file.
+     * @return The config map. The key is the configuration name of the tool, while the value is the tool's maven path.
+     */
     private Map<String, String> getConfigMap(List<String> lines) {
         Map<String, String> map = new HashMap<>();
         lines.forEach(line -> {

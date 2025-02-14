@@ -6,9 +6,9 @@ buildscript {
     dependencies {
         classpath files('plugins/acp.jar')
         classpath 'com.google.code.gson:gson:2.11.0'
-        classpath 'org.apache.commons:commons-compress:1.27.1'
         classpath 'commons-io:commons-io:2.18.0'
         classpath 'net.neoforged:srgutils:1.0.9'
+        classpath 'org.apache.commons:commons-compress:1.27.1'
     }
 }
 
@@ -17,14 +17,9 @@ plugins {
 }
 
 ext {
+    ACP_VERSION = '0.2.1'
     MC_VERSION = 'a1.2.6'
 }
-
-version = MC_VERSION
-
-// Older versions of Minecraft run Java 6. You should still set your JDK in your IDE to Java 8.
-sourceCompatibility = '1.6'
-targetCompatibility = '1.6'
 
 repositories {
     maven { url = 'https://libraries.minecraft.net' }
@@ -56,21 +51,21 @@ tasks.withType(JavaExec) {
 }
 
 task decompile() {
-    dependsOn(':makeOriginalHashes')
+    dependsOn(':makeVanillaHashes')
 }
 
 task runClient(type: JavaExec) {
     group = 'acp-run'
-    main = 'acp.client.Start'
+    mainClass = 'acp.client.Start'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 compileJava {
-    options.compilerArgs = ['-g:none']
+    options.compilerArgs = ['-g:none', '-source', '1.6', '-target', '1.6']
 }
 
 jar {
-    archiveBaseName = 'interm'
+    archiveBaseName = 'interm-' + MC_VERSION
     exclude ('acp/')
     from(zipTree(file(Paths.EXTRA_JAR))) {
         include('com/')
@@ -85,7 +80,8 @@ FileFilter runFilter = (File file) -> !file.name.contains('resources') && !file.
 clean {
     delete(file(Paths.DIR_SRC).listFiles(srcFilter))
     delete(file(Paths.DIR_RESOURCES).listFiles())
-    delete(file(Paths.DIR_ORIGINAL_SRC))
+    delete(file(Paths.DIR_VANILLA_SRC))
+    delete(file(Paths.DIR_VANILLA_RESOURCES))
     if(file(Paths.DIR_TEMP).exists()) delete(file(Paths.DIR_TEMP).listFiles(tempFilter))
     if(file(Paths.DIR_RUN).exists()) delete(file(Paths.DIR_RUN).listFiles(runFilter))
 }

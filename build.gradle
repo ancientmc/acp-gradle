@@ -9,13 +9,14 @@ buildscript {
 }
 
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
 }
 
 group 'com.ancientmc'
-version '0.2.0.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
+version '0.2.1.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
@@ -25,6 +26,9 @@ repositories {
     maven { url = 'https://maven.neoforged.net/'}
 }
 
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'io.github.moist-mason.license-importer'
 
 licenseimporter {
@@ -78,22 +82,33 @@ jar {
     from sourceSets.modtools.output
     manifest {
         attributes(
-                'Implementation-Title': 'acp-gradle',
+                'Specification-Title': 'ACP Gradle',
+                'Specification-Ventor': 'AncientMC',
+                'Specification-Version': archiveVersion,
+                'Implementation-Title': 'com.ancientmc:acp-gradle',
+                'Implementation-Vendor': 'AncientMC',
                 'Implementation-Version': archiveVersion,
         )
     }
 }
 
-task testJar(type: Copy, dependsOn: jar) {
+tasks.register('testJar', Copy) {
+    dependsOn jar
     from jar
-    into ('acp_test/plugins/')
+    into('acp_test/plugins/')
     rename { 'acp.jar' }
 }
 
-test {
-    dependsOn(':testJar')
+tasks.named('test') {
+    dependsOn testJar
     useJUnitPlatform()
-    filter { includeTestsMatching "*testDecompileRuby" }
+    filter { includeTestsMatching '*testDecompileRuby' }
+}
+
+tasks.withType(Test).configureEach {
+    testLogging {
+        showStandardStreams true
+    }
 }
 
 publishing {

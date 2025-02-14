@@ -1,5 +1,6 @@
 package com.ancientmc.modtools.tasks;
 
+import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;
@@ -24,33 +25,44 @@ import java.util.Map;
 public abstract class MakeArchives extends DefaultTask {
     @TaskAction
     public void exec() {
-        File hashDirectory = getHashDirectory().get().getAsFile();
-        File srg = getSrg().get().getAsFile();
-        File obfDirectory = getObfuscatedClassDirectory().get().getAsFile();
-        File archiveDirectory = getArchiveDirectory().get().getAsFile();
+        File hashDirectory = getHashDirectory().getAsFile().get();
+        File srg = getSrg().getAsFile().get();
+        File obfDirectory = getObfuscatedClassDirectory().getAsFile().get();
+        File resourcesDirectory = getResourcesDirectory().getAsFile().get();
+        File archiveDirectory = getArchiveDirectory().getAsFile().get();
 
         try {
             // Retrieve hash maps.
-            Map<String, String> originalMap = getHashMap(new File(hashDirectory, "original.md5"));
+            Map<String, String> vanillaMap = getHashMap(new File(hashDirectory, "vanilla.md5"));
             Map<String, String> moddedMap = getHashMap(new File(hashDirectory, "modded.md5"));
             Map<String, String> classMap = Util.getClassMap(srg);
 
             // Remove ACP start class from map.
             moddedMap.remove("acp/client/Start");
-            List<File> moddedClasses = new ArrayList<>();
+            List<File> moddedFiles = new ArrayList<>();
+
+            // Key -> the resource. Value -> the resource's parent directories.
+            Map<File, String> moddedResources = new HashMap<>();
 
             moddedMap.forEach((name, hash) -> {
-                if (!originalMap.containsValue(hash)) {
-                    // Get the class file names without packages.
-                    String strippedName = name.substring(name.lastIndexOf('/') + 1);
+                if (!vanillaMap.containsValue(hash)) {
+                    if (name.startsWith("net/minecraft/src/") || (name.startsWith("com/mojang"))) {
+                        // Add classes. Get the file names without packages
+                        String strippedName = name.substring(name.lastIndexOf('/') + 1);
 
-                    String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
-                    File moddedClass = getProject().file(obfDirectory.getPath() + "/" + className + ".class");
-                    moddedClasses.add(moddedClass);
+                        String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
+                        File moddedClass = getProject().file(obfDirectory.getPath() + "/" + className + ".class");
+                        moddedFiles.add(moddedClass);
+                    } else {
+                        // Add resources
+                        File moddedResource = getProject().file(resourcesDirectory.getPath() + "/" + name);
+                        String parent = name.substring(0, name.lastIndexOf('/'));
+                        moddedResources.put(moddedResource, parent);
+                    }
                 }
             });
 
-            Util.compress(moddedClasses, archiveDirectory);
+            Util.compress(moddedFiles, moddedResources, archiveDirectory);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,6 +95,9 @@ public abstract class MakeArchives extends DefaultTask {
 
     @InputDirectory
     public abstract DirectoryProperty getObfuscatedClassDirectory();
+
+    @InputDirectory
+    public abstract DirectoryProperty getResourcesDirectory();
 
     @InputDirectory
     public abstract DirectoryProperty getHashDirectory();

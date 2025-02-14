@@ -62,7 +62,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setGroup("modtools");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
-            task.args("--diff", Paths.DIR_ORIGINAL_SRC, Paths.DIR_SRC, "--output", diffPatches);
+            task.args("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", diffPatches);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
             task.setIgnoreExitValue(true);
         });
@@ -79,7 +79,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.getMainClass().set("net.md_5.specialsource.SpecialSource");
             task.setClasspath(project.files(specialsource));
             task.args("--in-jar", Paths.INTERM_JAR, "--out-jar", Paths.REOBF_JAR, "--srg-in", Paths.REOBF_SRG, "--reverse");
-            task.getLogging().captureStandardError(LogLevel.DEBUG);
+            task.getLogging().captureStandardError(LogLevel.LIFECYCLE);
         });
 
         extractReobfClasses.configure(task -> {
@@ -93,6 +93,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setGroup("modtools");
             task.dependsOn(extractReobfClasses);
             task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
+            task.getResourcesDirectory().set(project.file(Paths.DIR_RESOURCES));
             task.getOutput().set(new File("build/modding/hashes/modded.md5"));
         });
 
@@ -101,6 +102,7 @@ public class ModToolsPlugin implements Plugin<Project> {
             task.setGroup("modtools");
             task.dependsOn(makeModdedHashes);
             task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
+            task.getResourcesDirectory().set(project.file(Paths.DIR_RESOURCES));
             task.getHashDirectory().set(project.file("build/modding/hashes/"));
             task.getSrg().set(project.file(Paths.SRG));
             task.getArchiveDirectory().set(project.file("build/modding/archives/" + name + "/"));

@@ -27,7 +27,7 @@ public class Util {
      * Gets a map of class names from the SRG file. The key is the obfuscated name, while the value is the mapped name.
      * @param srg The SRG file.
      * @return The class map.
-     * @throws IOException
+     * @throws IOException exception
      */
     public static Map<String, String> getClassMap(File srg) throws IOException {
         Map<String, String> map = new HashMap<>();
@@ -57,50 +57,77 @@ public class Util {
 
     /**
      * Quick method that compresses multiple files into both a ZIP and TAR
-     * @param files The files.
+     * @param classes The class files.
+     * @param resources The resource files.
      * @param directory The output directory.
-     * @throws IOException
+     * @throws IOException exception
      */
-    public static void compress(Collection<File> files, File directory) throws IOException {
+    public static void compress(Collection<File> classes, Map<File, String> resources, File directory) throws IOException {
         String archive = directory.getName();
-        Util.compressZip(files, new File(directory, archive + ".zip"));
-        Util.compressTar(files, new File(directory, archive + ".tar.gz"));
+        Util.compressZip(classes, resources, new File(directory, archive + ".zip"));
+        Util.compressTar(classes, resources, new File(directory, archive + ".tar.gz"));
     }
 
     /**
-     * Simple compression function for multiple files.
-     * @param files The files.
+     * Simple ZIP compression function for mod files.
+     * @param classes The class files.
+     * @param resources The resource files.
      * @param zip The output ZIP.
-     * @throws IOException
+     * @throws IOException exception
      */
-    public static void compressZip(Collection<File> files, File zip) throws IOException {
+    public static void compressZip(Collection<File> classes, Map<File, String> resources, File zip) throws IOException {
         ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
 
-        for (File file : files) {
-            zipOut.putNextEntry(new ZipEntry(file.getName()));
-            FileInputStream in = new FileInputStream(file);
+        for (File cls : classes) {
+            zipOut.putNextEntry(new ZipEntry(cls.getName()));
+            FileInputStream in = new FileInputStream(cls);
             IOUtils.copy(in, zipOut);
             zipOut.closeEntry();
         }
+
+        resources.forEach((resource, parent) -> {
+            try {
+                zipOut.putNextEntry(new ZipEntry(parent + "/" + resource.getName()));
+                FileInputStream in = new FileInputStream(resource);
+                IOUtils.copy(in, zipOut);
+                zipOut.closeEntry();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         zipOut.close();
     }
 
     /**
-     * Simple compression function for multiple files.
-     * @param files The files.
+     * Simple TAR/GZIP compression function for mod files.
+     * @param classes The class files.
+     * @param resources The resource files.
      * @param tar The output TAR GZIP.
-     * @throws IOException
+     * @throws IOException exception
      */
-    public static void compressTar(Collection<File> files, File tar) throws IOException {
+    public static void compressTar(Collection<File> classes, Map<File, String> resources, File tar) throws IOException {
         GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(Files.newOutputStream(tar.toPath()));
         TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut);
 
-        for (File file : files) {
-            tarOut.putArchiveEntry(new TarArchiveEntry(file, file.getName()));
-            FileInputStream in = new FileInputStream(file);
+        for (File cls : classes) {
+            tarOut.putArchiveEntry(new TarArchiveEntry(cls, cls.getName()));
+            FileInputStream in = new FileInputStream(cls);
             IOUtils.copy(in, tarOut);
             tarOut.closeArchiveEntry();
         }
+
+        resources.forEach((resource, parent) -> {
+            try {
+                tarOut.putArchiveEntry(new TarArchiveEntry(resource, parent + "/" + resource.getName()));
+                FileInputStream in = new FileInputStream(resource);
+                IOUtils.copy(in, tarOut);
+                tarOut.closeArchiveEntry();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         tarOut.finish();
         tarOut.close();
         gzipOut.close();

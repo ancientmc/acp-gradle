@@ -13,9 +13,10 @@ public class Paths {
     public static String DIR_RUN;
     public static String DIR_NATIVES;
     public static String DIR_SRC;
-    public static String DIR_ORIGINAL_SRC;
     public static String DIR_RESOURCES;
-    public static String DIR_ORIGINAL_CLASSES;
+    public static String DIR_VANILLA_SRC;
+    public static String DIR_VANILLA_RESOURCES;
+    public static String DIR_VANILLA_CLASSES;
     public static String DIR_REOBF_CLASSES;
     public static String DIR_MODDED_CLASSES;
     public static String ACP_DATA;
@@ -48,9 +49,10 @@ public class Paths {
         DIR_RUN = "run/";
         DIR_NATIVES = DIR_RUN + "bin/natives/";
         DIR_SRC = "src/main/java/";
-        DIR_ORIGINAL_SRC = "build/modding/originalSrc";
+        DIR_VANILLA_SRC = "build/modding/vanillaFiles/src";
         DIR_RESOURCES = "src/main/resources/";
-        DIR_ORIGINAL_CLASSES = "build/modding/classes/original/";
+        DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources";
+        DIR_VANILLA_CLASSES = "build/modding/classes/vanilla/";
         DIR_MODDED_CLASSES = "build/classes/java/main/";
         DIR_REOBF_CLASSES = "build/modding/classes/reobf/";
         ACP_DATA = DIR_CFG + "data.zip";

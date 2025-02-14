@@ -32,9 +32,10 @@ public abstract class MakeHashes extends DefaultTask {
     @TaskAction
     public void exec() {
         try {
-            File directory = getClassesDirectory().get().getAsFile();
+            File classDirectory = getClassesDirectory().get().getAsFile();
+            File resourceDirectory = getResourcesDirectory().get().getAsFile();
             File output = getOutput().get().getAsFile();
-            run(directory, output);
+            run(classDirectory, resourceDirectory, output);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -42,19 +43,29 @@ public abstract class MakeHashes extends DefaultTask {
 
     /**
      * Main execution method for the text file generation. A map gets generated and is then written out as a text file.
-     * @param directory The directory containing the class files.
+     * @param classDirectory The directory containing the class files.
+     * @param resourceDirectory The directory containing the resource files.
      * @param out The output text file containing the hash values.
      * @throws IOException
      */
-    public static void run(File directory, File out) throws IOException {
+    public static void run(File classDirectory, File resourceDirectory, File out) throws IOException {
         Map<String, String> map = new HashMap<>();
-        Collection<File> classes = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
 
         classes.forEach(cls -> {
             String hash = getHash(cls);
             String name = cls.getAbsolutePath();
             name = name.replace(".class", "")
-                    .replace(directory.getAbsolutePath() + File.separator, "")
+                    .replace(classDirectory.getAbsolutePath() + File.separator, "")
+                    .replace(File.separator, "/");
+            map.put(name, hash);
+        });
+
+        resources.forEach(rs -> {
+            String hash = getHash(rs);
+            String name = rs.getAbsolutePath();
+            name = name.replace(resourceDirectory.getAbsolutePath() + File.separator, "")
                     .replace(File.separator, "/");
             map.put(name, hash);
         });
@@ -72,14 +83,14 @@ public abstract class MakeHashes extends DefaultTask {
     }
 
     /**
-     * Calculates an MD5 hash from the given class.
-     * @param cls The class file.
+     * Calculates an MD5 hash from the given file.
+     * @param file The file.
      * @return The hash.
      */
-    public static String getHash(File cls) {
+    public static String getHash(File file) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] bytes = md.digest(Files.readAllBytes(cls.toPath()));
+            byte[] bytes = md.digest(Files.readAllBytes(file.toPath()));
 
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
@@ -94,10 +105,12 @@ public abstract class MakeHashes extends DefaultTask {
     @InputDirectory
     public abstract RegularFileProperty getClassesDirectory();
 
+    @InputDirectory
+    public abstract RegularFileProperty getResourcesDirectory();
+
     /**
      * The output text file containing the hash values.
      */
     @OutputFile
     public abstract RegularFileProperty getOutput();
-
 }
