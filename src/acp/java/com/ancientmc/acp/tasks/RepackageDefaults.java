@@ -49,7 +49,7 @@ public abstract class RepackageDefaults extends DefaultTask {
      * @param in The input file.
      * @param out The output file.
      * @param toAdd The text getting added.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public void writeFile(File in, File out, String toAdd) throws IOException {
         List<String> lines = Files.readAllLines(in.toPath());

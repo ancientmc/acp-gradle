@@ -46,7 +46,7 @@ public abstract class MakeHashes extends DefaultTask {
      * @param classDirectory The directory containing the class files.
      * @param resourceDirectory The directory containing the resource files.
      * @param out The output text file containing the hash values.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static void run(File classDirectory, File resourceDirectory, File out) throws IOException {
         Map<String, String> map = new HashMap<>();

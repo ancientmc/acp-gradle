@@ -1,4 +1,4 @@
-package com.ancientmc.modtools.tasks;
+package com.ancientmc.acp.tasks;
 
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
@@ -46,7 +46,7 @@ public abstract class DownloadModLoader extends DefaultTask {
      * @return The URL for the ModLoader LZMA.
      * @throws MalformedURLException
      */
-    private URL getURL(String repo, String version, String loader) throws MalformedURLException {
+    private URL getURL(String repo, String version, String loader) throws IOException {
         String ml = getModLoaderPath(loader);
         String mavenPath = ml + ":" + version;
 

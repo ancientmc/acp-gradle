@@ -9,13 +9,12 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
 }
 
-group 'com.ancientmc'
+group 'io.github.ancientmc' // Usual
 version '0.2.1.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
@@ -26,9 +25,6 @@ repositories {
     maven { url = 'https://maven.neoforged.net/'}
 }
 
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
-apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'io.github.moist-mason.license-importer'
 
 licenseimporter {
@@ -61,18 +57,14 @@ dependencies {
 }
 
 gradlePlugin {
+    website = 'https://github.com/ancientmc/acp-gradle'
+    vcsUrl = 'https://github.com/ancientmc/acp-gradle'
     plugins {
         acp {
             id = 'com.ancientmc.acp'
-            displayName = 'acp-plugin'
+            displayName = 'acp-gradle'
             description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
             implementationClass = 'com.ancientmc.acp.AcpPlugin'
-        }
-        modtools {
-            id = 'com.ancientmc.modtools'
-            displayName = 'modtools'
-            description = 'Gradle plugin containing useful modding tools for users working with ACP.'
-            implementationClass = 'com.ancientmc.modtools.ModToolsPlugin'
         }
     }
 }
@@ -85,7 +77,7 @@ jar {
                 'Specification-Title': 'ACP Gradle',
                 'Specification-Ventor': 'AncientMC',
                 'Specification-Version': archiveVersion,
-                'Implementation-Title': 'com.ancientmc:acp-gradle',
+                'Implementation-Title': 'io.github.ancientmc:acp-gradle',
                 'Implementation-Vendor': 'AncientMC',
                 'Implementation-Version': archiveVersion,
         )

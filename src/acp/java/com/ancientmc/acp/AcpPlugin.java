@@ -1,10 +1,9 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.init.AcpInitializer;
-import com.ancientmc.acp.tasks.InjectModPatches;
-import com.ancientmc.acp.tasks.MakeHashes;
-import com.ancientmc.acp.tasks.RepackageDefaults;
+import com.ancientmc.acp.tasks.*;
 import com.ancientmc.acp.util.Paths;
+import org.apache.commons.io.FileUtils;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -45,6 +44,13 @@ public class AcpPlugin implements Plugin<Project> {
         TaskProvider<Copy> backupResources = project.getTasks().register("backupResources", Copy.class);
         TaskProvider<JavaCompile> testCompile = project.getTasks().register("testCompile", JavaCompile.class);
         TaskProvider<MakeHashes> makeVanillaHashes = project.getTasks().register("makeVanillaHashes", MakeHashes.class);
+        TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
+        TaskProvider<JavaExec> makeDiffPatches = project.getTasks().register("makeDiffPatches", JavaExec.class);
+        TaskProvider<MakeHashes> makeModdedHashes = project.getTasks().register("makeModdedHashes", MakeHashes.class);
+        TaskProvider<MakeReobfSrg> makeReobfSrg = project.getTasks().register("makeReobfSrg", MakeReobfSrg.class);
+        TaskProvider<JavaExec> reobfJar = project.getTasks().register("reobfJar", JavaExec.class);
+        TaskProvider<Copy> extractReobfClasses = project.getTasks().register("extractReobfClasses", Copy.class);
+        TaskProvider<MakeArchives> makeArchives = project.getTasks().register("makeArchives", MakeArchives.class);
 
         Configuration jarsplitter = project.getConfigurations().create("jarsplitter");
         Configuration mcinjector = project.getConfigurations().create("mcinjector");
@@ -52,12 +58,19 @@ public class AcpPlugin implements Plugin<Project> {
         Configuration fernflower = project.getConfigurations().create("fernflower");
         Configuration diffpatch = project.getConfigurations().create("diffpatch");
         Configuration binpatch = project.getConfigurations().create("binpatch");
+        Configuration specialsource = project.getConfigurations().create("specialsource");
 
         project.afterEvaluate(proj -> {
             try {
                 AcpInitializer.init(proj, extension, minecraftVersion);
+
+                String diffPatches = extension.getDiffPatchesDir().get();
+
+                if (!proj.file(diffPatches).exists()) {
+                    FileUtils.forceMkdir(proj.file(diffPatches));
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
 
@@ -182,6 +195,65 @@ public class AcpPlugin implements Plugin<Project> {
             task.getClassesDirectory().set(project.file(Paths.DIR_VANILLA_CLASSES));
             task.getResourcesDirectory().set(project.file(Paths.DIR_VANILLA_RESOURCES));
             task.getOutput().set(project.file("build/modding/hashes/vanilla.md5"));
+        });
+
+        downloadModLoader.configure(task -> {
+            String loaderType = extension.getLoader().get();
+            task.setGroup("modtools");
+            task.getVersion().set(minecraftVersion);
+            task.getOutputDir().set(project.file(Paths.DIR_MODPATCHES));
+            task.getModLoader().set(loaderType);
+        });
+
+        makeDiffPatches.configure(task -> {
+            String diffPatches = extension.getDiffPatchesDir().get();
+            task.setGroup("modtools");
+            task.getMainClass().set("codechicken.diffpatch.DiffPatch");
+            task.setClasspath(project.files(diffpatch));
+            task.args("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", diffPatches);
+            task.getLogging().captureStandardOutput(LogLevel.DEBUG);
+            task.setIgnoreExitValue(true);
+        });
+
+        makeReobfSrg.configure(task -> {
+            task.setGroup("modtools");
+            task.getInputSrg().set(project.file(Paths.SRG));
+            task.getOutputSrg().set(project.file(Paths.REOBF_SRG));
+        });
+
+        reobfJar.configure(task -> {
+            task.setGroup("modtools");
+            task.dependsOn(":jar", makeReobfSrg);
+            task.getMainClass().set("net.md_5.specialsource.SpecialSource");
+            task.setClasspath(project.files(specialsource));
+            task.args("--in-jar", Paths.INTERM_JAR, "--out-jar", Paths.REOBF_JAR, "--srg-in", Paths.REOBF_SRG, "--reverse");
+            task.getLogging().captureStandardError(LogLevel.LIFECYCLE);
+        });
+
+        extractReobfClasses.configure(task -> {
+            task.setGroup("modtools");
+            task.dependsOn(reobfJar);
+            task.from(project.zipTree(project.file(Paths.REOBF_JAR))).include("*.class", "net/");
+            task.into(Paths.DIR_REOBF_CLASSES);
+        });
+
+        makeModdedHashes.configure(task -> {
+            task.setGroup("modtools");
+            task.dependsOn(extractReobfClasses);
+            task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
+            task.getResourcesDirectory().set(project.file(Paths.DIR_RESOURCES));
+            task.getOutput().set(new File("build/modding/hashes/modded.md5"));
+        });
+
+        makeArchives.configure(task -> {
+            String name = extension.getModName().get();
+            task.setGroup("modtools");
+            task.dependsOn(makeModdedHashes);
+            task.getObfuscatedClassDirectory().set(project.file(Paths.DIR_REOBF_CLASSES));
+            task.getResourcesDirectory().set(project.file(Paths.DIR_RESOURCES));
+            task.getHashDirectory().set(project.file("build/modding/hashes/"));
+            task.getSrg().set(project.file(Paths.SRG));
+            task.getArchiveDirectory().set(project.file("build/modding/archives/" + name + "/"));
         });
     }
 }

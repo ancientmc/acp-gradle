@@ -1,6 +1,5 @@
-package com.ancientmc.modtools.tasks;
+package com.ancientmc.acp.tasks;
 
-import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.DefaultTask;

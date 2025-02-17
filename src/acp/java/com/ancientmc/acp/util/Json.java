@@ -25,7 +25,7 @@ public class Json {
      * Useful utility method for easily converting a JSON file into a JSON object parsable by Gson.
      * @param file The JSON file.
      * @return The JSON file as a Gson object.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static JsonObject get(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -63,7 +63,7 @@ public class Json {
      * @param jsons The JSON files that the libraries are parsed from. Two JSONS are parsed: Minecraft's Version JSON created by
      *              Mojang, and a jar dependencies JSON file for libraries that are stored in the Minecraft JAR file (usually sound libraries).
      * @return The list of libraries.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static List<String> getLibraries(List<File> jsons) throws IOException {
         List<String> libraries = new ArrayList<>();
@@ -88,7 +88,7 @@ public class Json {
      * Gets a list of the native URLs from the JSON.
      * @param json The Minecraft version JSON.
      * @return The list of URLs.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static List<URL> getNativeUrls(File json) throws IOException {
         JsonObject jsonObj = get(json);
@@ -118,7 +118,7 @@ public class Json {
      * Minecraft's resources (ones not already present within the JAR).
      * @param json The Minecraft version JSON.
      * @return The asset index URL.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static URL getAssetIndexUrl(File json) throws IOException {
         JsonObject jsonObj = get(json);
@@ -131,7 +131,7 @@ public class Json {
      * @param side The game side. Acceptable inputs are "client" and "server", though older versions may not have the server JAR in their
      *             JSONs.
      * @return The URL to the JAR file.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static URL getJarUrl(File json, String side) throws IOException {
         JsonObject jsonObj = get(json);

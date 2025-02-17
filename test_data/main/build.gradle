@@ -32,15 +32,11 @@ sourceSets {
 }
 
 apply plugin: 'com.ancientmc.acp'
-apply plugin: 'com.ancientmc.modtools'
 
 import com.ancientmc.acp.util.*
 
 acp {
     data = "com.ancientmc.acp:acp-data:${MC_VERSION}"
-}
-
-modtools {
     loader = 'risugami'
     diffPatchesDir = project.buildDir.absolutePath + '/modding/patches/diff'
     modName = 'ruby'
