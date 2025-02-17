@@ -23,7 +23,7 @@ public class AcpPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        String minecraftVersion = project.getExtensions().getExtraProperties().get("MC_VERSION").toString();
+        String minecraftVersion = project.getProperties().get("minecraft_version").toString();
         AcpExtension extension = project.getExtensions().create("acp", AcpExtension.class, project);
 
         // Set the Minecraft version for the various directory/file paths to utilize.

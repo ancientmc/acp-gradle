@@ -103,7 +103,7 @@ public class AcpInitializer {
     private static String getStartupMessage(Project project, String minecraftVersion) throws IOException {
         List<String> lines = Arrays.asList("Ancient Coder Pack",
                 "Copyright (c) AncientMC",
-                "ACP Version: " + project.getExtensions().getExtraProperties().get("ACP_VERSION"),
+                "ACP Version: " + project.getProperties().get("acp_version").toString(),
                 "ACP-Gradle Version: " + getPluginVersion(project),
                 "Minecraft Version: " + minecraftVersion);
 
