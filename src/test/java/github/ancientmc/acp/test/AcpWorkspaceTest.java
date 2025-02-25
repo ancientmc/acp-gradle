@@ -24,19 +24,17 @@ public class AcpWorkspaceTest {
      * The generated directory for our test workspace.
      */
     private File testDir;
-    /**
-     * The "test_data" folder, which contains template files used to make an ACP test workspace.
-     */
-    private File testData;
 
     /**
      * Sets up the test workspace.
-     * @throws IOException
+     * @throws IOException exception.
      */
     @BeforeEach
     public void setup() throws IOException {
         testDir = new File("acp_test/");
-        testData = new File("test_data/main/");
+
+        //  The "test_data" folder, which contains template files used to make an ACP test workspace.
+        File testData = new File("test_data/main/");
 
         // Each template, including the build file, gets copied over to the test workspace directory.
         Collection<File> files = FileUtils.listFiles(testData, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
@@ -106,13 +104,13 @@ public class AcpWorkspaceTest {
             injectRubyTestMod();
             System.out.println("Ruby mod injection successful");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
     /**
      * Copies the ruby test mod into the source path.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public void injectRubyTestMod() throws IOException {
         File ruby = new File("test_data/ruby/");

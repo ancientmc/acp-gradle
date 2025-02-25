@@ -33,7 +33,7 @@ public class DownloadFileStep extends Step {
             try {
                 FileUtils.copyURLToFile(input, output);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

@@ -27,7 +27,7 @@ public class Step {
      */
     public void printMessage(Logger logger, String message, boolean condition) {
         if (condition) {
-            System.out.println(message);
+            logger.lifecycle(message);
         }
     }
 
@@ -51,7 +51,6 @@ public class Step {
 
     /**
      * Gets output from a file-based step. Usually used when getting a downloaded file in inherited Step classes.
-     * Easier to call this than typing out the full output in ACPInitialization.
      * @return The output of the step.
      * @see DownloadFileStep#getOutput() DownloadFileStep.getOutput() for the most used example.
      */

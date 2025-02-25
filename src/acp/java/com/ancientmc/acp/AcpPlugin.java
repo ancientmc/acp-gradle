@@ -63,7 +63,6 @@ public class AcpPlugin implements Plugin<Project> {
         project.afterEvaluate(proj -> {
             try {
                 AcpInitializer.init(proj, extension, minecraftVersion);
-
                 String diffPatches = extension.getDiffPatchesDir().get();
 
                 if (!proj.file(diffPatches).exists()) {
@@ -166,6 +165,7 @@ public class AcpPlugin implements Plugin<Project> {
 
         backupSrc.configure(task -> {
            task.setGroup("decompile");
+           task.setDescription("Creates a backup of the source in the build directory. Used when generating patch files for mods.");
            task.dependsOn(copyResources);
            task.from(project.file(Paths.DIR_SRC)).exclude("acp/");
            task.into(project.file(Paths.DIR_VANILLA_SRC));

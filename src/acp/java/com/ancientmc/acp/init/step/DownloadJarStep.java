@@ -32,7 +32,7 @@ public class DownloadJarStep extends DownloadFileStep {
                 File jar = new File(output, version + (input.getPath().contains("client") ? ".jar" : "-server.jar"));
                 FileUtils.copyURLToFile(input, jar);
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

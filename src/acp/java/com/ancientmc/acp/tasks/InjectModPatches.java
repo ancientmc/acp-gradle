@@ -34,7 +34,7 @@ public abstract class InjectModPatches extends DefaultTask {
             File output = getOutputJar().get().getAsFile();
             run(input, dir, output);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

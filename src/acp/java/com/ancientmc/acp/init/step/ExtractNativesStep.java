@@ -15,15 +15,18 @@ import java.util.List;
  * Extracts native libraries required for Minecraft to run into the designated folder.
  */
 public class ExtractNativesStep extends Step {
+
     /**
      * The list of URLs for native libraries from Minecraft's website. The URLs are retrieved via a method in utils.Json
      * @see Json#getNativeUrls(File)
      */
     private List<URL> urls;
+
     /**
      * The output directory that will contain the native files.
      */
     private File output;
+
     /**
      * The gradle project.
      */
@@ -47,14 +50,12 @@ public class ExtractNativesStep extends Step {
                     jars.add(new File(output, path));
                 }
 
-                jars.forEach(jar -> {
-                    project.copy(action -> {
-                        action.from(project.zipTree(jar));
-                        action.into(project.file(output));
-                    });
-                });
+                jars.forEach(jar -> project.copy(action -> {
+                    action.from(project.zipTree(jar));
+                    action.into(project.file(output));
+                }));
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }

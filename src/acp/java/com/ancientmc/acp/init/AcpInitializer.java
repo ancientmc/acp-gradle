@@ -81,9 +81,9 @@ public class AcpInitializer {
 
         Step downloadAssets = new DownloadAssetsStep()
                 .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
-                .setOutput(project.file(Paths.DIR_RUN))
+                .setOutput(project.file(Paths.DIR_ASSETS))
                 .setMessage("Downloading assets");
-        downloadAssets.exec(logger, !project.file(Paths.DIR_RUN + "resources/").exists());
+        downloadAssets.exec(logger, !project.file(Paths.DIR_ASSETS).exists());
 
         Step downloadClient = new DownloadJarStep()
                 .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
@@ -116,11 +116,13 @@ public class AcpInitializer {
      * @return The ACP Gradle version.
      */
     private static String getPluginVersion(Project project) throws IOException {
-        // Unfortunately this may have to be unparamititized (intentional misspelling).
-        Plugin plugin = project.getPlugins().stream().filter(p -> p.getClass().getName().contains("acp")).findAny().get();
-        URLClassLoader loader = (URLClassLoader) plugin.getClass().getClassLoader();
-        Manifest manifest = new Manifest(loader.findResource("META-INF/MANIFEST.MF").openStream());
+        Plugin<?> plugin = project.getPlugins().stream().filter(p -> p.getClass().getName().contains("acp")).findAny().orElse(null);
 
-        return manifest.getMainAttributes().getValue("Implementation-Version");
+        if (plugin != null) {
+            URLClassLoader loader = (URLClassLoader) plugin.getClass().getClassLoader();
+            Manifest manifest = new Manifest(loader.findResource("META-INF/MANIFEST.MF").openStream());
+            return manifest.getMainAttributes().getValue("Implementation-Version");
+        }
+        return null;
     }
 }

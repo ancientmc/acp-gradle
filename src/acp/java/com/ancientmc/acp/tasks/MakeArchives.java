@@ -22,6 +22,7 @@ import java.util.Map;
  * Makes two archives (ZIP and TAR) of mod classes and/or modified Minecraft classes for distribution.
  */
 public abstract class MakeArchives extends DefaultTask {
+
     @TaskAction
     public void exec() {
         File hashDirectory = getHashDirectory().getAsFile().get();
@@ -63,7 +64,7 @@ public abstract class MakeArchives extends DefaultTask {
 
             Util.compress(moddedFiles, moddedResources, archiveDirectory);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,7 +90,7 @@ public abstract class MakeArchives extends DefaultTask {
     public String getObfName(String name, Map<String, String> map) {
         return map.entrySet().stream()
                 .filter(entry -> name.equals(entry.getValue()))
-                .map(Map.Entry::getKey).findAny().get();
+                .map(Map.Entry::getKey).findAny().orElse(null);
     }
 
     @InputDirectory

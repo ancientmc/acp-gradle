@@ -22,6 +22,7 @@ import java.util.List;
  * The conversion process is done using SRGUtils.
  */
 public abstract class MakeReobfSrg extends DefaultTask {
+
     @TaskAction
     public void exec() {
         try {
@@ -47,7 +48,7 @@ public abstract class MakeReobfSrg extends DefaultTask {
             writer.close();
             FileUtils.forceDelete(temp);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

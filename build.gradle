@@ -1,20 +1,11 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url = 'https://github.com/ancientmc/ancientmc-maven/raw/maven' }
-    }
-    dependencies {
-        classpath 'io.github.moist-mason:license-importer:1.0'
-    }
-}
-
 plugins {
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
+    id 'io.github.moist-mason.license-importer' version '1.0'
 }
 
-group 'io.github.ancientmc' // Usual
+group 'com.ancientmc'
 version '0.2.1.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
@@ -22,10 +13,8 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 repositories {
     mavenCentral()
     mavenLocal()
-    maven { url = 'https://maven.neoforged.net/'}
+    maven { url = 'https://maven.neoforged.net/' }
 }
-
-apply plugin: 'io.github.moist-mason.license-importer'
 
 licenseimporter {
     url = 'https://raw.githubusercontent.com/ancientmc/license/master/LICENSE'
@@ -34,13 +23,10 @@ licenseimporter {
 
 sourceSets {
     acp
-    modtools
 }
 
 configurations {
     acpImplementation
-    modtoolsImplementation.extendsFrom acpImplementation
-    implementation.extendsFrom acpImplementation, modtoolsImplementation
 }
 
 dependencies {
@@ -50,34 +36,30 @@ dependencies {
     acpImplementation 'net.neoforged:srgutils:1.0.9'
     acpImplementation 'org.apache.commons:commons-compress:1.27.1'
 
-    modtoolsImplementation sourceSets.acp.output
-
     testImplementation gradleTestKit()
+    testImplementation 'commons-io:commons-io:2.18.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 
 gradlePlugin {
     website = 'https://github.com/ancientmc/acp-gradle'
     vcsUrl = 'https://github.com/ancientmc/acp-gradle'
-    plugins {
-        acp {
-            id = 'com.ancientmc.acp'
-            displayName = 'acp-gradle'
-            description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
-            implementationClass = 'com.ancientmc.acp.AcpPlugin'
-        }
+    plugins.register('acp') {
+        id = 'com.ancientmc.acp'
+        displayName = 'acp-gradle'
+        description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
+        implementationClass = 'com.ancientmc.acp.AcpPlugin'
     }
 }
 
 jar {
     from sourceSets.acp.output
-    from sourceSets.modtools.output
     manifest {
         attributes(
                 'Specification-Title': 'ACP Gradle',
                 'Specification-Ventor': 'AncientMC',
                 'Specification-Version': archiveVersion,
-                'Implementation-Title': 'io.github.ancientmc:acp-gradle',
+                'Implementation-Title': 'com.ancientmc:acp-gradle',
                 'Implementation-Vendor': 'AncientMC',
                 'Implementation-Version': archiveVersion,
         )
@@ -91,10 +73,10 @@ tasks.register('testJar', Copy) {
     rename { 'acp.jar' }
 }
 
-tasks.named('test') {
+test {
     dependsOn testJar
     useJUnitPlatform()
-    filter { includeTestsMatching '*testDecompileRuby' }
+    filter { includeTestsMatching '*testDecompileAll' }
 }
 
 tasks.withType(Test).configureEach {
@@ -104,27 +86,28 @@ tasks.withType(Test).configureEach {
 }
 
 publishing {
-    publications {
-        pluginMaven(MavenPublication) {
-            groupId = project.group
-            artifactId = 'acp-gradle'
-            version = project.version
-            pom {
-                name = 'acp-gradle'
-                description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
-                url = 'https://github.com/ancientmc/acp-gradle'
-                licenses {
-                    license {
-                        name = 'AncientMC License'
-                        url = 'https://github.com/ancientmc/license/blob/master/LICENSE'
-                    }
+    publications.register('pluginMaven', MavenPublication) {
+        groupId = project.group
+        artifactId = 'acp-gradle'
+        version = project.version
+        pom {
+            name = 'acp-gradle'
+            description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
+            url = 'https://github.com/ancientmc/acp-gradle'
+            licenses {
+                license {
+                    name = 'AncientMC License'
+                    url = 'https://github.com/ancientmc/license/blob/master/LICENSE'
                 }
-                developers {
-                    developer {
-                        id = 'moist-mason'
-                        name = 'Mason'
-                    }
+            }
+            developers {
+                developer {
+                    id = 'moist-mason'
+                    name = 'Mason'
                 }
+            }
+            scm {
+
             }
         }
     }

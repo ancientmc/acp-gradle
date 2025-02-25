@@ -29,6 +29,7 @@ import java.util.Map;
  * These hash values are used to determine whether a compiled class file has been modified.
  */
 public abstract class MakeHashes extends DefaultTask {
+
     @TaskAction
     public void exec() {
         try {
@@ -94,9 +95,8 @@ public abstract class MakeHashes extends DefaultTask {
 
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     /**

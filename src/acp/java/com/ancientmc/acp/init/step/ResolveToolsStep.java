@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ResolveToolsStep extends Step {
+
     /**
      * The gradle project.
      */

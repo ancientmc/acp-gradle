@@ -6,11 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.gradle.internal.os.OperatingSystem;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +20,25 @@ public class Json {
     private static final String LWJGL_MAC_VERSION = "2.9.1";
 
     /**
-     * Useful utility method for easily converting a JSON file into a JSON object parsable by Gson.
+     * Utility method for easily converting a JSON file into a JSON object parsable by Gson.
      * @param file The JSON file.
      * @return The JSON file as a Gson object.
      * @throws IOException exception.
      */
     public static JsonObject get(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
+        return JsonParser.parseReader(reader).getAsJsonObject();
+    }
+
+    /**
+     * Utility method for easily converting a JSON URL into a JSON object parsable by Gson.
+     * @param url The JSON file.
+     * @return The JSON file as a Gson object.
+     * @throws IOException exception.
+     */
+    public static JsonObject get(URL url) throws IOException {
+        URLConnection connection = url.openConnection();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         return JsonParser.parseReader(reader).getAsJsonObject();
     }
 

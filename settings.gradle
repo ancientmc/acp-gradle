@@ -1,3 +1,10 @@
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://github.com/ancientmc/ancientmc-maven/raw/maven/' }
+    }
+}
+
 rootProject.name = 'acp-gradle'
 
 include(':test_data')

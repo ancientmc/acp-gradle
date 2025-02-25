@@ -12,6 +12,7 @@ public class Paths {
     public static String DIR_MODPATCHES;
     public static String DIR_RUN;
     public static String DIR_NATIVES;
+    public static String DIR_ASSETS;
     public static String DIR_SRC;
     public static String DIR_RESOURCES;
     public static String DIR_VANILLA_SRC;
@@ -48,6 +49,7 @@ public class Paths {
         DIR_MODPATCHES = DIR_CFG + "modpatches/";
         DIR_RUN = "run/";
         DIR_NATIVES = DIR_RUN + "bin/natives/";
+        DIR_ASSETS = DIR_RUN + "resources/";
         DIR_SRC = "src/main/java/";
         DIR_VANILLA_SRC = "build/modding/vanillaFiles/src";
         DIR_RESOURCES = "src/main/resources/";

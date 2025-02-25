@@ -40,7 +40,7 @@ public abstract class RepackageDefaults extends DefaultTask {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

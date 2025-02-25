@@ -21,7 +21,7 @@ import java.net.URL;
 public abstract class DownloadModLoader extends DefaultTask {
 
     @TaskAction
-    void exec() {
+    public void exec() {
         try {
             String version = getVersion().get();
             String loader = getModLoader().get();
@@ -34,7 +34,7 @@ public abstract class DownloadModLoader extends DefaultTask {
             }
             FileUtils.copyURLToFile(url, getProject().file(output.getPath() + "/modloader.lzma"));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -44,7 +44,7 @@ public abstract class DownloadModLoader extends DefaultTask {
      * @param version The Minecraft version.
      * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge).
      * @return The URL for the ModLoader LZMA.
-     * @throws MalformedURLException
+     * @throws MalformedURLException exception.
      */
     private URL getURL(String repo, String version, String loader) throws IOException {
         String ml = getModLoaderPath(loader);

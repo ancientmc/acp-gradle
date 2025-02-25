@@ -12,10 +12,12 @@ import java.util.List;
  * Downloads Minecraft's libraries as Gradle dependencies.
  */
 public class ResolveLibrariesStep extends Step {
+
     /**
      * The list of Minecraft's libraries, formatted via maven path (group.sub:name:version)
      */
     private List<String> libraries;
+
     /**
      * The Gradle project.
      */

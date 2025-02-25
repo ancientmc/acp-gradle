@@ -10,12 +10,23 @@ public class AcpExtension {
     protected final Project project;
 
     /**
-     * The data property.
+     * The data property, linked to the ZIP file containing mappings and patch files ACP needs to decompile Minecraft.
      */
     private final Property<String> data;
 
+    /**
+     * The mod loader. Acceptable options are 'risugami' (for Risugami's Mod Loader) and 'forge' (for Minecraft Forge).
+     */
     private final Property<String> loader;
+
+    /**
+     * The directory where the generated diff patches for mods are located. Customizable by the user.
+     */
     private final Property<String> diffPatchesDir;
+
+    /**
+     * The customizable name of the mod.
+     */
     private final Property<String> modName;
 
     public AcpExtension(final Project project) {

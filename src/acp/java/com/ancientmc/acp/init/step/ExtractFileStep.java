@@ -9,14 +9,17 @@ import java.io.File;
  * Extracts a single archive file.
  */
 public class ExtractFileStep extends Step {
+
     /**
      * The input archive file getting extracted.
      */
     private File input;
+
     /**
      * The output directory that the archive contents are extracted into.
      */
     private File output;
+
     /**
      * The Gradle project.
      */
@@ -30,6 +33,7 @@ public class ExtractFileStep extends Step {
     @Override
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
+
         if (condition) {
             project.copy(action -> {
                 action.from(project.zipTree(input));

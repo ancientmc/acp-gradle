@@ -135,6 +135,7 @@ public class Util {
      */
     public static String getOSName() {
         OperatingSystem os = OperatingSystem.current();
+
         if(os.isWindows()) {
             return "windows";
         } else if (os.isMacOsX()) {
