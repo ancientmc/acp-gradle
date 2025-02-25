@@ -27,6 +27,7 @@ sourceSets {
 
 configurations {
     acpImplementation
+    implementation.extendsFrom acpImplementation
 }
 
 dependencies {
