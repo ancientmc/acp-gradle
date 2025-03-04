@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.ancientmc'
-version '0.2.1.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
+version '0.2.2.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
@@ -58,7 +58,7 @@ jar {
     manifest {
         attributes(
                 'Specification-Title': 'ACP Gradle',
-                'Specification-Ventor': 'AncientMC',
+                'Specification-Vendor': 'AncientMC',
                 'Specification-Version': archiveVersion,
                 'Implementation-Title': 'com.ancientmc:acp-gradle',
                 'Implementation-Vendor': 'AncientMC',
@@ -77,7 +77,7 @@ tasks.register('testJar', Copy) {
 test {
     dependsOn testJar
     useJUnitPlatform()
-    filter { includeTestsMatching '*testDecompileAll' }
+    filter { includeTestsMatching '*testDecompileRuby' }
 }
 
 tasks.withType(Test).configureEach {
@@ -92,7 +92,7 @@ publishing {
         artifactId = 'acp-gradle'
         version = project.version
         pom {
-            name = 'acp-gradle'
+            name = artifactId
             description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
             url = 'https://github.com/ancientmc/acp-gradle'
             licenses {
@@ -105,10 +105,8 @@ publishing {
                 developer {
                     id = 'moist-mason'
                     name = 'Mason'
+                    url = 'https//github.com/moist-mason/'
                 }
-            }
-            scm {
-
             }
         }
     }

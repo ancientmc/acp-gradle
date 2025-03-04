@@ -25,7 +25,7 @@ public abstract class DownloadModLoader extends DefaultTask {
         try {
             String version = getVersion().get();
             String loader = getModLoader().get();
-            File output = getOutputDir().get().getAsFile();
+            File output = getOutputDir().getAsFile().get();
             String repo = Util.getAncientMCMaven();
             URL url = getURL(repo, version, loader);
 

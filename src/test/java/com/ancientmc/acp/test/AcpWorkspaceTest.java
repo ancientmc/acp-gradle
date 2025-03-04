@@ -1,4 +1,4 @@
-package github.ancientmc.acp.test;
+package com.ancientmc.acp.test;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -20,6 +20,7 @@ import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AcpWorkspaceTest {
+
     /**
      * The generated directory for our test workspace.
      */
@@ -66,9 +67,9 @@ public class AcpWorkspaceTest {
     /** Sets up an ACP workspace with the modloader injected, as well as the test ruby mod copied to the source path.
      * Runs the game and also exports patches and archives. **/
     @Test public void testDecompileRuby() {
-       doTestRuby("decompileRuby", "clean", "downloadModLoader", "decompile");
-       doTest("runRuby", "runClient");
-       doTest("exportRuby", "makeDiffPatches", "makeArchives");
+        doTestRuby("decompileRuby", "clean", "downloadModLoader", "decompile");
+        doTest("runRuby", "runClient");
+        doTest("exportRuby", "makeDiffPatches", "makeArchives");
     }
 
     /**
@@ -77,6 +78,7 @@ public class AcpWorkspaceTest {
      */
     public void doTest(String name, String... args) {
         System.out.println("Running test " + name);
+
         for (String arg : args) {
             BuildResult result = GradleRunner.create()
                     .withProjectDir(testDir)

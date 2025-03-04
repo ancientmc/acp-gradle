@@ -63,10 +63,9 @@ public class AcpPlugin implements Plugin<Project> {
         project.afterEvaluate(proj -> {
             try {
                 AcpInitializer.init(proj, extension, minecraftVersion);
-                String diffPatches = extension.getDiffPatchesDir().get();
 
-                if (!proj.file(diffPatches).exists()) {
-                    FileUtils.forceMkdir(proj.file(diffPatches));
+                if (!proj.file(Paths.DIR_MODDED_PATCHES).exists()) {
+                    FileUtils.forceMkdir(proj.file(Paths.DIR_MODDED_PATCHES));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -173,6 +172,7 @@ public class AcpPlugin implements Plugin<Project> {
 
         backupResources.configure(task -> {
             task.setGroup("decompile");
+            task.setDescription("Creates a backup of Minecraft's JAR resources. Used when making hashes that get compared during the mod archive creation process.");
             task.dependsOn(backupSrc);
             task.from(project.file(Paths.DIR_RESOURCES));
             task.into(project.file(Paths.DIR_VANILLA_RESOURCES));
@@ -180,10 +180,11 @@ public class AcpPlugin implements Plugin<Project> {
 
         testCompile.configure(task -> {
             task.setGroup("decompile");
+            task.setDescription("Compiles the game and stores the class files in the build directory. These class files are used when making the hashes that get compared during the mod archive creation process.");
             task.dependsOn(backupResources);
             task.setSource(project.file(Paths.DIR_SRC));
             task.setClasspath(project.getExtensions().getByType(SourceSetContainer.class).getByName("main").getCompileClasspath());
-            task.getDestinationDirectory().set(new File(Paths.DIR_VANILLA_CLASSES));
+            task.getDestinationDirectory().set(project.file(Paths.DIR_VANILLA_CLASSES));
             task.getOptions().setCompilerArgs(Arrays.asList("-g:none", "-source", "1.6", "-target", "1.6"));
             task.exclude("acp/");
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
@@ -191,6 +192,7 @@ public class AcpPlugin implements Plugin<Project> {
 
         makeVanillaHashes.configure(task -> {
             task.setGroup("decompile");
+            task.setDescription("Creates the hashes for the vanilla Minecraft files (or vanilla files plus the mod loader patches applied by the end user).");
             task.dependsOn(testCompile);
             task.getClassesDirectory().set(project.file(Paths.DIR_VANILLA_CLASSES));
             task.getResourcesDirectory().set(project.file(Paths.DIR_VANILLA_RESOURCES));
@@ -200,23 +202,24 @@ public class AcpPlugin implements Plugin<Project> {
         downloadModLoader.configure(task -> {
             String loaderType = extension.getLoader().get();
             task.setGroup("modtools");
+            task.setDescription("Downloads the mod loader and modding API for the selected Minecraft version.");
             task.getVersion().set(minecraftVersion);
             task.getOutputDir().set(project.file(Paths.DIR_MODPATCHES));
             task.getModLoader().set(loaderType);
         });
 
         makeDiffPatches.configure(task -> {
-            String diffPatches = extension.getDiffPatchesDir().get();
             task.setGroup("modtools");
             task.getMainClass().set("codechicken.diffpatch.DiffPatch");
             task.setClasspath(project.files(diffpatch));
-            task.args("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", diffPatches);
+            task.args("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", Paths.DIR_MODDED_PATCHES);
             task.getLogging().captureStandardOutput(LogLevel.DEBUG);
             task.setIgnoreExitValue(true);
         });
 
         makeReobfSrg.configure(task -> {
             task.setGroup("modtools");
+            task.setDescription("");
             task.getInputSrg().set(project.file(Paths.SRG));
             task.getOutputSrg().set(project.file(Paths.REOBF_SRG));
         });
@@ -242,7 +245,7 @@ public class AcpPlugin implements Plugin<Project> {
             task.dependsOn(extractReobfClasses);
             task.getClassesDirectory().set(project.file(Paths.DIR_MODDED_CLASSES));
             task.getResourcesDirectory().set(project.file(Paths.DIR_RESOURCES));
-            task.getOutput().set(new File("build/modding/hashes/modded.md5"));
+            task.getOutput().set(project.file("build/modding/hashes/modded.md5"));
         });
 
         makeArchives.configure(task -> {

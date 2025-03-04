@@ -16,11 +16,6 @@ plugins {
     id 'java-library'
 }
 
-ext {
-    ACP_VERSION = '0.2.1'
-    MC_VERSION = 'a1.2.6'
-}
-
 repositories {
     maven { url = 'https://libraries.minecraft.net' }
     maven { url = 'https://maven.neoforged.net/' }
@@ -35,25 +30,24 @@ apply plugin: 'com.ancientmc.acp'
 
 import com.ancientmc.acp.util.*
 
+version = '0.0.1'
+
 acp {
-    data = "com.ancientmc.acp:acp-data:${MC_VERSION}"
+    data = "com.ancientmc.acp:acp-data:${minecraft_version}"
     loader = 'risugami'
-    diffPatchesDir = project.buildDir.absolutePath + '/modding/patches/diff'
     modName = 'ruby'
 }
 
-tasks.withType(JavaExec) {
-    systemProperty 'java.library.path', Paths.DIR_NATIVES
-}
-
-task decompile() {
+tasks.register('decompile') {
+    group = 'decompile'
     dependsOn(':makeVanillaHashes')
 }
 
-task runClient(type: JavaExec) {
-    group = 'acp-run'
+tasks.register('runClient', JavaExec) {
+    group = 'run'
     mainClass = 'acp.client.Start'
     classpath = sourceSets.main.runtimeClasspath
+    systemProperty 'java.library.path', Paths.DIR_NATIVES
 }
 
 compileJava {
@@ -61,7 +55,7 @@ compileJava {
 }
 
 jar {
-    archiveBaseName = 'interm-' + MC_VERSION
+    archiveFileName = 'interm-' + minecraft_version + '.jar'
     exclude ('acp/')
     from(zipTree(file(Paths.EXTRA_JAR))) {
         include('com/')
@@ -70,7 +64,7 @@ jar {
 }
 
 FileFilter srcFilter = (File file) -> !file.name.contains("acp")
-FileFilter tempFilter = (File file) -> !file.name.equals(MC_VERSION + '.jar') && !file.name.endsWith('.json')
+FileFilter tempFilter = (File file) -> !file.name.equals(minecraft_version + '.jar') && !file.name.endsWith('.json')
 FileFilter runFilter = (File file) -> !file.name.contains('resources') && !file.name.contains('bin')
 
 clean {

@@ -24,8 +24,8 @@ public abstract class RepackageDefaults extends DefaultTask {
         try {
             File in = getSourceDirIn().getAsFile().get();
             File out = getSourceDirOut().getAsFile().get();
-
             File[] files = in.listFiles((File file) -> file.getName().endsWith(".java") && !file.isDirectory());
+
             if (files != null) {
                 for (File file : files) {
                     String name = file.getName();
@@ -53,6 +53,7 @@ public abstract class RepackageDefaults extends DefaultTask {
      */
     public void writeFile(File in, File out, String toAdd) throws IOException {
         List<String> lines = Files.readAllLines(in.toPath());
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
             writer.write(toAdd);
             for (String line : lines) {

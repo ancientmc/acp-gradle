@@ -26,8 +26,8 @@ public abstract class MakeReobfSrg extends DefaultTask {
     @TaskAction
     public void exec() {
         try {
-            File input = getInputSrg().get().getAsFile();
-            File output = getOutputSrg().get().getAsFile();
+            File input = getInputSrg().getAsFile().get();
+            File output = getOutputSrg().getAsFile().get();
             File temp = getProject().file(Paths.DIR_TEMP + "temp.srg");
 
             IMappingFile.load(input).write(temp.toPath(), IMappingFile.Format.SRG, false);

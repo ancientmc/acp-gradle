@@ -92,7 +92,6 @@ public abstract class MakeHashes extends DefaultTask {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] bytes = md.digest(Files.readAllBytes(file.toPath()));
-
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new RuntimeException(e);
@@ -105,6 +104,9 @@ public abstract class MakeHashes extends DefaultTask {
     @InputDirectory
     public abstract RegularFileProperty getClassesDirectory();
 
+    /**
+     * The directory containing the JAR resource files.
+     */
     @InputDirectory
     public abstract RegularFileProperty getResourcesDirectory();
 

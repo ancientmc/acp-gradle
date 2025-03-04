@@ -4,6 +4,7 @@ import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
 public class AcpExtension {
+
     /**
      * The gradle project.
      */
@@ -20,11 +21,6 @@ public class AcpExtension {
     private final Property<String> loader;
 
     /**
-     * The directory where the generated diff patches for mods are located. Customizable by the user.
-     */
-    private final Property<String> diffPatchesDir;
-
-    /**
      * The customizable name of the mod.
      */
     private final Property<String> modName;
@@ -33,7 +29,6 @@ public class AcpExtension {
         this.project = project;
         this.data = project.getObjects().property(String.class);
         this.loader = project.getObjects().property(String.class);
-        this.diffPatchesDir = project.getObjects().property(String.class);
         this.modName = project.getObjects().property(String.class);
     }
 
@@ -43,10 +38,6 @@ public class AcpExtension {
 
     public Property<String> getLoader() {
         return loader;
-    }
-
-    public Property<String> getDiffPatchesDir() {
-        return diffPatchesDir;
     }
 
     public Property<String> getModName() {

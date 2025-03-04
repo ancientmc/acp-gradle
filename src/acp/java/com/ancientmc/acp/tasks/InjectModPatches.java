@@ -29,9 +29,9 @@ public abstract class InjectModPatches extends DefaultTask {
     @TaskAction
     public void exec() {
         try {
-            File input = getInputJar().get().getAsFile();
-            File dir = getPatchDir().get().getAsFile();
-            File output = getOutputJar().get().getAsFile();
+            File input = getInputJar().getAsFile().get();
+            File dir = getPatchDir().getAsFile().get();
+            File output = getOutputJar().getAsFile().get();
             run(input, dir, output);
         } catch (IOException e) {
             throw new RuntimeException(e);

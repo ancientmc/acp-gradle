@@ -62,7 +62,10 @@ public abstract class MakeArchives extends DefaultTask {
                 }
             });
 
-            Util.compress(moddedFiles, moddedResources, archiveDirectory);
+            // mod version
+            String version = this.getProject().getVersion().toString();
+
+            Util.compress(moddedFiles, moddedResources, archiveDirectory, version);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -123,6 +123,7 @@ public class AcpInitializer {
             Manifest manifest = new Manifest(loader.findResource("META-INF/MANIFEST.MF").openStream());
             return manifest.getMainAttributes().getValue("Implementation-Version");
         }
+
         return null;
     }
 }

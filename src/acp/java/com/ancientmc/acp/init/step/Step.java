@@ -9,6 +9,7 @@ import java.io.File;
  * of ACP's setup.
  */
 public class Step {
+
     /**
      * The message that is printed in the console upon the step's execution.
      */

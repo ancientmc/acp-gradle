@@ -57,10 +57,10 @@ public class Util {
      * @param directory The output directory.
      * @throws IOException exception
      */
-    public static void compress(Collection<File> classes, Map<File, String> resources, File directory) throws IOException {
+    public static void compress(Collection<File> classes, Map<File, String> resources, File directory, String version) throws IOException {
         String archive = directory.getName();
-        Util.compressZip(classes, resources, new File(directory, archive + ".zip"));
-        Util.compressTar(classes, resources, new File(directory, archive + ".tar.gz"));
+        Util.compressZip(classes, resources, new File(directory, archive + "-" + version + ".zip"));
+        Util.compressTar(classes, resources, new File(directory, archive + "-" + version + ".tar.gz"));
     }
 
     /**
@@ -136,7 +136,7 @@ public class Util {
     public static String getOSName() {
         OperatingSystem os = OperatingSystem.current();
 
-        if(os.isWindows()) {
+        if (os.isWindows()) {
             return "windows";
         } else if (os.isMacOsX()) {
             return "osx";
@@ -146,6 +146,9 @@ public class Util {
         return "unknown";
     }
 
+    /**
+     * @return the URL to AncientMC's maven as a string.
+     */
     public static String getAncientMCMaven() {
         return "https://github.com/ancientmc/ancientmc-maven/raw/maven/";
     }

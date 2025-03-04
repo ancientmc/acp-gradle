@@ -20,6 +20,7 @@ public class Paths {
     public static String DIR_VANILLA_CLASSES;
     public static String DIR_REOBF_CLASSES;
     public static String DIR_MODDED_CLASSES;
+    public static String DIR_MODDED_PATCHES;
     public static String ACP_DATA;
     public static String VERSION_MANIFEST;
     public static String JSON;
@@ -53,10 +54,11 @@ public class Paths {
         DIR_SRC = "src/main/java/";
         DIR_VANILLA_SRC = "build/modding/vanillaFiles/src";
         DIR_RESOURCES = "src/main/resources/";
-        DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources";
-        DIR_VANILLA_CLASSES = "build/modding/classes/vanilla/";
+        DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources/";
+        DIR_VANILLA_CLASSES = "build/modding/vanillaFiles/classes/";
         DIR_MODDED_CLASSES = "build/classes/java/main/";
-        DIR_REOBF_CLASSES = "build/modding/classes/reobf/";
+        DIR_REOBF_CLASSES = "build/modding/reobfClasses/";
+        DIR_MODDED_PATCHES = "build/modding/patches/";
         ACP_DATA = DIR_CFG + "data.zip";
         VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
         JSON = DIR_TEMP + version + ".json";
