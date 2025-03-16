@@ -1,4 +1,4 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
@@ -12,10 +12,6 @@ import java.net.URL;
  * Extension of the DownloadFile step that allows for extra configuration for jar downloading.
  */
 public class DownloadJarStep extends DownloadFileStep {
-    /**
-     * The Minecraft version, as determined in the ACP end-gradle workspace.
-     */
-    private String version;
 
     /**
      * This method parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
@@ -29,17 +25,12 @@ public class DownloadJarStep extends DownloadFileStep {
 
         if (condition) {
             try {
-                File jar = new File(output, version + (input.getPath().contains("client") ? ".jar" : "-server.jar"));
+                File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
                 FileUtils.copyURLToFile(input, jar);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-    }
-
-    public DownloadJarStep setVersion(String version) {
-        this.version = version;
-        return this;
     }
 
     public DownloadJarStep setInput(URL input) {

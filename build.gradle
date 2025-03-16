@@ -6,9 +6,9 @@ plugins {
 }
 
 group 'com.ancientmc'
-version '0.2.2.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
+version '0.3.0.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
     mavenCentral()
@@ -77,12 +77,14 @@ tasks.register('testJar', Copy) {
 test {
     dependsOn testJar
     useJUnitPlatform()
-    filter { includeTestsMatching '*testDecompileRuby' }
 }
 
 tasks.withType(Test).configureEach {
     testLogging {
-        showStandardStreams true
+        showExceptions true
+        exceptionFormat "full"
+        showCauses true
+        showStackTraces true
     }
 }
 

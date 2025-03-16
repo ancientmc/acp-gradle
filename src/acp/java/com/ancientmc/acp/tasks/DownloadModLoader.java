@@ -20,6 +20,7 @@ import java.net.URL;
  */
 public abstract class DownloadModLoader extends DefaultTask {
 
+
     @TaskAction
     public void exec() {
         try {
@@ -32,6 +33,7 @@ public abstract class DownloadModLoader extends DefaultTask {
             if (!output.exists()) {
                 FileUtils.forceMkdir(output);
             }
+
             FileUtils.copyURLToFile(url, getProject().file(output.getPath() + "/modloader.lzma"));
         } catch (IOException e) {
             throw new RuntimeException(e);

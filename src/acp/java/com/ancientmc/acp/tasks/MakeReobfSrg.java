@@ -36,11 +36,12 @@ public abstract class MakeReobfSrg extends DefaultTask {
             List<String> lines = Files.readAllLines(temp.toPath());
 
             /*
-             Adds a line to strip the package of any straggling classes with the "net/minecraft/src" package; since the
-             vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
-             into the net/minecraft/src path.
+             Adds a line to strip the package of any straggling classes with the "net/minecraft/src" or the "com/mojang/minecraft/src/" packages.
+             Since the vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
+             into the /src/ path.
              */
             writer.write("PK: . net/minecraft/src\n");
+            writer.write("PK: . com/mojang/minecraft/src/\n");
 
             for(String line : lines) {
                 writer.write(line + "\n");

@@ -1,17 +1,12 @@
-package com.ancientmc.acp.tasks;
+package com.ancientmc.acp.tasks.step;
 
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.tasks.InputDirectory;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,47 +19,59 @@ import java.util.stream.Collectors;
  * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files can be injected, as this task
  * makes temporary JAR files for each implemented LZMA.
  */
-public abstract class InjectModPatches extends DefaultTask {
-
-    @TaskAction
-    public void exec() {
-        try {
-            File input = getInputJar().getAsFile().get();
-            File dir = getPatchDir().getAsFile().get();
-            File output = getOutputJar().getAsFile().get();
-            run(input, dir, output);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+public class InjectBinPatchesStep extends Step {
 
     /**
-     * Main execution method. The folder containing the LZMA patch files are parsed, and a list is created; this list is then iterated
-     * to determine which LZMA files have yet to be injected. For each LZMA file, except the last in the list, the output JAR after injection
-     * is a temporary file, stored in a folder that gets deleted after all the LZMAs have been processed.
-     * @param input The vanilla input JAR file (${version}-slim.jar).
-     * @param dir The directory containing the LZMA patches (cfg\modpatches).
-     * @param output The final output JAR file (${version}-mod.jar).
+     * The base input JAR.
      */
-    public void run(File input, File dir, File output) throws IOException {
-        Project project = getProject();
-        List<File> files = getFiles(dir);
+    protected File input;
+
+    /**
+     * The base output JAR.
+     */
+    protected File output;
+
+    /**
+     * The patch directory containing the LZMA files.
+     */
+    protected File patchDirectory;
+
+    /**
+     * The Gradle project.
+     */
+    protected Project project;
+
+    @Override
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+
+        List<File> files = getFiles(patchDirectory);
 
         files.forEach(lzma -> {
             File currIn = getCurrentInput(input, files, lzma);
             File currOut = getCurrentOutput(output, files, lzma);
 
             project.javaexec(action -> {
-                Configuration binpatch = project.getConfigurations().getByName("binpatch");
+                Configuration binpatch = project.getConfigurations().findByName("binpatch");
                 action.getMainClass().set("net.neoforged.binarypatcher.ConsoleTool");
                 action.setClasspath(project.files(binpatch));
                 action.args("--clean", currIn.getAbsolutePath(), "--apply", lzma.getAbsolutePath(), "--output", currOut.getAbsolutePath(), "--unpatched");
             });
         });
 
-        FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
+        try {
+            FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    /**
+     * Gets a filtered list of LZMA files from the patch directory. It is filtered to only include LZMAs, and
+     * compared so that the mod loader LZMA (Risugami or Forge) is injected first.
+     * @param directory The patch directory.
+     * @return The LZMA list.
+     */
     public List<File> getFiles(File directory) {
         return FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY)
                 .stream().filter(f -> f.getName().endsWith(".lzma"))
@@ -81,7 +88,7 @@ public abstract class InjectModPatches extends DefaultTask {
      * @return The current input for injection.
      */
     public File getCurrentInput(File input, List<File> files, File lzma) {
-        File temp = getProject().file(Paths.DIR_TEMP + "modjars/temp" + files.indexOf(lzma) + ".jar");
+        File temp = project.file(Paths.DIR_TEMP + "modjars/temp" + files.indexOf(lzma) + ".jar");
         return files.indexOf(lzma) == 0 ? input : temp;
     }
 
@@ -95,7 +102,7 @@ public abstract class InjectModPatches extends DefaultTask {
      * @return The current output after injection.
      */
     public File getCurrentOutput(File output, List<File> files, File lzma) {
-        File temp = getProject().file(Paths.DIR_TEMP + "modjars/temp" + (files.indexOf(lzma) + 1) + ".jar");
+        File temp = project.file(Paths.DIR_TEMP + "modjars/temp" + (files.indexOf(lzma) + 1) + ".jar");
         return files.indexOf(lzma) == files.size() - 1 ? output : temp;
     }
 
@@ -110,21 +117,23 @@ public abstract class InjectModPatches extends DefaultTask {
         }
     }
 
-    /**
-     * The vanilla input JAR (${version}-slim.jar).
-     */
-    @InputFile
-    public abstract RegularFileProperty getInputJar();
+    public InjectBinPatchesStep setOutput(File output) {
+        this.output = output;
+        return this;
+    }
 
-    /**
-     * The directory containing the LZMA archive(s) (cfg\modpatches).
-     */
-    @InputDirectory
-    public abstract RegularFileProperty getPatchDir();
+    public InjectBinPatchesStep setInput(File input) {
+        this.input = input;
+        return this;
+    }
 
-    /**
-     * The output JAR containing the mod classes (${version}-mod.jar).
-     */
-    @OutputFile
-    public abstract RegularFileProperty getOutputJar();
+    public InjectBinPatchesStep setPatchDirectory(File patchDirectory) {
+        this.patchDirectory = patchDirectory;
+        return this;
+    }
+
+    public InjectBinPatchesStep setProject(Project project) {
+        this.project = project;
+        return this;
+    }
 }

@@ -1,10 +1,11 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 /**
@@ -30,7 +31,7 @@ public class DownloadFileStep extends Step {
         super.exec(logger, condition);
 
         if (condition) {
-            try {
+            try (InputStream in = input.openStream()) {
                 FileUtils.copyURLToFile(input, output);
             } catch (IOException e) {
                 throw new RuntimeException(e);

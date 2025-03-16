@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.gradle.internal.os.OperatingSystem;
 
 import java.io.*;
 import java.net.URL;
@@ -16,8 +15,6 @@ import java.util.List;
  * Utility class for JSON parsing, mainly Minecraft's version JSON.
  */
 public class Json {
-    private static final String LWJGL_VERSION = "2.9.0";
-    private static final String LWJGL_MAC_VERSION = "2.9.1";
 
     /**
      * Utility method for easily converting a JSON file into a JSON object parsable by Gson.
@@ -57,11 +54,11 @@ public class Json {
                 JsonElement id = entry.getAsJsonObject().get("id");
 
                 if (id.getAsString().equals(version)) {
-                    return new URL(entry.getAsJsonObject().get("url").getAsString());
+                    return Util.getUrl(entry.getAsJsonObject().get("url").getAsString());
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         return null;
@@ -78,16 +75,14 @@ public class Json {
     public static List<String> getLibraries(List<File> jsons) throws IOException {
         List<String> libraries = new ArrayList<>();
 
+
         for (File json : jsons) {
             JsonObject object = get(json);
             JsonArray libArray = object.getAsJsonArray("libraries");
 
             for (JsonElement entry : libArray.asList()) {
                 String name = entry.getAsJsonObject().getAsJsonPrimitive("name").getAsString();
-
-                if (!name.startsWith("net.minecraft:launchwrapper") && isAllowed(name)) {
-                    libraries.add(name);
-                }
+                libraries.add(name);
             }
         }
 
@@ -106,15 +101,14 @@ public class Json {
         List<URL> urls = new ArrayList<>();
 
         for (JsonElement entry : libraries.asList()) {
-            String name = entry.getAsJsonObject().get("name").getAsString();
             JsonObject downloads = entry.getAsJsonObject().getAsJsonObject("downloads");
 
             if (downloads.has("classifiers")) {
                 String os = Util.getOSName();
                 JsonObject natives = downloads.getAsJsonObject("classifiers").getAsJsonObject("natives-" + os);
 
-                if (natives != null && isAllowed(name)) {
-                    URL url = new URL(natives.get("url").getAsString());
+                if (natives != null) {
+                    URL url = Util.getUrl(natives.get("url").getAsString());
                     urls.add(url);
                 }
             }
@@ -132,7 +126,7 @@ public class Json {
      */
     public static URL getAssetIndexUrl(File json) throws IOException {
         JsonObject jsonObj = get(json);
-        return new URL(jsonObj.getAsJsonObject("assetIndex").get("url").getAsString());
+        return Util.getUrl(jsonObj.getAsJsonObject("assetIndex").get("url").getAsString());
     }
 
     /**
@@ -147,18 +141,6 @@ public class Json {
         JsonObject jsonObj = get(json);
         JsonObject sideObj = jsonObj.getAsJsonObject("downloads").getAsJsonObject(side);
 
-        return new URL(sideObj.get("url").getAsString());
-    }
-
-    /**
-     * Filters through the correct LWJGL version to download. All libraries are passed through this method in above methods, but any non-LWJGL library
-     * will get skipped through the first if statement.
-     */
-    public static boolean isAllowed(String name) {
-        if (!name.contains("org.lwjgl")) {
-            return true;
-        }
-
-        return (OperatingSystem.current().isMacOsX()) ? name.contains(LWJGL_MAC_VERSION) : name.contains(LWJGL_VERSION);
+        return Util.getUrl(sideObj.get("url").getAsString());
     }
 }

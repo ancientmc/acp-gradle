@@ -1,4 +1,4 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
@@ -44,6 +44,7 @@ public class ExtractNativesStep extends Step {
         if (condition) {
             try {
                 List<File> jars = new ArrayList<>();
+
                 for(URL url : urls) {
                     String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
                     FileUtils.copyURLToFile(url, new File(output, path));

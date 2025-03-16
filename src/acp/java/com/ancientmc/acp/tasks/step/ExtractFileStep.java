@@ -1,9 +1,11 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Extracts a single archive file.
@@ -13,17 +15,22 @@ public class ExtractFileStep extends Step {
     /**
      * The input archive file getting extracted.
      */
-    private File input;
+    protected File input;
 
     /**
      * The output directory that the archive contents are extracted into.
      */
-    private File output;
+    protected File output;
 
     /**
      * The Gradle project.
      */
-    private Project project;
+    protected Project project;
+
+    /**
+     * Paths and files excluded from extraction.
+     */
+    protected List<String> exclusions;
 
     /**
      * Main extraction method. Uses Gradle's copy task and zip-tree function.
@@ -38,6 +45,10 @@ public class ExtractFileStep extends Step {
             project.copy(action -> {
                 action.from(project.zipTree(input));
                 action.into(output);
+
+                if (exclusions != null) {
+                    action.exclude(exclusions);
+                }
             });
         }
     }
@@ -53,6 +64,11 @@ public class ExtractFileStep extends Step {
 
     public ExtractFileStep setOutput(File output) {
         this.output = output;
+        return this;
+    }
+
+    public ExtractFileStep setExclusions(List<String> exclusions) {
+        this.exclusions = exclusions;
         return this;
     }
 

@@ -10,6 +10,8 @@ import org.gradle.internal.os.OperatingSystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collection;
@@ -144,6 +146,19 @@ public class Util {
             return "linux";
         }
         return "unknown";
+    }
+
+    /**
+     * Returns a URL from a String path.
+     * @param path The path for the URL.
+     * @return The URL.
+     */
+    public static URL getUrl(String path) {
+        try {
+            return URI.create(path).toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

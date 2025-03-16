@@ -54,12 +54,12 @@ public class AcpWorkspaceTest {
      **/
     @Test public void testDecompileAll() {
         testDecompile();
-        testDecompileModdedClean();
-        testDecompileRuby();
     }
 
+    @Test public void testInitialize() { doTest("initialize", "initialize"); }
+
     /** Sets up a vanilla ACP workspace. The "modpatches" folder must be deleted before this can be run.**/
-    @Test public void testDecompile() { doTest("decompile", "clean", "decompile", "runClient"); }
+    @Test public void testDecompile() { doTest("decompile", "decompile", "runClient"); }
 
     /** Sets up an ACP workspace with the modloader injected, but with no additional mods installed. **/
     @Test public void testDecompileModdedClean() { doTest("decompileModded", "clean", "downloadModLoader", "decompile", "runClient"); }

@@ -1,10 +1,8 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.DependencyResolutionListener;
-import org.gradle.api.artifacts.DependencySet;
-import org.gradle.api.artifacts.ResolvableDependencies;
+import org.gradle.api.artifacts.*;
 
 import java.util.List;
 
@@ -30,17 +28,14 @@ public class ResolveLibrariesStep extends Step {
      */
     @Override
     public void exec() {
-        DependencySet dependencies = project.getConfigurations().getByName("implementation").getDependencies();
+        DependencySet dependencies = project.getConfigurations().named("implementation").get().getDependencies();
 
-        project.getGradle().addListener(new DependencyResolutionListener() {
-            @Override
-            public void beforeResolve(ResolvableDependencies resolvableDependencies) {
-                libraries.forEach(lib -> dependencies.add(project.getDependencies().create(lib)));
-                project.getGradle().removeListener(this);
+        libraries.forEach(lib -> {
+            Dependency dependency = project.getDependencies().create(lib);
+            if (!dependencies.contains(dependency)) {
+                project.getLogger().info("Resolve {}", lib);
+                dependencies.add(dependency);
             }
-
-            @Override
-            public void afterResolve(ResolvableDependencies resolvableDependencies) { }
         });
     }
 

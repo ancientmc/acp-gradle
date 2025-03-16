@@ -1,8 +1,8 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
-import org.gradle.api.NonNullApi;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyResolutionListener;
 import org.gradle.api.artifacts.ResolvableDependencies;
 
@@ -35,7 +35,7 @@ public class ResolveToolsStep extends Step {
             List<String> lines = Files.readAllLines(properties.toPath());
             Map<String, String> map = getConfigMap(lines);
             map.forEach((name, tool) -> {
-                Configuration cfg = project.getConfigurations().getByName(name);
+                Configuration cfg = project.getConfigurations().named(name).get();
                 resolve(cfg, tool);
             });
         } catch (IOException e) {
@@ -49,16 +49,12 @@ public class ResolveToolsStep extends Step {
      * @param tool The name of the tool dependency.
      */
     public void resolve(Configuration cfg, String tool) {
-        project.getGradle().addListener(new DependencyResolutionListener() {
-            @Override
-            public void beforeResolve(ResolvableDependencies resolvableDependencies) {
-                cfg.getDependencies().add(project.getDependencies().create(tool));
-                project.getGradle().removeListener(this);
-            }
+        Dependency dependency = project.getDependencies().create(tool);
 
-            @Override
-            public void afterResolve(ResolvableDependencies resolvableDependencies) { }
-        });
+        if (!cfg.getDependencies().contains(dependency)) {
+            project.getLogger().info("Resolve {}", tool);
+            cfg.getDependencies().add(dependency);
+        }
     }
 
     /**

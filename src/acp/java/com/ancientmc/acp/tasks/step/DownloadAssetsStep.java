@@ -1,11 +1,15 @@
-package com.ancientmc.acp.init.step;
+package com.ancientmc.acp.tasks.step;
 
 import com.ancientmc.acp.util.Json;
+import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.logging.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
@@ -41,7 +45,10 @@ public class DownloadAssetsStep extends Step {
 
                 JsonObject indexObj = Json.get(index);
                 Map<String, String> assets = getAssets(indexObj);
-                download(assets, output);
+
+                if (assets != null) {
+                    download(assets, output);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -51,18 +58,23 @@ public class DownloadAssetsStep extends Step {
     /**
      * Retrieves a hash map of all the assets.
      * @param index The asset index JSON object.
+     * @return The assets as a map. The key is the name of the asset, while the value is its hash. Returns null if the index is empty.
      * @throws IOException exception.
      */
     public static Map<String, String> getAssets(JsonObject index) throws IOException {
         Map<String, String> assets = new HashMap<>();
         JsonObject objects = index.getAsJsonObject("objects");
 
-        objects.keySet().forEach(name -> {
-            String hash = objects.getAsJsonObject(name).get("hash").getAsString();
-            assets.put(name, hash);
-        });
+        if (!objects.isEmpty()) {
+            objects.keySet().forEach(name -> {
+                String hash = objects.getAsJsonObject(name).get("hash").getAsString();
+                assets.put(name, hash);
+            });
 
-        return assets;
+            return assets;
+        }
+
+        return null;
     }
 
     /**
@@ -80,7 +92,7 @@ public class DownloadAssetsStep extends Step {
         map.forEach((key, value) -> {
             try {
                 String path = value.substring(0, 2) + '/' + value;
-                URL url = new URL("https://resources.download.minecraft.net/" + path);
+                URL url = Util.getUrl("https://resources.download.minecraft.net/" + path);
                 File file = new File(dest, key);
 
                 if(!file.getParentFile().exists()) {
