@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -11,7 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-public class RepackageDefaultsStep extends Step {
+public class RepackageDefaults extends Step {
 
     /**
      * The source directory.
@@ -73,12 +74,12 @@ public class RepackageDefaultsStep extends Step {
         FileUtils.forceDelete(in);
     }
 
-    public RepackageDefaultsStep setInputDirectory(File inputDirectory) {
+    public RepackageDefaults setInputDirectory(File inputDirectory) {
         this.inputDirectory = inputDirectory;
         return this;
     }
 
-    public RepackageDefaultsStep setOutputDirectory(File outputDirectory) {
+    public RepackageDefaults setOutputDirectory(File outputDirectory) {
         this.outputDirectory = outputDirectory;
         return this;
     }

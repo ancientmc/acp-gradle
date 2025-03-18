@@ -38,28 +38,11 @@ acp {
     modName = 'ruby'
 }
 
-tasks.named('initialize') { }
+// These are easy ways to run tasks as opposed to CLI or finding them in your IDE's menus.
 tasks.named('decompile') { }
-
-tasks.register('runClient', JavaExec) {
-    group = 'run'
-    mainClass = 'acp.client.Start'
-    classpath = sourceSets.main.runtimeClasspath
-    systemProperty 'java.library.path', Paths.DIR_NATIVES
-}
-
-compileJava {
-    options.compilerArgs = ['-g:none', '-source', '1.6', '-target', '1.6']
-}
-
-jar {
-    archiveFileName = 'interm-' + minecraft_version + '.jar'
-    exclude ('acp/')
-    from(zipTree(file(Paths.EXTRA_JAR))) {
-        include('com/')
-        include('paulscode/')
-    }
-}
+tasks.named('downloadModLoader') { }
+tasks.named('runClient') { }
+tasks.named('buildMod') { }
 
 FileFilter srcFilter = (File file) -> !file.name.contains("acp")
 FileFilter tempFilter = (File file) -> !file.name.equals('client.jar') && !file.name.endsWith('.json')

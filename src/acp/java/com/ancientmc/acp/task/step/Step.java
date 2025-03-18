@@ -1,12 +1,12 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step;
 
+import com.ancientmc.acp.task.step.io.DownloadFile;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
 
 /**
- * Base class for steps, which are essentially mini-tasks that occur during the initilization (project configuration phase)
- * of ACP's setup.
+ * Base class for steps, which are essentially mini-functions that occur within Gradle tasks.
  */
 public class Step {
 
@@ -51,21 +51,34 @@ public class Step {
     }
 
     /**
-     * Gets output from a file-based step. Usually used when getting a downloaded file in inherited Step classes.
+     * Gets the output from a file-based step. Usually used when getting a downloaded file in inherited Step classes.
      * @return The output of the step.
-     * @see DownloadFileStep#getOutput() DownloadFileStep.getOutput() for the most used example.
+     * @see DownloadFile#getOutput() DownloadFileStep.getOutput() for the most used example.
      */
     public File getOutput() {
         return output;
     }
 
     /**
-     * Sets the message printed to the console.
+     * Sets the message printed to the console. This method also acts as a pseudo-build method for finalizing a Step object.
+     * It should always be called last in the setter chains.
      * @param message The message printed to the console.
      * @return This step.
      */
     public Step setMessage(String message) {
         this.message = message;
+        return this;
+    }
+
+    /**
+     * Sets the step execution message printed to tne console. This method also acts as a pseudo-build method for finalizing a Step object.
+     *      * It should always be called last in the setter chains.
+     * @param phase The phase of action. Used phases are "init" for the Initialize task, "decomp" for the Decompile task, and "mod" for the BuildMod task.
+     * @param message The message of the step's action.
+     * @return This step.
+     */
+    public Step setMessage(String phase, String message) {
+        this.message = "[acp." + phase + "] Step -> " + message;
         return this;
     }
 }

@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
@@ -19,7 +20,7 @@ import java.util.Map;
  * This step downloads the asset files. Instead of downloading the asset hashes in their pure forms, it goes the extra mile
  * and converts those hash files into the actual resource files used by the game.
  */
-public class DownloadAssetsStep extends Step {
+public class DownloadAssets extends Step {
 
     /**
      * The URL for the index file containing a map of resource files and their hash values.
@@ -127,12 +128,12 @@ public class DownloadAssetsStep extends Step {
         return output;
     }
 
-    public DownloadAssetsStep setIndex(URL index) {
+    public DownloadAssets setIndex(URL index) {
         this.index = index;
         return this;
     }
 
-    public DownloadAssetsStep setOutput(File output) {
+    public DownloadAssets setOutput(File output) {
         this.output = output;
         return this;
     }

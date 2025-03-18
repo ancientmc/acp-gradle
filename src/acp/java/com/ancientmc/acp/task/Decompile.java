@@ -1,7 +1,12 @@
-package com.ancientmc.acp.tasks;
+package com.ancientmc.acp.task;
 
-import com.ancientmc.acp.tasks.step.*;
+import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.function.*;
+import com.ancientmc.acp.task.step.function.MakeHashes;
+import com.ancientmc.acp.task.step.io.CopyFile;
+import com.ancientmc.acp.task.step.io.ExtractFile;
 import com.ancientmc.acp.util.Paths;
+import com.ancientmc.acp.util.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -11,10 +16,11 @@ import java.io.File;
 import java.util.Arrays;
 
 /**
- * Main decompile task. Assumes the Initialize task has already been run. Otherwise
+ * Main decompilation task.
  */
 public abstract class Decompile extends DefaultTask {
-
+    public static final String PHASE = "decomp";
+    
     @TaskAction
     public void exec() {
         Project project = getProject();
@@ -27,22 +33,21 @@ public abstract class Decompile extends DefaultTask {
                 .setConfiguration("jarsplitter")
                 .setMainClass("net.neoforged.jarsplitter.ConsoleTool")
                 .setArgs(Arrays.asList("--input", Paths.BASE_JAR, "--slim", Paths.SLIM_JAR, "--extra", Paths.EXTRA_JAR, "--srg", Paths.TSRG))
-                .setMessage("[acp.decomp] Step -> Splitting JAR...");
+                .setMessage(PHASE, "Splitting JAR...");
         splitJar.exec(logger, !project.file(Paths.SLIM_JAR).exists());
 
-        Step injectModPatches = new Step();
         String toInject = Paths.SLIM_JAR;
         File modPatches = project.file(Paths.DIR_MODPATCHES);
 
         if (modPatches.exists()) {
-            injectModPatches = new InjectBinPatchesStep()
+            Step injectModPatches = new InjectBinPatches()
                     .setInput(project.file(Paths.SLIM_JAR))
                     .setOutput(project.file(Paths.MODLOADER_JAR))
-                    .setPatchDirectory(project.file(Paths.DIR_MODDED_PATCHES))
+                    .setPatchDirectory(project.file(Paths.DIR_MODPATCHES))
                     .setProject(project)
-                    .setMessage("[acp.decomp] Step -> Injecting Modloader and mod library patches...");
-            toInject = Paths.MODLOADER_JAR;
+                    .setMessage(PHASE, "Injecting Modloader and mod library patches...");
             injectModPatches.exec(logger, !project.file(Paths.MODLOADER_JAR).exists());
+            toInject = Paths.MODLOADER_JAR;
         }
 
         Step mcinject = new JavaExecStep()
@@ -50,7 +55,7 @@ public abstract class Decompile extends DefaultTask {
                 .setConfiguration("mcinjector")
                 .setMainClass("de.oceanlabs.mcp.mcinjector.MCInjector")
                 .setArgs(Arrays.asList("--in", toInject, "--out", Paths.INJECT_JAR, "--acc", Paths.DIR_INJECT + "access.txt", "--exc", Paths.DIR_INJECT + "exceptions.txt", "--blacklist", Paths.DIR_INJECT + "blacklist.txt"))
-                .setMessage("[acp.decomp] Step -> Injecting access modifiers and exception fixes...");
+                .setMessage(PHASE, "Injecting access modifiers and exception fixes...");
         mcinject.exec(logger, !project.file(Paths.INJECT_JAR).exists());
 
         Step deobfuscate = new JavaExecStep()
@@ -58,7 +63,7 @@ public abstract class Decompile extends DefaultTask {
                 .setConfiguration("autorenamingtool")
                 .setMainClass("net.neoforged.art.Main")
                 .setArgs(Arrays.asList("--input", Paths.INJECT_JAR, "--output", Paths.MAPPED_JAR, "--map", Paths.TSRG, "--src-fix", "--strip-sigs"))
-                .setMessage("[acp.decomp] Step -> Deobfuscating JAR...");
+                .setMessage(PHASE, "Deobfuscating JAR...");
         deobfuscate.exec(logger, !project.file(Paths.MAPPED_JAR).exists());
 
         Step decompile = new JavaExecStep()
@@ -66,14 +71,14 @@ public abstract class Decompile extends DefaultTask {
                 .setConfiguration("fernflower")
                 .setMainClass("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler")
                 .setArgs(Arrays.asList("-rbr=0", "-rsy=0", "-asc=1", "-din=1", "-dgs=0", "-jvn=1", "-ind=    ", Paths.MAPPED_JAR, Paths.FINAL_JAR))
-                .setMessage("[acp.decomp] Step -> Decompiling JAR...");
+                .setMessage(PHASE, "Decompiling JAR...");
         decompile.exec(logger, !project.file(Paths.FINAL_JAR).exists());
 
-        Step unzip = new ExtractFileStep()
+        Step unzip = new ExtractFile()
                 .setInput(project.file(Paths.FINAL_JAR))
                 .setOutput(project.file(Paths.DIR_SRC))
                 .setProject(project)
-                .setMessage("[acp.decomp] Step -> Unzipping Minecraft's source...");
+                .setMessage(PHASE, "Unzipping Minecraft's source...");
         unzip.exec(logger, !project.file(Paths.DIR_SRC + "com/mojang/minecraft/").exists()
                 || !project.file(Paths.DIR_SRC + "net/minecraft/").exists());
 
@@ -83,46 +88,44 @@ public abstract class Decompile extends DefaultTask {
                 .setMainClass("codechicken.diffpatch.DiffPatch")
                 .setArgs(Arrays.asList("--patch", Paths.DIR_SRC, Paths.DIR_PATCHES, "--output", Paths.DIR_SRC,
                         "--reject", Paths.DIR_TEMP + "patch_rejects/"))
-                .setMessage("[acp.decomp] Step -> Patching source files...");
+                .setMessage(PHASE, "Patching source files...");
         patch.exec(logger, true); // condition???
 
-        Step repackageDefaults = new RepackageDefaultsStep()
+        Step repackageDefaults = new RepackageDefaults()
                 .setInputDirectory(project.file(Paths.DIR_SRC))
                 .setOutputDirectory(project.file(Paths.DIR_SRC))
-                .setMessage("[acp.decomp] Step -> Repackaging default-level source files...");
+                .setMessage(PHASE, "Repackaging default-level source files...");
         repackageDefaults.exec(logger, true); // condition???
 
-        Step copyResources = new ExtractFileStep()
+        Step copyResources = new ExtractFile()
                 .setProject(project)
                 .setInput(project.file(Paths.EXTRA_JAR))
                 .setOutput(project.file(Paths.DIR_RESOURCES))
                 .setExclusions(Arrays.asList("com/jcraft/**", "paulscode/**", "META-INF/**"))
-                .setMessage("[acp.decomp] Step -> Extracting JAR resources...");
-        copyResources.exec(logger, project.file(Paths.DIR_RESOURCES).listFiles() == null);
+                .setMessage(PHASE, "Extracting JAR resources...");
+        copyResources.exec(logger, Util.directoryCondition(project.file(Paths.DIR_RESOURCES)));
 
-        Step backupSrc = new CopyFileStep()
+        Step backupSrc = new CopyFile()
                 .setProject(project)
                 .setInput(project.file(Paths.DIR_SRC))
                 .setOutput(project.file(Paths.DIR_VANILLA_SRC))
                 .setExclusions("acp/")
-                .setMessage("[acp.decomp] Step -> Backing up source files...");
-        backupSrc.exec(logger, project.file(Paths.DIR_VANILLA_SRC).listFiles() == null);
+                .setMessage(PHASE, "Backing up source files...");
+        backupSrc.exec(logger, Util.directoryCondition(project.file(Paths.DIR_VANILLA_SRC)));
 
-        Step backupResources = new CopyFileStep()
+        Step backupResources = new CopyFile()
                 .setProject(project)
                 .setInput(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.DIR_VANILLA_RESOURCES))
-                .setMessage("[acp.decomp] Step -> Backing up JAR resources...");
-        backupResources.exec(logger, project.file(Paths.DIR_VANILLA_RESOURCES).listFiles() == null);
+                .setMessage(PHASE, "Backing up JAR resources...");
+        backupResources.exec(logger, Util.directoryCondition(project.file(Paths.DIR_VANILLA_RESOURCES)));
 
-        Step testCompile = new JavaCompileStep()
+        Step makeVanillaHashes = new MakeHashes()
                 .setProject(project)
-                .setMessage("[acp.decomp] Step -> Test compiling...");
-        testCompile.exec(logger, project.file(Paths.DIR_VANILLA_CLASSES).listFiles() == null);
-
-        Step makeVanillaHashes = new MakeVanillaHashesStep()
-                .setProject(project)
-                .setMessage("[acp.decomp] Step -> Making vanilla hashes...");
+                .setSourceDirectory(project.file(Paths.DIR_VANILLA_SRC))
+                .setResourceDirectory(project.file(Paths.DIR_VANILLA_RESOURCES))
+                .setOutput(project.file("build/modding/hashes/vanilla.md5"))
+                .setMessage(PHASE, "Generating vanilla hashes...");
         makeVanillaHashes.exec(logger, !project.file("build/modding/hashes/vanilla.md5").exists());
     }
 }

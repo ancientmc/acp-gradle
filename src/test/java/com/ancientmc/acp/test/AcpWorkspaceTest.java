@@ -56,10 +56,20 @@ public class AcpWorkspaceTest {
         testDecompile();
     }
 
-    @Test public void testInitialize() { doTest("initialize", "initialize"); }
+    @Test public void testInitialize() { doTest("initialize"); }
 
     /** Sets up a vanilla ACP workspace. The "modpatches" folder must be deleted before this can be run.**/
-    @Test public void testDecompile() { doTest("decompile", "decompile", "runClient"); }
+    @Test public void testDecompile() { doTest("decompile"); }
+
+    /** Runs the game. **/
+    @Test public void testRunClient() { doTest("runClient"); }
+
+    /** Builds our mod. **/
+    @Test public void testBuild() { doTest("buildMod"); }
+
+    /**
+     * THE FOLLOWING BELOW IS THE "NEEDS TO BE REWORKED" ZONE!
+     */
 
     /** Sets up an ACP workspace with the modloader injected, but with no additional mods installed. **/
     @Test public void testDecompileModdedClean() { doTest("decompileModded", "clean", "downloadModLoader", "decompile", "runClient"); }
@@ -70,6 +80,14 @@ public class AcpWorkspaceTest {
         doTestRuby("decompileRuby", "clean", "downloadModLoader", "decompile");
         doTest("runRuby", "runClient");
         doTest("exportRuby", "makeDiffPatches", "makeArchives");
+    }
+
+    /**
+     * Runs a single-argument test who shares a name with its argument.
+     * @param name The name of the test.
+     */
+    public void doTest(String name) {
+        doTest(name, name);
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
@@ -11,7 +11,7 @@ import java.net.URL;
 /**
  * Extension of the DownloadFile step that allows for extra configuration for jar downloading.
  */
-public class DownloadJarStep extends DownloadFileStep {
+public class DownloadJar extends DownloadFile {
 
     /**
      * This method parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
@@ -33,12 +33,12 @@ public class DownloadJarStep extends DownloadFileStep {
         }
     }
 
-    public DownloadJarStep setInput(URL input) {
+    public DownloadJar setInput(URL input) {
         super.setInput(input);
         return this;
     }
 
-    public DownloadJarStep setOutput(File output) {
+    public DownloadJar setOutput(File output) {
         super.setOutput(output);
         return this;
     }

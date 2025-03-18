@@ -4,7 +4,10 @@ import net.neoforged.srgutils.IMappingFile;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
@@ -49,43 +52,34 @@ public class Util {
         String[] split = path.split(":");
         String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
         String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
-        return new URL(repo + newPath);
+        return Util.getUrl(repo + newPath);
     }
 
     /**
      * Quick method that compresses multiple files into both a ZIP and TAR
-     * @param classes The class files.
-     * @param resources The resource files.
+     * @param files The mod file map.
      * @param directory The output directory.
      * @throws IOException exception
      */
-    public static void compress(Collection<File> classes, Map<File, String> resources, File directory, String version) throws IOException {
+    public static void compress(Map<File, String> files, File directory, String version) throws IOException {
         String archive = directory.getName();
-        Util.compressZip(classes, resources, new File(directory, archive + "-" + version + ".zip"));
-        Util.compressTar(classes, resources, new File(directory, archive + "-" + version + ".tar.gz"));
+        Util.compressZip(files, new File(directory, archive + "-" + version + ".zip"));
+        Util.compressTar(files, new File(directory, archive + "-" + version + ".tar.gz"));
     }
 
     /**
      * Simple ZIP compression function for mod files.
-     * @param classes The class files.
-     * @param resources The resource files.
+     * @param files The mod file map.
      * @param zip The output ZIP.
      * @throws IOException exception
      */
-    public static void compressZip(Collection<File> classes, Map<File, String> resources, File zip) throws IOException {
+    public static void compressZip(Map<File, String> files, File zip) throws IOException {
         ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
 
-        for (File cls : classes) {
-            zipOut.putNextEntry(new ZipEntry(cls.getName()));
-            FileInputStream in = new FileInputStream(cls);
-            IOUtils.copy(in, zipOut);
-            zipOut.closeEntry();
-        }
-
-        resources.forEach((resource, parent) -> {
+        files.forEach((file, parent) -> {
             try {
-                zipOut.putNextEntry(new ZipEntry(parent + "/" + resource.getName()));
-                FileInputStream in = new FileInputStream(resource);
+                zipOut.putNextEntry(new ZipEntry(parent + "/" + file.getName()));
+                FileInputStream in = new FileInputStream(file);
                 IOUtils.copy(in, zipOut);
                 zipOut.closeEntry();
             } catch (IOException e) {
@@ -98,26 +92,18 @@ public class Util {
 
     /**
      * Simple TAR/GZIP compression function for mod files.
-     * @param classes The class files.
-     * @param resources The resource files.
+     * @param files The mod file map.
      * @param tar The output TAR GZIP.
      * @throws IOException exception
      */
-    public static void compressTar(Collection<File> classes, Map<File, String> resources, File tar) throws IOException {
+    public static void compressTar(Map<File, String> files, File tar) throws IOException {
         GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(Files.newOutputStream(tar.toPath()));
         TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut);
 
-        for (File cls : classes) {
-            tarOut.putArchiveEntry(new TarArchiveEntry(cls, cls.getName()));
-            FileInputStream in = new FileInputStream(cls);
-            IOUtils.copy(in, tarOut);
-            tarOut.closeArchiveEntry();
-        }
-
-        resources.forEach((resource, parent) -> {
+        files.forEach((file, parent) -> {
             try {
-                tarOut.putArchiveEntry(new TarArchiveEntry(resource, parent + "/" + resource.getName()));
-                FileInputStream in = new FileInputStream(resource);
+                tarOut.putArchiveEntry(new TarArchiveEntry(file, parent + "/" + file.getName()));
+                FileInputStream in = new FileInputStream(file);
                 IOUtils.copy(in, tarOut);
                 tarOut.closeArchiveEntry();
             } catch (IOException e) {
@@ -159,6 +145,15 @@ public class Util {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean directoryCondition(File directory) {
+        return !directory.exists() || isDirectoryEmpty(directory);
+    }
+
+    public static boolean isDirectoryEmpty(File directory) {
+        Collection<File> files = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        return files.isEmpty();
     }
 
     /**

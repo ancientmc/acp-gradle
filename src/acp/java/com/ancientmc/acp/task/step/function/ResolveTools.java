@@ -1,10 +1,9 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.artifacts.DependencyResolutionListener;
-import org.gradle.api.artifacts.ResolvableDependencies;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ResolveToolsStep extends Step {
+public class ResolveTools extends Step {
 
     /**
      * The gradle project.
@@ -76,12 +75,12 @@ public class ResolveToolsStep extends Step {
         return map;
     }
 
-    public ResolveToolsStep setProject(Project project) {
+    public ResolveTools setProject(Project project) {
         this.project = project;
         return this;
     }
 
-    public ResolveToolsStep setProperties(File properties) {
+    public ResolveTools setProperties(File properties) {
         this.properties = properties;
         return this;
     }

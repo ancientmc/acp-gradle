@@ -11,13 +11,12 @@ public class Paths {
     public static final String DIR_MODPATCHES = DIR_CFG + "modpatches/";
     public static final String DIR_START = DIR_CFG + "start/acp/client/";
     public static final String DIR_RUN = "run/";
-    public static final String DIR_NATIVES = DIR_RUN + "natives/";
+    public static final String DIR_NATIVES = DIR_RUN + "bin/natives/";
     public static final String DIR_ASSETS = DIR_RUN + "resources/";
     public static final String DIR_SRC = "src/main/java/";
     public static final String DIR_RESOURCES = "src/main/resources";
     public static final String DIR_VANILLA_SRC = "build/modding/vanillaFiles/src/";
     public static final String DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources/";
-    public static final String DIR_VANILLA_CLASSES = "build/modding/vanillaFiles/classes/";
     public static final String DIR_REOBF_CLASSES = "build/modding/reobfClasses/";
     public static final String DIR_MODDED_CLASSES = "build/classes/java/main/";
     public static final String DIR_MODDED_PATCHES = "build/modding/patches/";

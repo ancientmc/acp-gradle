@@ -1,13 +1,11 @@
-package com.ancientmc.acp.tasks;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import net.neoforged.srgutils.IMappingFile;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.DefaultTask;
-import org.gradle.api.file.RegularFileProperty;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.Project;
+import org.gradle.api.logging.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,20 +14,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-/**
- * Makes the SRG file for reobfuscation. It's not a TSRGv2, just a regular SRG, because then it can be read by SpecialSource,
- * which is what's used for reobfuscation. The SRG is made via converting from the main TSRGv2 found in the ACP data.
- * The conversion process is done using SRGUtils.
- */
-public abstract class MakeReobfSrg extends DefaultTask {
+public class MakeReobfSrg extends Step {
+    protected File input;
 
-    @TaskAction
-    public void exec() {
+    protected File output;
+
+    protected Project project;
+
+    @Override
+    public void exec(Logger logger, boolean condition) {
+        super.exec(logger, condition);
+        File temp = project.file(Paths.DIR_TEMP + "temp.srg");
+
         try {
-            File input = getInputSrg().getAsFile().get();
-            File output = getOutputSrg().getAsFile().get();
-            File temp = getProject().file(Paths.DIR_TEMP + "temp.srg");
-
             IMappingFile.load(input).write(temp.toPath(), IMappingFile.Format.SRG, false);
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(output));
@@ -46,6 +43,7 @@ public abstract class MakeReobfSrg extends DefaultTask {
             for(String line : lines) {
                 writer.write(line + "\n");
             }
+
             writer.close();
             FileUtils.forceDelete(temp);
         } catch (IOException e) {
@@ -53,9 +51,18 @@ public abstract class MakeReobfSrg extends DefaultTask {
         }
     }
 
-    @InputFile
-    public abstract RegularFileProperty getInputSrg();
+    public MakeReobfSrg setProject(Project project) {
+        this.project = project;
+        return this;
+    }
 
-    @OutputFile
-    public abstract RegularFileProperty getOutputSrg();
+    public MakeReobfSrg setOutput(File output) {
+        this.output = output;
+        return this;
+    }
+
+    public MakeReobfSrg setInput(File input) {
+        this.input = input;
+        return this;
+    }
 }

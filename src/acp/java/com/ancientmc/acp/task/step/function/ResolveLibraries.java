@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.*;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * Downloads Minecraft's libraries as Gradle dependencies.
  */
-public class ResolveLibrariesStep extends Step {
+public class ResolveLibraries extends Step {
 
     /**
      * The list of Minecraft's libraries, formatted via maven path (group.sub:name:version)
@@ -39,12 +40,12 @@ public class ResolveLibrariesStep extends Step {
         });
     }
 
-    public ResolveLibrariesStep setLibraries(List<String> libraries) {
+    public ResolveLibraries setLibraries(List<String> libraries) {
         this.libraries = libraries;
         return this;
     }
 
-    public ResolveLibrariesStep setProject(Project project) {
+    public ResolveLibraries setProject(Project project) {
         this.project = project;
         return this;
     }

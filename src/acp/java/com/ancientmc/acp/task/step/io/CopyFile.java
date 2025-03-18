@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * Copies a file. Done using the Gradle API's CopySpec function.
  */
-public class CopyFileStep extends Step {
+public class CopyFile extends Step {
 
     /**
      * The input file getting copied.
@@ -39,8 +40,8 @@ public class CopyFileStep extends Step {
         super.exec(logger, condition);
 
         try {
-            if (!output.getParentFile().exists()) {
-                Files.createDirectories(output.getParentFile().toPath());
+            if (!output.exists()) {
+                Files.createDirectories(output.toPath());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -60,26 +61,26 @@ public class CopyFileStep extends Step {
         return output;
     }
 
-    public CopyFileStep setInput(File input) {
+    public CopyFile setInput(File input) {
         this.input = input;
         return this;
     }
 
-    public CopyFileStep setOutput(File output) {
+    public CopyFile setOutput(File output) {
         this.output = output;
         return this;
     }
 
-    public CopyFileStep setExclusions(List<String> exclusions) {
+    public CopyFile setExclusions(List<String> exclusions) {
         this.exclusions = exclusions;
         return this;
     }
 
-    public CopyFileStep setExclusions(String exclusions) {
+    public CopyFile setExclusions(String exclusions) {
         return setExclusions(Collections.singletonList(exclusions));
     }
 
-    public CopyFileStep setProject(Project project) {
+    public CopyFile setProject(Project project) {
         this.project = project;
         return this;
     }

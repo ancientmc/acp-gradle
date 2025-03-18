@@ -1,7 +1,10 @@
-package com.ancientmc.acp.tasks;
+package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.tasks.step.*;
+import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.function.ResolveLibraries;
+import com.ancientmc.acp.task.step.function.ResolveTools;
+import com.ancientmc.acp.task.step.io.*;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
@@ -9,9 +12,6 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
-import org.gradle.api.provider.Property;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.jar.Manifest;
 
 public abstract class Initialize extends DefaultTask {
+    private static final String PHASE = "init";
 
     @TaskAction
     public void exec() {
@@ -34,67 +35,65 @@ public abstract class Initialize extends DefaultTask {
                     .setMessage(getStartupMessage(project, version));
             startupMessage.exec(logger, !(project.file(Paths.DIR_CFG).exists() && project.file(Paths.DIR_RUN).exists()));
 
-            getLogger().lifecycle("[acp.init] Initializing ACP...");
-
-            Step downloadAcpData = new DownloadFileStep()
+            Step downloadAcpData = new DownloadFile()
                     .setInput(Util.toMavenUrl(Util.getAncientMCMaven(), extension.getData().get(), "zip"))
                     .setOutput(project.file(Paths.ACP_DATA))
-                    .setMessage("[acp.init] Step -> Downloading ACP data...");
+                    .setMessage(PHASE, "Downloading ACP data...");
             downloadAcpData.exec(logger, !downloadAcpData.getOutput().exists());
 
-            Step extractAcpData = new ExtractFileStep()
+            Step extractAcpData = new ExtractFile()
                     .setInput(downloadAcpData.getOutput())
                     .setOutput(project.file(Paths.DIR_CFG))
                     .setProject(project)
-                    .setMessage("[acp.init] Step -> Extracting ACP data...");
+                    .setMessage(PHASE, "Extracting ACP data...");
             extractAcpData.exec(logger, !project.file(Paths.TSRG).exists());
 
-            Step downloadVersionManifest = new DownloadFileStep()
+            Step downloadVersionManifest = new DownloadFile()
                     .setInput(Util.getUrl("https://raw.githubusercontent.com/ancientmc/AcpGen/refs/heads/classic/data/versions/version_manifest.json"))
                     .setOutput(project.file(Paths.VERSION_MANIFEST))
-                    .setMessage("[acp.init] Step -> Downloading version manifest...");
+                    .setMessage(PHASE, "Downloading version manifest...");
             downloadVersionManifest.exec(logger, !downloadVersionManifest.getOutput().exists());
 
-            Step downloadJson = new DownloadFileStep()
+            Step downloadJson = new DownloadFile()
                     .setInput(Json.getJsonUrl(downloadVersionManifest.getOutput(), version))
                     .setOutput(project.file(Paths.JSON))
-                    .setMessage("[acp.init] Step -> Downloading version JSON...");
+                    .setMessage(PHASE, "Downloading version JSON...");
             downloadJson.exec(logger, !downloadJson.getOutput().exists());
 
-            Step resolveLibraries = new ResolveLibrariesStep()
+            Step resolveLibraries = new ResolveLibraries()
                     .setLibraries(Json.getLibraries(Arrays.asList(downloadJson.getOutput(), project.file(Paths.DIR_CFG + "jardep.json"))))
                     .setProject(project);
             resolveLibraries.exec();
 
-            Step resolveTools = new ResolveToolsStep()
+            Step resolveTools = new ResolveTools()
                     .setProject(project)
                     .setProperties(project.file("gradle.properties"));
             resolveTools.exec();
 
-            Step extractNatives = new ExtractNativesStep()
+            Step extractNatives = new ExtractNatives()
                     .setUrls(Json.getNativeUrls(downloadJson.getOutput()))
                     .setProject(project)
                     .setOutput(project.file(Paths.DIR_NATIVES))
-                    .setMessage("[acp.init] Step -> Extracting natives...");
+                    .setMessage(PHASE, "Extracting natives...");
             extractNatives.exec(logger, !extractNatives.getOutput().exists());
 
-            Step downloadAssets = new DownloadAssetsStep()
+            Step downloadAssets = new DownloadAssets()
                     .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
-                    .setMessage("[acp.init] Step -> Downloading assets...");
+                    .setMessage(PHASE, "Downloading assets...");
             downloadAssets.exec(logger, !project.file(Paths.DIR_ASSETS).exists());
 
-            Step downloadClient = new DownloadJarStep()
+            Step downloadClient = new DownloadJar()
                     .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
                     .setOutput(project.file(Paths.DIR_TEMP))
-                    .setMessage("[acp.init] Step -> Downloading client JAR...");
+                    .setMessage(PHASE, "Downloading client JAR...");
             downloadClient.exec(logger, !project.file(Paths.BASE_JAR).exists()); // Fails if downloadClient.getOutput() is used here. Probably bc that isn't used in another step.
 
-            Step copyStart = new CopyFileStep()
+            Step copyStart = new CopyFile()
                     .setProject(project)
                     .setInput(project.file(Paths.DIR_START))
                     .setOutput(project.file(Paths.DIR_SRC + "acp/client/"))
-                    .setMessage("[acp.init] Step -> Copying start files...");
+                    .setMessage(PHASE, "Copying start files...");
             copyStart.exec(logger, !project.file(Paths.DIR_SRC + "acp/client/Start.java").exists());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -113,7 +112,8 @@ public abstract class Initialize extends DefaultTask {
                 "Copyright (c) AncientMC",
                 "ACP Version: " + project.getProperties().get("acp_version").toString(),
                 "ACP-Gradle Version: " + getPluginVersion(project),
-                "Minecraft Version: " + minecraftVersion);
+                "Minecraft Version: " + minecraftVersion,
+                "[acp.init] Initializing ACP...");
 
         return String.join("\n", lines) + "\n";
     }

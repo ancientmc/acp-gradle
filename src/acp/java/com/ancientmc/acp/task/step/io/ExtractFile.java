@@ -1,16 +1,16 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Extracts a single archive file.
  */
-public class ExtractFileStep extends Step {
+public class ExtractFile extends Step {
 
     /**
      * The input archive file getting extracted.
@@ -32,6 +32,8 @@ public class ExtractFileStep extends Step {
      */
     protected List<String> exclusions;
 
+    protected List<String> inclusions;
+
     /**
      * Main extraction method. Uses Gradle's copy task and zip-tree function.
      * @param logger The gradle logger.
@@ -46,6 +48,10 @@ public class ExtractFileStep extends Step {
                 action.from(project.zipTree(input));
                 action.into(output);
 
+                if (inclusions != null) {
+                    action.include(inclusions);
+                }
+
                 if (exclusions != null) {
                     action.exclude(exclusions);
                 }
@@ -57,22 +63,27 @@ public class ExtractFileStep extends Step {
         return output;
     }
 
-    public ExtractFileStep setInput(File input) {
+    public ExtractFile setInput(File input) {
         this.input = input;
         return this;
     }
 
-    public ExtractFileStep setOutput(File output) {
+    public ExtractFile setOutput(File output) {
         this.output = output;
         return this;
     }
 
-    public ExtractFileStep setExclusions(List<String> exclusions) {
+    public ExtractFile setExclusions(List<String> exclusions) {
         this.exclusions = exclusions;
         return this;
     }
 
-    public ExtractFileStep setProject(Project project) {
+    public ExtractFile setInclusions(List<String> inclusions) {
+        this.inclusions = inclusions;
+        return this;
+    }
+
+    public ExtractFile setProject(Project project) {
         this.project = project;
         return this;
     }

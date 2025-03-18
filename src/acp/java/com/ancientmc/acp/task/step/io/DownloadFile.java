@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.logging.Logger;
 
@@ -11,7 +12,7 @@ import java.net.URL;
 /**
  * Downloads a file from a URL link.
  */
-public class DownloadFileStep extends Step {
+public class DownloadFile extends Step {
     /**
      * The input URL.
      */
@@ -43,12 +44,12 @@ public class DownloadFileStep extends Step {
         return output;
     }
 
-    public DownloadFileStep setInput(URL input) {
+    public DownloadFile setInput(URL input) {
         this.input = input;
         return this;
     }
 
-    public DownloadFileStep setOutput(File output) {
+    public DownloadFile setOutput(File output) {
         this.output = output;
         return this;
     }

@@ -1,4 +1,4 @@
-package com.ancientmc.acp.tasks;
+package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
@@ -19,7 +19,6 @@ import java.net.URL;
  * via the injectModPatches task during setup.
  */
 public abstract class DownloadModLoader extends DefaultTask {
-
 
     @TaskAction
     public void exec() {

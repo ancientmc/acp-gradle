@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Extracts native libraries required for Minecraft to run into the designated folder.
  */
-public class ExtractNativesStep extends Step {
+public class ExtractNatives extends Step {
 
     /**
      * The list of URLs for native libraries from Minecraft's website. The URLs are retrieved via a method in utils.Json
@@ -65,17 +66,17 @@ public class ExtractNativesStep extends Step {
         return output;
     }
 
-    public ExtractNativesStep setUrls(List<URL> urls) {
+    public ExtractNatives setUrls(List<URL> urls) {
         this.urls = urls;
         return this;
     }
 
-    public ExtractNativesStep setOutput(File output) {
+    public ExtractNatives setOutput(File output) {
         this.output = output;
         return this;
     }
 
-    public ExtractNativesStep setProject(Project project) {
+    public ExtractNatives setProject(Project project) {
         this.project = project;
         return this;
     }

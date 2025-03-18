@@ -29,7 +29,7 @@ public class Json {
 
     /**
      * Utility method for easily converting a JSON URL into a JSON object parsable by Gson.
-     * @param url The JSON file.
+     * @param url The JSON URL link.
      * @return The JSON file as a Gson object.
      * @throws IOException exception.
      */

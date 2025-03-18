@@ -1,5 +1,6 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -19,7 +20,7 @@ import java.util.stream.Collectors;
  * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files can be injected, as this task
  * makes temporary JAR files for each implemented LZMA.
  */
-public class InjectBinPatchesStep extends Step {
+public class InjectBinPatches extends Step {
 
     /**
      * The base input JAR.
@@ -117,22 +118,22 @@ public class InjectBinPatchesStep extends Step {
         }
     }
 
-    public InjectBinPatchesStep setOutput(File output) {
+    public InjectBinPatches setOutput(File output) {
         this.output = output;
         return this;
     }
 
-    public InjectBinPatchesStep setInput(File input) {
+    public InjectBinPatches setInput(File input) {
         this.input = input;
         return this;
     }
 
-    public InjectBinPatchesStep setPatchDirectory(File patchDirectory) {
+    public InjectBinPatches setPatchDirectory(File patchDirectory) {
         this.patchDirectory = patchDirectory;
         return this;
     }
 
-    public InjectBinPatchesStep setProject(Project project) {
+    public InjectBinPatches setProject(Project project) {
         this.project = project;
         return this;
     }

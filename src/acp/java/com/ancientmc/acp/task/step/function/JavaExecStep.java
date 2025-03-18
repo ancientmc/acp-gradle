@@ -1,13 +1,16 @@
-package com.ancientmc.acp.tasks.step;
+package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.logging.Logger;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
- * Step used to execute Java-based programs during decompilation.
+ * Step used to execute Java-based tools needed during decompilation.
  */
 public class JavaExecStep extends Step {
 
@@ -17,17 +20,17 @@ public class JavaExecStep extends Step {
     protected Project project;
 
     /**
-     * The configuration for our tool.
+     * The configuration for our tool being executed.
      */
     protected Configuration configuration;
 
     /**
-     * The main class of the tool.
+     * The main class of the tool being executed.
      */
     protected String mainClass;
 
     /**
-     * The tool's Java arguments.
+     * The tool's command line arguments.
      */
     protected List<String> args;
 
@@ -39,6 +42,10 @@ public class JavaExecStep extends Step {
             action.setClasspath(project.files(configuration));
             action.getMainClass().set(mainClass);
             action.setArgs(args);
+
+            if (isMakeDiffPatchesStep(args)) {
+                action.setIgnoreExitValue(true);
+            }
         });
     }
 
@@ -60,5 +67,14 @@ public class JavaExecStep extends Step {
     public JavaExecStep setArgs(List<String> args) {
         this.args = args;
         return this;
+    }
+
+    /**
+     * The makeDiffPatches step as part of the BuildMod task crashes the process unless we ignore the exit value. We don't want to do this
+     * for all JavaExec steps, so for each JavaExec we check for the args, and only call the JavaExec.setIgnoreExitValue method if there's a match
+     * with the makeDiffPatches step.
+     */
+    public static boolean isMakeDiffPatchesStep(List<String> args) {
+        return args.equals(Arrays.asList("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", Paths.DIR_MODDED_PATCHES + "/diff/"));
     }
 }
