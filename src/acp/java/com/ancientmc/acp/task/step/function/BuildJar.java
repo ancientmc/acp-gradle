@@ -13,18 +13,25 @@ import org.gradle.api.logging.Logger;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.jar.JarEntry;
 
 /**
  * Builds the intermediate JAR containing obfuscated class files. The JAR is just an archive so we use Compress-IO to build it.
  */
 public class BuildJar extends Step {
-    protected Project project;
 
+    /**
+     * The class directory.
+     */
     protected File classDirectory;
 
+    /**
+     * The resource directory.
+     */
     protected File resourceDirectory;
 
+    /**
+     * The output JAR.
+     */
     protected File output;
 
     @Override
@@ -35,17 +42,14 @@ public class BuildJar extends Step {
             }
 
             JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
-            out.setMethod(8);
             Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
             Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
 
             if (!classes.isEmpty()) {
-                project.getLogger().lifecycle("Classes size -> " + classes.size());
                 classes.forEach(cls -> addEntry(out, classDirectory, cls));
             }
 
             if (!resources.isEmpty()) {
-                project.getLogger().lifecycle("Resources size -> " + classes.size());
                 resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
             }
 
@@ -59,8 +63,9 @@ public class BuildJar extends Step {
     public static void addEntry(JarArchiveOutputStream out, File directory, File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             String path = getPath(directory, file);
-            out.putArchiveEntry(new JarArchiveEntry(new JarEntry(path)));
+            out.putArchiveEntry(new JarArchiveEntry(path));
             IOUtils.copy(in, out);
+            in.close();
             out.closeArchiveEntry();
             out.flush();
         } catch (IOException e) {
@@ -72,18 +77,13 @@ public class BuildJar extends Step {
         return directory.toPath().relativize(file.toPath()).toString();
     }
 
-    public BuildJar setProject(Project project) {
-        this.project = project;
-        return this;
-    }
-
     public BuildJar setClassDirectory(File classDirectory) {
         this.classDirectory = classDirectory;
         return this;
     }
 
-    public BuildJar setResources(File resources) {
-        this.resourceDirectory = resources;
+    public BuildJar setResourceDirectory(File resourceDirectory) {
+        this.resourceDirectory = resourceDirectory;
         return this;
     }
 

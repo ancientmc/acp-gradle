@@ -9,6 +9,7 @@ import org.gradle.api.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,11 @@ public class MakeArchives extends Step {
 
     public void exec(Logger logger, boolean condition) {
         try {
+
+            if (!archiveDirectory.exists()) {
+                Files.createDirectories(archiveDirectory.toPath());
+            }
+
             Map<String, String> vanillaMap = getHashMap(new File(hashDirectory, "vanilla.md5"));
             Map<String, String> moddedMap = getHashMap(new File(hashDirectory, "modded.md5"));
             Map<String, String> classMap = Util.getClassMap(srg);
@@ -102,7 +108,7 @@ public class MakeArchives extends Step {
     }
 
     /**
-     * Get obfuscated class name.
+     * Gets obfuscated class name.
      */
     public String getObfName(String name, Map<String, String> map) {
         return map.entrySet().stream()

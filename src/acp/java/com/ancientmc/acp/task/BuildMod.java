@@ -13,7 +13,6 @@ import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class BuildMod extends DefaultTask {
     public static final String PHASE = "mod";
@@ -22,7 +21,7 @@ public class BuildMod extends DefaultTask {
     public void exec() {
         Project project = getProject();
         Logger logger = project.getLogger();
-        AcpExtension extension = (AcpExtension) project.getExtensions().getByName("acp");
+        AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
         String lzmaPath = "build/modding/patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
 
         Step moddedCompile = new JavaCompileStep()
@@ -30,72 +29,71 @@ public class BuildMod extends DefaultTask {
                 .setClasspathCollection(project.getExtensions().getByType(SourceSetContainer.class).named("main").get().getCompileClasspath())
                 .setNativesDirectory(project.file(Paths.DIR_NATIVES))
                 .setOutputDirectory(project.file(Paths.DIR_MODDED_CLASSES))
-                .setMessage(PHASE, "Compiling the game...");
-        moddedCompile.exec(logger, Util.directoryCondition(project.file(Paths.DIR_MODDED_CLASSES)));
+                .setMessage(PHASE, "Compiling the game");
+        moddedCompile.exec(logger, true);
 
         Step makeDiffPatches = new JavaExecStep()
                 .setProject(project)
                 .setConfiguration("diffpatch")
                 .setMainClass("codechicken.diffpatch.DiffPatch")
                 .setArgs(Arrays.asList("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", Paths.DIR_MODDED_PATCHES + "/diff/"))
-                .setMessage(PHASE, "Making DIFF patches...");
+                .setMessage(PHASE, "Making DIFF patches");
         makeDiffPatches.exec(logger, Util.directoryCondition(project.file(Paths.DIR_MODDED_PATCHES + "/diff/")));
 
         Step makeReobfSrg = new MakeReobfSrg()
                 .setProject(project)
                 .setInput(project.file(Paths.TSRG))
                 .setOutput(project.file(Paths.REOBF_SRG))
-                .setMessage(PHASE, "Making SRG for reobfuscation...");
+                .setMessage(PHASE, "Making SRG for reobfuscation");
         makeReobfSrg.exec(logger, !project.file(Paths.REOBF_SRG).exists());
 
         Step buildJar = new BuildJar()
-                .setProject(project)
                 .setClassDirectory(project.file(Paths.DIR_MODDED_CLASSES))
-                .setResources(project.file(Paths.DIR_RESOURCES))
+                .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.INTERM_JAR))
-                .setMessage(PHASE, "Building JAR...");
-        buildJar.exec(logger, !project.file(Paths.INTERM_JAR).exists());
+                .setMessage(PHASE, "Building JAR");
+        buildJar.exec(logger, true);
 
         Step reobfJar = new JavaExecStep()
                 .setProject(project)
                 .setConfiguration("specialsource")
                 .setMainClass("net.md_5.specialsource.SpecialSource")
-                .setArgs(Arrays.asList("--in-jar", Paths.INTERM_JAR, "--out-jar", Paths.REOBF_JAR, "--srg-in", Paths.REOBF_SRG, "--reverse"))
-                .setMessage(PHASE, "Reobfuscating JAR...");
-        reobfJar.exec(logger, !project.file(Paths.REOBF_JAR).exists());
+                .setArgs(Arrays.asList("--in-jar", Paths.INTERM_JAR, "--out-jar", Paths.REOBF_JAR, "--srg-in", Paths.REOBF_SRG))
+                .setMessage(PHASE, "Reobfuscating JAR");
+        reobfJar.exec(logger, true);
 
         Step makeBinPatches = new JavaExecStep()
                 .setProject(project)
                 .setConfiguration("binpatch")
                 .setMainClass("net.neoforged.binarypatcher.ConsoleTool")
-                .setArgs(Arrays.asList("--clean", Paths.MAPPED_JAR, "--dirty", Paths.REOBF_JAR, "--output", lzmaPath))
-                .setMessage(PHASE, "Making binary patches...");
-        makeBinPatches.exec(logger, !project.file(lzmaPath).exists());
+                .setArgs(Arrays.asList("--clean", Paths.VANILLA_JAR, "--dirty", Paths.INTERM_JAR, "--output", lzmaPath, "--srg", Paths.REOBF_SRG))
+                .setMessage(PHASE, "Making binary patches");
+        makeBinPatches.exec(logger, true);
 
         Step extractReobfClasses = new ExtractFile()
                 .setProject(project)
                 .setInput(project.file(Paths.REOBF_JAR))
                 .setOutput(project.file(Paths.DIR_REOBF_CLASSES))
-                .setInclusions(List.of("*.class"))
-                .setMessage(PHASE, "Extracting reobfuscated classes...");
-        extractReobfClasses.exec(logger, project.file(Paths.DIR_REOBF_CLASSES).listFiles() == null);
+                .setInclusions(Arrays.asList("*.class", "**/*.class"))
+                .setMessage(PHASE, "Extracting reobfuscated classes");
+        extractReobfClasses.exec(logger, true);
 
         Step makeModdedHashes = new MakeHashes()
                 .setProject(project)
                 .setClassDirectory(project.file(Paths.DIR_MODDED_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file("build/modding/hashes/modded.md5"))
-                .setMessage(PHASE, "Generating modded hashes...");
-        makeModdedHashes.exec(logger, !project.file("build/modding/hashes/modded.md5").exists());
+                .setMessage(PHASE, "Generating modded hashes");
+        makeModdedHashes.exec(logger, true);
 
         Step makeArchives = new MakeArchives()
                 .setProject(project)
                 .setSrg(project.file(Paths.TSRG))
-                .setObfDirectory(project.file(Paths.DIR_MODDED_CLASSES))
+                .setObfDirectory(project.file(Paths.DIR_REOBF_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
                 .setHashDirectory(project.file("build/modding/hashes"))
-                .setArchiveDirectory(project.file("build/modding/archives"))
-                .setMessage(PHASE, "Compressing ZIP and TAR archives...");
-        makeArchives.exec(logger, Util.directoryCondition(project.file("build/modding/archives/")));
+                .setArchiveDirectory(project.file("build/modding/archives/" + extension.getModName().get() + "/"))
+                .setMessage(PHASE, "Compressing ZIP and TAR archives");
+        makeArchives.exec(logger, true);
     }
 }

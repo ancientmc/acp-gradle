@@ -50,7 +50,7 @@ public class MakeHashes extends Step {
             String hash = getHash(src);
             String name = src.getAbsolutePath();
             System.out.println(name);
-            name = name.replace(".java", "")
+            name = name.replace(".class", "")
                     .replace(sourceDirectory.getAbsolutePath() + File.separator, "")
                     .replace(File.separator, "/");
             map.put(name, hash);

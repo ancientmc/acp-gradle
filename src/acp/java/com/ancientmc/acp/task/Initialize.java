@@ -38,26 +38,26 @@ public abstract class Initialize extends DefaultTask {
             Step downloadAcpData = new DownloadFile()
                     .setInput(Util.toMavenUrl(Util.getAncientMCMaven(), extension.getData().get(), "zip"))
                     .setOutput(project.file(Paths.ACP_DATA))
-                    .setMessage(PHASE, "Downloading ACP data...");
+                    .setMessage(PHASE, "Downloading ACP data");
             downloadAcpData.exec(logger, !downloadAcpData.getOutput().exists());
 
             Step extractAcpData = new ExtractFile()
                     .setInput(downloadAcpData.getOutput())
                     .setOutput(project.file(Paths.DIR_CFG))
                     .setProject(project)
-                    .setMessage(PHASE, "Extracting ACP data...");
+                    .setMessage(PHASE, "Extracting ACP data");
             extractAcpData.exec(logger, !project.file(Paths.TSRG).exists());
 
             Step downloadVersionManifest = new DownloadFile()
                     .setInput(Util.getUrl("https://raw.githubusercontent.com/ancientmc/AcpGen/refs/heads/classic/data/versions/version_manifest.json"))
                     .setOutput(project.file(Paths.VERSION_MANIFEST))
-                    .setMessage(PHASE, "Downloading version manifest...");
+                    .setMessage(PHASE, "Downloading version manifest");
             downloadVersionManifest.exec(logger, !downloadVersionManifest.getOutput().exists());
 
             Step downloadJson = new DownloadFile()
                     .setInput(Json.getJsonUrl(downloadVersionManifest.getOutput(), version))
                     .setOutput(project.file(Paths.JSON))
-                    .setMessage(PHASE, "Downloading version JSON...");
+                    .setMessage(PHASE, "Downloading version JSON");
             downloadJson.exec(logger, !downloadJson.getOutput().exists());
 
             Step resolveLibraries = new ResolveLibraries()
@@ -74,26 +74,26 @@ public abstract class Initialize extends DefaultTask {
                     .setUrls(Json.getNativeUrls(downloadJson.getOutput()))
                     .setProject(project)
                     .setOutput(project.file(Paths.DIR_NATIVES))
-                    .setMessage(PHASE, "Extracting natives...");
+                    .setMessage(PHASE, "Extracting natives");
             extractNatives.exec(logger, !extractNatives.getOutput().exists());
 
             Step downloadAssets = new DownloadAssets()
                     .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
-                    .setMessage(PHASE, "Downloading assets...");
+                    .setMessage(PHASE, "Downloading assets");
             downloadAssets.exec(logger, !project.file(Paths.DIR_ASSETS).exists());
 
             Step downloadClient = new DownloadJar()
                     .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
                     .setOutput(project.file(Paths.DIR_TEMP))
-                    .setMessage(PHASE, "Downloading client JAR...");
+                    .setMessage(PHASE, "Downloading client JAR");
             downloadClient.exec(logger, !project.file(Paths.BASE_JAR).exists()); // Fails if downloadClient.getOutput() is used here. Probably bc that isn't used in another step.
 
             Step copyStart = new CopyFile()
                     .setProject(project)
                     .setInput(project.file(Paths.DIR_START))
                     .setOutput(project.file(Paths.DIR_SRC + "acp/client/"))
-                    .setMessage(PHASE, "Copying start files...");
+                    .setMessage(PHASE, "Copying start files");
             copyStart.exec(logger, !project.file(Paths.DIR_SRC + "acp/client/Start.java").exists());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -113,7 +113,7 @@ public abstract class Initialize extends DefaultTask {
                 "ACP Version: " + project.getProperties().get("acp_version").toString(),
                 "ACP-Gradle Version: " + getPluginVersion(project),
                 "Minecraft Version: " + minecraftVersion,
-                "[acp.init] Initializing ACP...");
+                "[acp.init] Initializing ACP");
 
         return String.join("\n", lines) + "\n";
     }

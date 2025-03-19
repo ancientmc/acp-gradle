@@ -72,13 +72,13 @@ public class Step {
 
     /**
      * Sets the step execution message printed to tne console. This method also acts as a pseudo-build method for finalizing a Step object.
-     *      * It should always be called last in the setter chains.
+     * It should always be called last in the setter chains.
      * @param phase The phase of action. Used phases are "init" for the Initialize task, "decomp" for the Decompile task, and "mod" for the BuildMod task.
      * @param message The message of the step's action.
      * @return This step.
      */
     public Step setMessage(String phase, String message) {
-        this.message = "[acp." + phase + "] Step -> " + message;
+        this.message = "[acp." + phase + "] Step -> " + message + "...";
         return this;
     }
 }

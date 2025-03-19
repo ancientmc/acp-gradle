@@ -18,8 +18,8 @@ public class Paths {
     public static final String DIR_VANILLA_SRC = "build/modding/vanillaFiles/src/";
     public static final String DIR_VANILLA_CLASSES = "build/modding/vanillaFiles/classes/";
     public static final String DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources/";
-    public static final String DIR_REOBF_CLASSES = "build/modding/reobfClasses/";
-    public static final String DIR_MODDED_CLASSES = "build/modding/moddedClasses/";
+    public static final String DIR_REOBF_CLASSES = "build/modding/moddedClasses/reobf/";
+    public static final String DIR_MODDED_CLASSES = "build/modding/moddedClasses/deobf/";
     public static final String DIR_MODDED_PATCHES = "build/modding/patches/";
     public static final String ACP_DATA = DIR_CFG + "data.zip";
     public static final String VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
@@ -31,6 +31,7 @@ public class Paths {
     public static final String MAPPED_JAR = DIR_TEMP + "mapped.jar";
     public static final String INJECT_JAR = DIR_TEMP + "inject.jar";
     public static final String FINAL_JAR = DIR_TEMP + "final.jar";
+    public static final String VANILLA_JAR = "build/modding/vanillaFiles/vanilla.jar";
     public static final String INTERM_JAR = "build/libs/intermediate.jar";
     public static final String REOBF_JAR = "build/libs/reobf.jar";
     public static final String TSRG = DIR_CFG + "cuneiform.tsrg";
