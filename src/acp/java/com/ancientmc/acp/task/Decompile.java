@@ -10,6 +10,7 @@ import com.ancientmc.acp.util.Util;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
@@ -120,9 +121,17 @@ public abstract class Decompile extends DefaultTask {
                 .setMessage(PHASE, "Backing up JAR resources...");
         backupResources.exec(logger, Util.directoryCondition(project.file(Paths.DIR_VANILLA_RESOURCES)));
 
+        Step vanillaCompile = new JavaCompileStep()
+                .setSourceDirectory(project.file(Paths.DIR_VANILLA_SRC))
+                .setClasspathCollection(project.getExtensions().getByType(SourceSetContainer.class).named("main").get().getCompileClasspath())
+                .setNativesDirectory(project.file(Paths.DIR_NATIVES))
+                .setOutputDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
+                .setMessage(PHASE, "Compiling the game...");
+        vanillaCompile.exec(logger, Util.directoryCondition(project.file(Paths.DIR_VANILLA_CLASSES)));
+
         Step makeVanillaHashes = new MakeHashes()
                 .setProject(project)
-                .setSourceDirectory(project.file(Paths.DIR_VANILLA_SRC))
+                .setClassDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_VANILLA_RESOURCES))
                 .setOutput(project.file("build/modding/hashes/vanilla.md5"))
                 .setMessage(PHASE, "Generating vanilla hashes...");

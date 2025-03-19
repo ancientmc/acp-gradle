@@ -16,9 +16,10 @@ public class Paths {
     public static final String DIR_SRC = "src/main/java/";
     public static final String DIR_RESOURCES = "src/main/resources";
     public static final String DIR_VANILLA_SRC = "build/modding/vanillaFiles/src/";
+    public static final String DIR_VANILLA_CLASSES = "build/modding/vanillaFiles/classes/";
     public static final String DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources/";
     public static final String DIR_REOBF_CLASSES = "build/modding/reobfClasses/";
-    public static final String DIR_MODDED_CLASSES = "build/classes/java/main/";
+    public static final String DIR_MODDED_CLASSES = "build/modding/moddedClasses/";
     public static final String DIR_MODDED_PATCHES = "build/modding/patches/";
     public static final String ACP_DATA = DIR_CFG + "data.zip";
     public static final String VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
