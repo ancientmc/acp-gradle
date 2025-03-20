@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.gradle.api.Project;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
@@ -27,6 +28,14 @@ import java.util.zip.ZipOutputStream;
  * Class full of miscellaneous utilities.
  */
 public class Util {
+
+    /**
+     * Gets the minecraft version from the version property.
+     */
+    public static String getMinecraftVersion(Project project) {
+        String versionProperty = project.getProperties().get("minecraft_version").toString();
+        return versionProperty.equals("a1.2.6-legacy") ? "a1.2.6" : versionProperty;
+    }
 
     /**
      * Gets a map of class names from the SRG file. The key is the obfuscated name, while the value is the mapped name.

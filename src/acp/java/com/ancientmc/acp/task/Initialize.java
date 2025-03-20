@@ -27,7 +27,7 @@ public abstract class Initialize extends DefaultTask {
     public void exec() {
         Project project = getProject();
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
-        String version = project.getProperties().get("minecraft_version").toString();
+        String version = Util.getMinecraftVersion(project);
         Logger logger = project.getLogger();
 
         try {

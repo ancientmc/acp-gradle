@@ -83,4 +83,9 @@ public class RepackageDefaults extends Step {
         this.outputDirectory = outputDirectory;
         return this;
     }
+
+    public RepackageDefaults setProject(Project project) {
+        this.project = project;
+        return this;
+    }
 }

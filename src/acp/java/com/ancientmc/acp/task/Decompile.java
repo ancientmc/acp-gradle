@@ -95,6 +95,7 @@ public abstract class Decompile extends DefaultTask {
         Step repackageDefaults = new RepackageDefaults()
                 .setInputDirectory(project.file(Paths.DIR_SRC))
                 .setOutputDirectory(project.file(Paths.DIR_SRC))
+                .setProject(project)
                 .setMessage(PHASE, "Repackaging default-level source files");
         repackageDefaults.exec(logger, true); // condition???
 

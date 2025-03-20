@@ -2,7 +2,7 @@ package com.ancientmc.acp;
 
 import com.ancientmc.acp.task.*;
 import com.ancientmc.acp.util.Paths;
-import org.apache.commons.io.FileUtils;
+import com.ancientmc.acp.util.Util;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.logging.LogLevel;
@@ -21,7 +21,7 @@ public class AcpPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        String minecraftVersion = project.getProperties().get("minecraft_version").toString();
+        String minecraftVersion = Util.getMinecraftVersion(project);
         AcpExtension extension = project.getExtensions().create("acp", AcpExtension.class, project);
 
         project.getPluginManager().apply(JavaPlugin.class);
