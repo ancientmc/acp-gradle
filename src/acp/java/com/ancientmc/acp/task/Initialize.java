@@ -81,7 +81,7 @@ public abstract class Initialize extends DefaultTask {
                     .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
                     .setMessage(PHASE, "Downloading assets");
-            downloadAssets.exec(logger, !project.file(Paths.DIR_ASSETS).exists());
+            downloadAssets.exec(logger, Util.directoryCondition(project.file(Paths.DIR_ASSETS)));
 
             Step downloadClient = new DownloadJar()
                     .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))

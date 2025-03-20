@@ -85,9 +85,9 @@ public class Util {
     public static void compressZip(Map<File, String> files, File zip) throws IOException {
         ZipOutputStream zipOut = new ZipOutputStream(Files.newOutputStream(zip.toPath()));
 
-        files.forEach((file, parent) -> {
+        files.forEach((file, path) -> {
             try {
-                zipOut.putNextEntry(new ZipEntry(parent + "/" + file.getName()));
+                zipOut.putNextEntry(new ZipEntry(path));
                 FileInputStream in = new FileInputStream(file);
                 IOUtils.copy(in, zipOut);
                 zipOut.closeEntry();
@@ -109,9 +109,9 @@ public class Util {
         GzipCompressorOutputStream gzipOut = new GzipCompressorOutputStream(Files.newOutputStream(tar.toPath()));
         TarArchiveOutputStream tarOut = new TarArchiveOutputStream(gzipOut);
 
-        files.forEach((file, parent) -> {
+        files.forEach((file, name) -> {
             try {
-                tarOut.putArchiveEntry(new TarArchiveEntry(file, parent + "/" + file.getName()));
+                tarOut.putArchiveEntry(new TarArchiveEntry(file, name));
                 FileInputStream in = new FileInputStream(file);
                 IOUtils.copy(in, tarOut);
                 tarOut.closeArchiveEntry();

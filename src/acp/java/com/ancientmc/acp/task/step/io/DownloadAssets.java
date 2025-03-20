@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,9 +48,10 @@ public class DownloadAssets extends Step {
 
                 JsonObject indexObj = Json.get(index);
                 Map<String, String> assets = getAssets(indexObj);
+                List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
 
                 if (assets != null) {
-                    download(assets, output);
+                    download(assets, omniArchiveAssets, output);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -79,26 +82,55 @@ public class DownloadAssets extends Step {
     }
 
     /**
+     * Some of the assets are *not* on Mojang's website but are in OmniArchive instead. This method retrieves them as a list,
+     * and we later call them as needed.
+     * @param index The asset index JSON object.
+     * @return The list of resources only found on OmniArchive.
+     */
+    public static List<String> getOmniArchiveAssets(JsonObject index) {
+        List<String> assets = new ArrayList<>();
+        JsonObject objects = index.getAsJsonObject("objects");
+
+        if (!objects.isEmpty()) {
+            objects.keySet().forEach(name -> {
+                String hash = objects.getAsJsonObject(name).get("hash").getAsString();
+
+                // only the OmniArchive-exclusive assets have a URL property.
+                if (objects.getAsJsonObject(name).has("url")) {
+                    assets.add(hash);
+                }
+            });
+
+            return assets;
+        }
+
+        return null;
+    }
+
+    /**
      * Gets each asset from the hash map and sets it up for downloading.
      * Each URL of a hash representing an asset is collected and written as a new file using its proper name.
      * @param map The hash map containing the assets.
-     * @param dest The "run\resources" directory path in the ACP workspace.
+     * @param omniArchiveAssets The list containing the hashes only found on OmniArchive.
+     * @param directory The "run\resources" directory path in the ACP workspace.
      * @throws IOException exception.
      */
-    public static void download(Map<String, String> map, File dest) throws IOException {
-        if(!dest.exists()) {
-            FileUtils.forceMkdir(dest);
+    public static void download(Map<String, String> map, List<String> omniArchiveAssets, File directory) throws IOException {
+        if(!directory.exists()) {
+            FileUtils.forceMkdir(directory);
         }
 
         map.forEach((key, value) -> {
             try {
                 String path = value.substring(0, 2) + '/' + value;
-                URL url = Util.getUrl("https://resources.download.minecraft.net/" + path);
-                File file = new File(dest, key);
+                String domain = omniArchiveAssets.contains(value) ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";
+                URL url = Util.getUrl(domain + path);
+                File file = new File(directory, key);
 
-                if(!file.getParentFile().exists()) {
+                if (!file.getParentFile().exists()) {
                     FileUtils.forceMkdir(file.getParentFile());
                 }
+
                 writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -120,6 +152,7 @@ public class DownloadAssets extends Step {
             out.write(b, 0, len);
             out.flush();
         }
+
         in.close();
         out.close();
     }

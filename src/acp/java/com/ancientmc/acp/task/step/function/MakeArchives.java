@@ -67,17 +67,20 @@ public class MakeArchives extends Step {
 
             moddedMap.forEach((name, hash) -> {
                 if (!vanillaMap.containsValue(hash)) {
-                    if (name.startsWith("net/minecraft/src/") || (name.startsWith("com/mojang"))) {
+                    if (name.startsWith("net/minecraft/") || (name.startsWith("com/mojang"))) {
 
-                        String className = classMap.containsValue(name) ? getObfName(name, classMap) : name;
+                        // For non-Minecraft classes, get the name without the package.
+                        String strippedName = name.substring(name.lastIndexOf('/') + 1);
+
+                        String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
                         File moddedClass = project.file(obfDirectory.getPath() + "/" + className + ".class");
-                        moddedFiles.put(moddedClass, name.substring(0, name.lastIndexOf('/')));
+                        moddedFiles.put(moddedClass, className + ".class");
 
                     } else {
 
                         // Add resources
                         File moddedResource = project.file(resourceDirectory.getPath() + "/" + name);
-                        moddedFiles.put(moddedResource, name.substring(0, name.lastIndexOf('/')));
+                        moddedFiles.put(moddedResource, name);
                     }
                 }
             });
