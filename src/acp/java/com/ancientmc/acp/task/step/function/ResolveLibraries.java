@@ -3,7 +3,8 @@ package com.ancientmc.acp.task.step.function;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.*;
+import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.DependencySet;
 
 import java.util.List;
 

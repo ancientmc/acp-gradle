@@ -2,23 +2,21 @@ plugins {
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
-    id 'io.github.moist-mason.license-importer' version '1.0'
 }
 
 group 'com.ancientmc'
 version '0.3.0.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    withSourcesJar()
+    withJavadocJar()
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
 
 repositories {
     mavenCentral()
     mavenLocal()
     maven { url = 'https://maven.neoforged.net/' }
-}
-
-licenseimporter {
-    url = 'https://raw.githubusercontent.com/ancientmc/license/master/LICENSE'
-    output = file(project.projectDir.path + "/LICENSE")
 }
 
 sourceSets {
@@ -53,6 +51,11 @@ gradlePlugin {
     }
 }
 
+javadoc {
+    source = sourceSets.acp.allJava
+    destinationDir = project.file('build/docs/')
+}
+
 jar {
     from sourceSets.acp.output
     manifest {
@@ -65,6 +68,14 @@ jar {
                 'Implementation-Version': archiveVersion,
         )
     }
+}
+
+sourcesJar {
+    from sourceSets.acp.allSource
+}
+
+javadocJar {
+    from javadoc.destinationDir
 }
 
 tasks.register('testJar', Copy) {
@@ -100,7 +111,7 @@ publishing {
             licenses {
                 license {
                     name = 'AncientMC License'
-                    url = 'https://github.com/ancientmc/license/blob/master/LICENSE'
+                    url = 'https://raw.githubusercontent.com/ancientmc/license/refs/heads/master/LICENSE'
                 }
             }
             developers {

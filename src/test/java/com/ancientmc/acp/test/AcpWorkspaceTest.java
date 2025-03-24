@@ -79,6 +79,8 @@ public class AcpWorkspaceTest {
     /** Sets up an ACP workspace with the modloader injected, as well as the test ruby mod copied to the source path.
      * Runs the game and also exports patches and archives. **/
     @Test public void testDecompileRuby() {
+        doTestRuby("decompileRuby", "downloadModLoader", "decompile");
+        doTest("runRuby", "runClient");
         doTest("exportRuby", "buildMod");
     }
 

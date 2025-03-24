@@ -6,13 +6,13 @@ import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 /**
  * Downloads a file from a URL link.
  */
 public class DownloadFile extends Step {
+
     /**
      * The input URL.
      */
@@ -32,7 +32,7 @@ public class DownloadFile extends Step {
         super.exec(logger, condition);
 
         if (condition) {
-            try (InputStream in = input.openStream()) {
+            try {
                 FileUtils.copyURLToFile(input, output);
             } catch (IOException e) {
                 throw new RuntimeException(e);

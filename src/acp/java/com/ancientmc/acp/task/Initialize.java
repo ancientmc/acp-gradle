@@ -1,7 +1,7 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.task.step.function.ResolveLibraries;
 import com.ancientmc.acp.task.step.function.ResolveTools;
 import com.ancientmc.acp.task.step.io.*;
@@ -36,7 +36,7 @@ public abstract class Initialize extends DefaultTask {
             startupMessage.exec(logger, !(project.file(Paths.DIR_CFG).exists() && project.file(Paths.DIR_RUN).exists()));
 
             Step downloadAcpData = new DownloadFile()
-                    .setInput(Util.toMavenUrl(Util.getAncientMCMaven(), extension.getData().get(), "zip"))
+                    .setInput(Util.toMavenUrl(Util.getAncientMcMaven(), extension.getData().get(), "zip"))
                     .setOutput(project.file(Paths.ACP_DATA))
                     .setMessage(PHASE, "Downloading ACP data");
             downloadAcpData.exec(logger, !downloadAcpData.getOutput().exists());
@@ -87,7 +87,7 @@ public abstract class Initialize extends DefaultTask {
                     .setInput(Json.getJarUrl(downloadJson.getOutput(), "client"))
                     .setOutput(project.file(Paths.DIR_TEMP))
                     .setMessage(PHASE, "Downloading client JAR");
-            downloadClient.exec(logger, !project.file(Paths.BASE_JAR).exists()); // Fails if downloadClient.getOutput() is used here. Probably bc that isn't used in another step.
+            downloadClient.exec(logger, !project.file(Paths.CLIENT_JAR).exists()); // Fails if downloadClient.getOutput() is used here. Probably bc that isn't used in another step.
 
             Step copyStart = new CopyFile()
                     .setProject(project)

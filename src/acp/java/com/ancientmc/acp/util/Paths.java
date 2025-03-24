@@ -24,7 +24,7 @@ public class Paths {
     public static final String ACP_DATA = DIR_CFG + "data.zip";
     public static final String VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
     public static final String JSON = DIR_TEMP + "version.json";
-    public static final String BASE_JAR = DIR_TEMP + "client.jar";
+    public static final String CLIENT_JAR = DIR_TEMP + "client.jar";
     public static final String SLIM_JAR = DIR_TEMP + "slim.jar";
     public static final String EXTRA_JAR = DIR_TEMP + "extra.jar";
     public static final String MODLOADER_JAR = DIR_TEMP + "mod.jar";

@@ -42,11 +42,12 @@ public class ExtractNatives extends Step {
     @Override
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
+
         if (condition) {
             try {
                 List<File> jars = new ArrayList<>();
 
-                for(URL url : urls) {
+                for (URL url : urls) {
                     String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
                     FileUtils.copyURLToFile(url, new File(output, path));
                     jars.add(new File(output, path));

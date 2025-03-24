@@ -33,6 +33,7 @@ public class ResolveTools extends Step {
         try {
             List<String> lines = Files.readAllLines(properties.toPath());
             Map<String, String> map = getConfigMap(lines);
+
             map.forEach((name, tool) -> {
                 Configuration cfg = project.getConfigurations().named(name).get();
                 resolve(cfg, tool);
@@ -65,6 +66,7 @@ public class ResolveTools extends Step {
      */
     private Map<String, String> getConfigMap(List<String> lines) {
         Map<String, String> map = new HashMap<>();
+
         lines.forEach(line -> {
             if (line.contains("tool_")) {
                 String[] split = line.split("=");
@@ -72,6 +74,7 @@ public class ResolveTools extends Step {
                 map.put(name, split[1]);
             }
         });
+
         return map;
     }
 

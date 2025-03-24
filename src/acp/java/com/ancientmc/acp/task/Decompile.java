@@ -1,8 +1,7 @@
 package com.ancientmc.acp.task;
 
-import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.task.step.function.*;
-import com.ancientmc.acp.task.step.function.MakeHashes;
 import com.ancientmc.acp.task.step.io.CopyFile;
 import com.ancientmc.acp.task.step.io.ExtractFile;
 import com.ancientmc.acp.util.Paths;
@@ -33,7 +32,7 @@ public abstract class Decompile extends DefaultTask {
                 .setProject(project)
                 .setConfiguration("jarsplitter")
                 .setMainClass("net.neoforged.jarsplitter.ConsoleTool")
-                .setArgs(Arrays.asList("--input", Paths.BASE_JAR, "--slim", Paths.SLIM_JAR, "--extra", Paths.EXTRA_JAR, "--srg", Paths.TSRG))
+                .setArgs(Arrays.asList("--input", Paths.CLIENT_JAR, "--slim", Paths.SLIM_JAR, "--extra", Paths.EXTRA_JAR, "--srg", Paths.TSRG))
                 .setMessage(PHASE, "Splitting JAR");
         splitJar.exec(logger, !project.file(Paths.SLIM_JAR).exists());
 
@@ -80,8 +79,8 @@ public abstract class Decompile extends DefaultTask {
                 .setOutput(project.file(Paths.DIR_SRC))
                 .setProject(project)
                 .setMessage(PHASE, "Unzipping Minecraft's source");
-        unzip.exec(logger, !project.file(Paths.DIR_SRC + "com/mojang/minecraft/").exists()
-                || !project.file(Paths.DIR_SRC + "net/minecraft/").exists());
+        unzip.exec(logger, Util.directoryCondition(project.file(Paths.DIR_SRC + "com/mojang/minecraft/"))
+                || Util.directoryCondition(project.file(Paths.DIR_SRC + "net/minecraft/")));
 
         Step patch = new JavaExecStep()
                 .setProject(project)

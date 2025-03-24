@@ -104,7 +104,7 @@ public class Json {
             JsonObject downloads = entry.getAsJsonObject().getAsJsonObject("downloads");
 
             if (downloads.has("classifiers")) {
-                String os = Util.getOSName();
+                String os = Util.getOsName();
                 JsonObject natives = downloads.getAsJsonObject("classifiers").getAsJsonObject("natives-" + os);
 
                 if (natives != null) {

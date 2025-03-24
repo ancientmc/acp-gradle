@@ -26,7 +26,7 @@ public abstract class DownloadModLoader extends DefaultTask {
             String version = getVersion().get();
             String loader = getModLoader().get();
             File output = getOutputDir().getAsFile().get();
-            String repo = Util.getAncientMCMaven();
+            String repo = Util.getAncientMcMaven();
             URL url = getURL(repo, version, loader);
 
             if (!output.exists()) {
@@ -65,7 +65,7 @@ public abstract class DownloadModLoader extends DefaultTask {
         } else if (loader.equals("risugami")) {
             return "risugami:modloader";
         } else {
-            getLogger().error("Unrecognized mod loader: " + loader);
+            getLogger().error("Unrecognized mod loader: {}", loader);
             return null;
         }
     }

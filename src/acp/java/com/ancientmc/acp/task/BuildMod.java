@@ -1,8 +1,8 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.function.*;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.task.step.function.*;
 import com.ancientmc.acp.task.step.io.ExtractFile;
 import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
@@ -14,6 +14,9 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.util.Arrays;
 
+/**
+ * Builds the mod's files for distribution: DiffPatches, LZMA binary patches, and ZIPs/TARs containing compiled classes.
+ */
 public class BuildMod extends DefaultTask {
     public static final String PHASE = "mod";
 

@@ -126,11 +126,11 @@ public class Util {
     }
 
     /**
-     * Gets a shortened version of the operating system's name. This class is used in getting the native URLs,
-     * as different versions for LWJGL's natives are needed depending on the operating system.
+     * Gets a shortened version of the operating system's name. This is used in getting the native URLs,
+     * as different versions for library natives are needed depending on the operating system.
      * @see Json#getNativeUrls(File)
      */
-    public static String getOSName() {
+    public static String getOsName() {
         OperatingSystem os = OperatingSystem.current();
 
         if (os.isWindows()) {
@@ -156,10 +156,18 @@ public class Util {
         }
     }
 
+    /**
+     * @param directory The input directory.
+     * @return true if the directory either does not exist or its contents are empty.
+     */
     public static boolean directoryCondition(File directory) {
         return !directory.exists() || isDirectoryEmpty(directory);
     }
 
+    /**
+     * @param directory The input directory.
+     * @return true if the directory is empty.
+     */
     public static boolean isDirectoryEmpty(File directory) {
         Collection<File> files = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
         return files.isEmpty();
@@ -168,7 +176,7 @@ public class Util {
     /**
      * @return the URL to AncientMC's maven as a string.
      */
-    public static String getAncientMCMaven() {
+    public static String getAncientMcMaven() {
         return "https://github.com/ancientmc/ancientmc-maven/raw/maven/";
     }
 }

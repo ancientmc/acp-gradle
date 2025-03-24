@@ -39,8 +39,8 @@ acp {
 }
 
 // These are easy ways to run tasks as opposed to CLI or finding them in your IDE's menus.
-tasks.named('decompile') { }
-tasks.named('downloadModLoader') { }
+tasks.named('decompile')
+tasks.named('downloadModLoader')
 tasks.named('runClient') { }
 tasks.named('buildMod') { }
 
