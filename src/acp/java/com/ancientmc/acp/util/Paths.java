@@ -29,6 +29,7 @@ public class Paths {
     public static final String EXTRA_JAR = DIR_TEMP + "extra.jar";
     public static final String MODLOADER_JAR = DIR_TEMP + "mod.jar";
     public static final String MAPPED_JAR = DIR_TEMP + "mapped.jar";
+    public static final String REPACKAGED_JAR = DIR_TEMP + "repackaged.jar";
     public static final String INJECT_JAR = DIR_TEMP + "inject.jar";
     public static final String FINAL_JAR = DIR_TEMP + "final.jar";
     public static final String VANILLA_JAR = "build/modding/vanillaFiles/vanilla.jar";

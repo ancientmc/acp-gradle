@@ -66,11 +66,20 @@ public abstract class Decompile extends DefaultTask {
                 .setMessage(PHASE, "Deobfuscating JAR");
         deobfuscate.exec(logger, !project.file(Paths.MAPPED_JAR).exists());
 
+        Step repackageDefaults = new RepackageDefaults()
+                .setTsrg(project.file(Paths.TSRG))
+                .setProject(project)
+                .setConfiguration("specialsource")
+                .setMainClass("net.md_5.specialsource.SpecialSource")
+                .setArgs()
+                .setMessage(PHASE, "Repackaging defaults");
+        repackageDefaults.exec(logger, !project.file(Paths.REPACKAGED_JAR).exists());
+
         Step decompile = new JavaExecStep()
                 .setProject(project)
                 .setConfiguration("fernflower")
                 .setMainClass("org.jetbrains.java.decompiler.main.decompiler.ConsoleDecompiler")
-                .setArgs(Arrays.asList("-rbr=0", "-rsy=0", "-asc=1", "-din=1", "-dgs=0", "-jvn=1", "-ind=    ", Paths.MAPPED_JAR, Paths.FINAL_JAR))
+                .setArgs(Arrays.asList("-rbr=0", "-rsy=0", "-asc=1", "-din=1", "-dgs=0", "-jvn=1", "-ind=    ", Paths.REPACKAGED_JAR, Paths.FINAL_JAR))
                 .setMessage(PHASE, "Decompiling JAR");
         decompile.exec(logger, !project.file(Paths.FINAL_JAR).exists());
 
@@ -90,13 +99,6 @@ public abstract class Decompile extends DefaultTask {
                         "--reject", Paths.DIR_TEMP + "patch_rejects/"))
                 .setMessage(PHASE, "Patching source files");
         patch.exec(logger, true); // condition???
-
-        Step repackageDefaults = new RepackageDefaults()
-                .setInputDirectory(project.file(Paths.DIR_SRC))
-                .setOutputDirectory(project.file(Paths.DIR_SRC))
-                .setProject(project)
-                .setMessage(PHASE, "Repackaging default-level source files");
-        repackageDefaults.exec(logger, true); // condition???
 
         Step copyResources = new ExtractFile()
                 .setProject(project)

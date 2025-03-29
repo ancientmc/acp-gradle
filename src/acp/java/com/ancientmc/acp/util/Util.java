@@ -178,5 +178,8 @@ public class Util {
      */
     public static String getAncientMcMaven() {
         return "https://github.com/ancientmc/ancientmc-maven/raw/maven/";
+        /*
+        return "https://maven.ancient-mc.com/"
+        */
     }
 }

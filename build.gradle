@@ -1,11 +1,21 @@
+import net.neoforged.srgutils.IMappingFile
+
+import java.text.DecimalFormat
+import java.text.NumberFormat
+
 plugins {
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
 }
 
+static String getYearDate() {
+    NumberFormat formatter = new DecimalFormat('000')
+    return '25' + formatter.format(Calendar.getInstance().get(Calendar.DAY_OF_YEAR))
+}
+
 group 'com.ancientmc'
-version '0.3.0.' + new Date().format('yyyyMMdd.HHmmss') + '-BETA'
+version '0.3.1.' + yearDate
 
 java {
     withSourcesJar()
@@ -23,9 +33,14 @@ sourceSets {
     acp
 }
 
+ext {
+    ENV = System.getenv()
+}
+
 configurations {
     acpImplementation
     implementation.extendsFrom acpImplementation
+    autorenamingtool
 }
 
 dependencies {
@@ -38,6 +53,8 @@ dependencies {
     testImplementation gradleTestKit()
     testImplementation 'commons-io:commons-io:2.18.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+
+    autorenamingtool 'net.neoforged:AutoRenamingTool:2.0.8'
 }
 
 gradlePlugin {
@@ -102,7 +119,7 @@ tasks.withType(Test).configureEach {
 publishing {
     publications.register('pluginMaven', MavenPublication) {
         groupId = project.group
-        artifactId = 'acp-gradle'
+        artifactId = project.name
         version = project.version
         pom {
             name = artifactId
@@ -128,5 +145,17 @@ publishing {
             name = 'ancientmc-maven'
             url = '../ancientmc-maven/'
         }
+        /*
+        maven {
+            if (ENV.MAVEN_URL) {
+                name = 'ancientmc-maven'
+                url = ENV.MAVEN_URL // https://maven.ancient-mc.com
+                credentials {
+                    username ENV.MAVEN_USERNAME
+                    password ENV.MAVEN_PASSWORD
+                }
+            }
+        }
+         */
     }
 }

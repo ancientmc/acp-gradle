@@ -1,0 +1,46 @@
+{
+  "tests": [
+    {
+      "name": "classic_vanilla",
+      "version": "c0.0.13a_03",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    },
+    {
+      "name": "classic_modded",
+      "version": "c0.0.14a_08",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "injectMod" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    },
+    {
+      "name": "legacyAlpha_vanilla",
+      "version": "a1.2.6-legacy",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    },
+    {
+      "name": "legacyAlpha_modded",
+      "version": "a1.2.6-legacy",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "injectMod" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    }
+  ]
+}

@@ -46,24 +46,26 @@ public class InjectBinPatches extends Step {
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
 
-        List<File> files = getFiles(patchDirectory);
+        if (condition) {
+            List<File> files = getFiles(patchDirectory);
 
-        files.forEach(lzma -> {
-            File currIn = getCurrentInput(input, files, lzma);
-            File currOut = getCurrentOutput(output, files, lzma);
+            files.forEach(lzma -> {
+                File currIn = getCurrentInput(input, files, lzma);
+                File currOut = getCurrentOutput(output, files, lzma);
 
-            project.javaexec(action -> {
-                Configuration binpatch = project.getConfigurations().findByName("binpatch");
-                action.getMainClass().set("net.neoforged.binarypatcher.ConsoleTool");
-                action.setClasspath(project.files(binpatch));
-                action.args("--clean", currIn.getAbsolutePath(), "--apply", lzma.getAbsolutePath(), "--output", currOut.getAbsolutePath(), "--unpatched");
+                project.javaexec(action -> {
+                    Configuration binpatch = project.getConfigurations().findByName("binpatch");
+                    action.getMainClass().set("net.neoforged.binarypatcher.ConsoleTool");
+                    action.setClasspath(project.files(binpatch));
+                    action.args("--clean", currIn.getAbsolutePath(), "--apply", lzma.getAbsolutePath(), "--output", currOut.getAbsolutePath(), "--unpatched");
+                });
             });
-        });
 
-        try {
-            FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

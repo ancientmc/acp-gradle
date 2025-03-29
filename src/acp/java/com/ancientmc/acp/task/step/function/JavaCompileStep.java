@@ -40,12 +40,13 @@ public class JavaCompileStep extends Step {
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        StandardJavaFileManager manager = compiler.getStandardFileManager(null, Locale.ENGLISH, Charset.defaultCharset());
-        Iterable<? extends JavaFileObject> sources = getSources(manager, sourceDirectory);
-        String classpath = getClasspath(classpathCollection);
-
-        compile(compiler, manager, sources, classpath);
+        if (condition) {
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            StandardJavaFileManager manager = compiler.getStandardFileManager(null, Locale.ENGLISH, Charset.defaultCharset());
+            Iterable<? extends JavaFileObject> sources = getSources(manager, sourceDirectory);
+            String classpath = getClasspath(classpathCollection);
+            compile(compiler, manager, sources, classpath);
+        }
     }
 
 
@@ -63,7 +64,6 @@ public class JavaCompileStep extends Step {
                 "-d", outputDirectory.getAbsolutePath()
         );
         System.setProperty("java.library.path", nativesDirectory.getAbsolutePath());
-
         compiler.getTask(null, manager, null, options, null, sources).call();
     }
 

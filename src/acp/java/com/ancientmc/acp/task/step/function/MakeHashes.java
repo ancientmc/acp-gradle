@@ -42,9 +42,15 @@ public class MakeHashes extends Step {
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
 
+        if (condition) {
+            Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+            write(sources, resources);
+        }
+    }
+
+    public void write(Collection<File> sources, Collection<File> resources) {
         Map<String, String> map = new HashMap<>();
-        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-        Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
 
         sources.forEach(src -> {
             String hash = getHash(src);
@@ -74,8 +80,6 @@ public class MakeHashes extends Step {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
-
-
             map.forEach((name, hash) -> {
                 try {
                     writer.write(name + " " + hash + "\n");

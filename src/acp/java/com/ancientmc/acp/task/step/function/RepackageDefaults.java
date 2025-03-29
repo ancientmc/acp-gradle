@@ -1,6 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
-import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -9,83 +9,85 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 
-public class RepackageDefaults extends Step {
+/**
+ * ACP uses AutoRenamingTool as its program to deobfuscate Minecraft's source code. The issue with ART is that it does not allow
+ * package mapping, which becomes a problem when the classes for old ModLoader by Risugami have no packages. This class uses SpecialSource,
+ * which does allow package mapping, to remap any unpackaged default classes to the "minecraft/src/" namespace. This is done by generating a temporary
+ * SRG (not TSRG) file.
+ */
+public class RepackageDefaults extends JavaExecStep {
 
     /**
-     * The source directory.
+     * The TSRG file, used to figure out the namespace to assign in the generated package SRG.
      */
-    protected File inputDirectory;
-
-    /**
-     * The source directory. It's the same as the input directory, they're only notated differently
-     * to prevent IO jank.
-     */
-    protected File outputDirectory;
-
-    /**
-     * The gradle project.
-     */
-    protected Project project;
+    protected File tsrg;
 
     @Override
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
+    }
 
-        try {
-            File[] files = inputDirectory.listFiles((File file) -> file.getName().endsWith(".java") && !file.isDirectory());
+    /**
+     * Writes the SRG file.
+     */
+    public File getSrg() {
+        File srg = project.file(Paths.DIR_TEMP + "pkg.srg");
 
-            if (files != null) {
-                for (File file : files) {
-                    String name = file.getName();
-
-                    // Creates a temp file that we will add the package header to.
-                    File temp = project.file(outputDirectory.getPath() + "/temp-" + name);
-                    writeFile(file, temp, "package net.minecraft.src;\n\n");
-
-                    // Moves the temp file to the endpoint path in net/minecraft/src, and then deletes the temp file.
-                    File newFile = project.file(outputDirectory.getPath() + "/net/minecraft/src/" + name);
-                    writeFile(temp, newFile, "");
-                }
+        if (!srg.exists()) {
+            try {
+                FileUtils.write(srg, "PK: . " + getPackage(), Charset.defaultCharset());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
+        }
+
+        return srg;
+    }
+
+    /**
+     * We have to check the TSRG to see which package namespace is in use. Old versions used the "com/mojang/minecraft" namespace,
+     * while newer ones use "net/minecraft".
+     * @return The ../src/ package, dependent on the version.
+     */
+    public String getPackage() {
+        try {
+            List<String> lines = Files.readAllLines(tsrg.toPath());
+            return lines.stream().anyMatch(l -> l.contains("com/mojang/minecraft/")) ? "com/mojang/minecraft/src" : "net/minecraft/src";
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    /**
-     * Simple method to write a new file based on an old file (which gets deleted), with the ability to add additional text at the beginning.
-     * @param in The input file.
-     * @param out The output file.
-     * @param toAdd The text getting added.
-     * @throws IOException exception.
-     */
-    public void writeFile(File in, File out, String toAdd) throws IOException {
-        List<String> lines = Files.readAllLines(in.toPath());
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(out))) {
-            writer.write(toAdd);
-            for (String line : lines) {
-                writer.write(line + "\n");
-            }
-        }
-        FileUtils.forceDelete(in);
-    }
-
-    public RepackageDefaults setInputDirectory(File inputDirectory) {
-        this.inputDirectory = inputDirectory;
-        return this;
-    }
-
-    public RepackageDefaults setOutputDirectory(File outputDirectory) {
-        this.outputDirectory = outputDirectory;
-        return this;
-    }
-
     public RepackageDefaults setProject(Project project) {
-        this.project = project;
+        super.setProject(project);
+        return this;
+    }
+
+    public RepackageDefaults setConfiguration(String configuration) {
+        super.setConfiguration(configuration);
+        return this;
+    }
+
+    public RepackageDefaults setMainClass(String mainClass) {
+        super.setMainClass(mainClass);
+        return this;
+    }
+
+    public RepackageDefaults setTsrg(File tsrg) {
+        this.tsrg = tsrg;
+        return this;
+    }
+
+    /**
+     * Hardcodes the SpecialSource arguments so we can include our generated SRG file.
+     */
+    public RepackageDefaults setArgs() {
+        super.setArgs(Arrays.asList("--in-jar", Paths.MAPPED_JAR, "--out-jar", Paths.REPACKAGED_JAR, "--srg-in", getSrg().getAbsolutePath()));
         return this;
     }
 }

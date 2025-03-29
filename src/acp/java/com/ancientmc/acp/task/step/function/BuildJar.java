@@ -38,27 +38,29 @@ public class BuildJar extends Step {
 
     @Override
     public void exec(Logger logger, boolean condition) {
-        try {
-            if (!output.getParentFile().exists()) {
-                Files.createDirectories(output.getParentFile().toPath());
+        if (condition) {
+            try {
+                if (!output.getParentFile().exists()) {
+                    Files.createDirectories(output.getParentFile().toPath());
+                }
+
+                JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
+                Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+                Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+
+                if (!classes.isEmpty()) {
+                    classes.forEach(cls -> addEntry(out, classDirectory, cls));
+                }
+
+                if (!resources.isEmpty()) {
+                    resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
+                }
+
+                out.finish();
+                out.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-
-            JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
-            Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-
-            if (!classes.isEmpty()) {
-                classes.forEach(cls -> addEntry(out, classDirectory, cls));
-            }
-
-            if (!resources.isEmpty()) {
-                resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
-            }
-
-            out.finish();
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

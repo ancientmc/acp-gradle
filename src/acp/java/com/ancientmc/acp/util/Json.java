@@ -75,7 +75,6 @@ public class Json {
     public static List<String> getLibraries(List<File> jsons) throws IOException {
         List<String> libraries = new ArrayList<>();
 
-
         for (File json : jsons) {
             JsonObject object = get(json);
             JsonArray libArray = object.getAsJsonArray("libraries");

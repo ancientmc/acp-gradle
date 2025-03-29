@@ -4,7 +4,7 @@ buildscript {
         maven { url = 'https://maven.neoforged.net' }
     }
     dependencies {
-        classpath files('plugins/acp.jar')
+        classpath files('../plugins/acp.jar')
         classpath 'com.google.code.gson:gson:2.11.0'
         classpath 'commons-io:commons-io:2.18.0'
         classpath 'net.neoforged:srgutils:1.0.9'
@@ -34,15 +34,15 @@ version = '0.0.1'
 
 acp {
     data = "com.ancientmc:versions:${minecraft_version}"
-    loader = 'risugami'
+    loader = "{loader}"
     modName = 'ruby'
 }
 
 // These are easy ways to run tasks as opposed to CLI or finding them in your IDE's menus.
 tasks.named('decompile')
 tasks.named('downloadModLoader')
-tasks.named('runClient') { }
-tasks.named('buildMod') { }
+tasks.named('runClient')
+tasks.named('buildMod')
 
 FileFilter srcFilter = (File file) -> !file.name.contains("acp")
 FileFilter tempFilter = (File file) -> !file.name.equals('client.jar') && !file.name.endsWith('.json')
@@ -55,4 +55,16 @@ clean {
     if(file(Paths.DIR_VANILLA_RESOURCES).exists()) delete(file(Paths.DIR_VANILLA_RESOURCES))
     if(file(Paths.DIR_TEMP).exists()) delete(file(Paths.DIR_TEMP).listFiles(tempFilter))
     if(file(Paths.DIR_RUN).exists()) delete(file(Paths.DIR_RUN).listFiles(runFilter))
+}
+
+tasks.register('injectMod') {
+    def files = files('mod_files').asFileTree
+    files.each { file ->
+        project.copy {
+            def type = 'src/main/' + file.name.endsWith('.java') ? 'java/' : 'resources/'
+            def parent = project.file('mod_files/' + type).toPath().relativize(file.parentFile.toPath()).toString().replace(File.separator, '/')
+            from (file.absolutePath)
+            into (project.file(type + '/' + parent))
+        }
+    }
 }

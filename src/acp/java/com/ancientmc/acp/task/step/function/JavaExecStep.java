@@ -38,15 +38,17 @@ public class JavaExecStep extends Step {
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
 
-        project.javaexec(action -> {
-            action.setClasspath(project.files(configuration));
-            action.getMainClass().set(mainClass);
-            action.setArgs(args);
+        if (condition) {
+            project.javaexec(action -> {
+                action.setClasspath(project.files(configuration));
+                action.getMainClass().set(mainClass);
+                action.setArgs(args);
 
-            if (isMakeDiffPatchesStep(args)) {
-                action.setIgnoreExitValue(true);
-            }
-        });
+                if (isMakeDiffPatchesStep(args)) {
+                    action.setIgnoreExitValue(true);
+                }
+            });
+        }
     }
 
     public JavaExecStep setProject(Project project) {

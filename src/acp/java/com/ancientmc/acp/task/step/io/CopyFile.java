@@ -39,22 +39,24 @@ public class CopyFile extends Step {
     public void exec(Logger logger, boolean condition) {
         super.exec(logger, condition);
 
-        try {
-            if (!output.exists()) {
-                Files.createDirectories(output.toPath());
+        if (condition) {
+            try {
+                if (!output.exists()) {
+                    Files.createDirectories(output.toPath());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+            project.copy(c -> {
+                c.from(input);
+                c.into(output);
+
+                if (exclusions != null) {
+                    c.exclude(exclusions);
+                }
+            });
         }
-
-        project.copy(c -> {
-            c.from(input);
-            c.into(output);
-
-            if (exclusions != null) {
-                c.exclude(exclusions);
-            }
-        });
     }
 
     public File getOutput() {

@@ -101,12 +101,14 @@ public class MakeArchives extends Step {
     public static Map<String, String> getHashMap(File hashFile) throws IOException {
         Map<String, String> map = new HashMap<>();
         List<String> lines = FileUtils.readLines(hashFile, StandardCharsets.UTF_8);
+
         lines.forEach(line -> {
             String[] split = line.split(" ");
 
             // split[0] = class name; split[1] = hash
             map.put(split[0], split[1]);
         });
+
         return map;
     }
 
