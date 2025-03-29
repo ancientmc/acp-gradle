@@ -30,7 +30,9 @@ import java.util.zip.ZipOutputStream;
 public class Util {
 
     /**
-     * Gets the minecraft version from the version property.
+     * Gets the minecraft version from the version property. If the developer is using the legacy Alpha 1.2.6
+     * build, "a1.2.6" is the returned string.
+     * @param project The gradle project.
      */
     public static String getMinecraftVersion(Project project) {
         String versionProperty = project.getProperties().get("minecraft_version").toString();
@@ -140,6 +142,7 @@ public class Util {
         } else if (os.isLinux() || os.isUnix()) {
             return "linux";
         }
+
         return "unknown";
     }
 
@@ -178,8 +181,5 @@ public class Util {
      */
     public static String getAncientMcMaven() {
         return "https://github.com/ancientmc/ancientmc-maven/raw/maven/";
-        /*
-        return "https://maven.ancient-mc.com/"
-        */
     }
 }
