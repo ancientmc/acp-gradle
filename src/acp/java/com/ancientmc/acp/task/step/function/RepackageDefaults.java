@@ -5,9 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -38,12 +36,10 @@ public class RepackageDefaults extends JavaExecStep {
     public File getSrg() {
         File srg = project.file(Paths.DIR_TEMP + "pkg.srg");
 
-        if (!srg.exists()) {
-            try {
-                FileUtils.write(srg, "PK: . " + getPackage(), Charset.defaultCharset());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            FileUtils.write(srg, "PK: . " + getPackage(), Charset.defaultCharset());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
         return srg;
@@ -54,13 +50,9 @@ public class RepackageDefaults extends JavaExecStep {
      * while newer ones use "net/minecraft".
      * @return The ../src/ package, dependent on the version.
      */
-    public String getPackage() {
-        try {
-            List<String> lines = Files.readAllLines(tsrg.toPath());
-            return lines.stream().anyMatch(l -> l.contains("com/mojang/minecraft/")) ? "com/mojang/minecraft/src" : "net/minecraft/src";
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public String getPackage() throws IOException {
+        List<String> lines = Files.readAllLines(tsrg.toPath());
+        return lines.stream().anyMatch(l -> l.contains("com/mojang/minecraft/")) ? "com/mojang/minecraft/src" : "net/minecraft/src";
     }
 
     public RepackageDefaults setProject(Project project) {

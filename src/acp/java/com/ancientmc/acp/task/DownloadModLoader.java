@@ -50,7 +50,6 @@ public abstract class DownloadModLoader extends DefaultTask {
     private URL getURL(String repo, String version, String loader) throws IOException {
         String ml = getModLoaderPath(loader);
         String mavenPath = ml + ":" + version;
-
         return Util.toMavenUrl(repo, mavenPath, "lzma");
     }
 

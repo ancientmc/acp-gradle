@@ -110,13 +110,13 @@ public class InjectBinPatches extends Step {
     }
 
     /**
-     * We want to compare the LZMA files to ensure that the ModLoader JAR is the first element in the list, and therefore is injected
+     * We want to compare the LZMA files to ensure that the ModLoader LZMA is the first element in the list, and therefore is injected
      * first. This comparator does that and gets called above for sorting.
      */
     private static class LzmaComparator implements Comparator<File> {
         @Override
         public int compare(File o1, File o2) {
-            return o1.getName().contains("modloader") ? -1 : 0;
+            return (o1.getName().contains("modloader") || o1.getName().contains("forge")) ? -1 : 0;
         }
     }
 

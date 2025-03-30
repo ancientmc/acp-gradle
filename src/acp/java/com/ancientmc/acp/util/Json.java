@@ -139,7 +139,6 @@ public class Json {
     public static URL getJarUrl(File json, String side) throws IOException {
         JsonObject jsonObj = get(json);
         JsonObject sideObj = jsonObj.getAsJsonObject("downloads").getAsJsonObject(side);
-
         return Util.getUrl(sideObj.get("url").getAsString());
     }
 }

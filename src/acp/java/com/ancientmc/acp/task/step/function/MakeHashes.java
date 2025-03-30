@@ -43,13 +43,17 @@ public class MakeHashes extends Step {
         super.exec(logger, condition);
 
         if (condition) {
-            Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            write(sources, resources);
+            try {
+                Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+                Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+                write(sources, resources);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    public void write(Collection<File> sources, Collection<File> resources) {
+    public void write(Collection<File> sources, Collection<File> resources) throws IOException {
         Map<String, String> map = new HashMap<>();
 
         sources.forEach(src -> {
@@ -71,23 +75,15 @@ public class MakeHashes extends Step {
             map.put(name, hash);
         });
 
-        try {
-            if (!output.getParentFile().exists()) {
-                Files.createDirectories(output.getParentFile().toPath());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (!output.getParentFile().exists()) {
+            Files.createDirectories(output.getParentFile().toPath());
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
-            map.forEach((name, hash) -> {
-                try {
-                    writer.write(name + " " + hash + "\n");
-                    writer.flush();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
+                writer.flush();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

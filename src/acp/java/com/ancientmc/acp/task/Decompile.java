@@ -26,8 +26,6 @@ public abstract class Decompile extends DefaultTask {
         Project project = getProject();
         Logger logger = project.getLogger();
 
-        logger.lifecycle("[acp.decomp] Beginning decompilation");
-
         Step splitJar = new JavaExecStep()
                 .setProject(project)
                 .setConfiguration("jarsplitter")

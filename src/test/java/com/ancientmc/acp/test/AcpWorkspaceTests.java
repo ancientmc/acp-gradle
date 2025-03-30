@@ -81,9 +81,7 @@ public class AcpWorkspaceTests {
                 Files.createDirectories(testDir.toPath());
             }
 
-            for (File file : mainFiles) {
-                copyFile(file, testDir, test);
-            }
+            mainFiles.forEach(file -> copyFile(file, testDir, test));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -30,7 +30,6 @@ public class MakeReobfSrg extends Step {
 
             try {
                 IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
-
                 BufferedWriter writer = new BufferedWriter(new FileWriter(output));
                 List<String> lines = Files.readAllLines(temp.toPath());
 

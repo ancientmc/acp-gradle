@@ -48,7 +48,6 @@ public class MakeArchives extends Step {
 
     public void exec(Logger logger, boolean condition) {
         try {
-
             if (!archiveDirectory.exists()) {
                 Files.createDirectories(archiveDirectory.toPath());
             }
