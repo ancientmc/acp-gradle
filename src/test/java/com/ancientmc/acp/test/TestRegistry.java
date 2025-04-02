@@ -14,8 +14,11 @@ public class TestRegistry {
     }
 
 
-    public List<AcpTest> get() {
-        List<AcpTest> list = new ArrayList<>();
+    /**
+     * @return The list of test objects that will be run.
+     */
+    public List<TestObject> get() {
+        List<TestObject> list = new ArrayList<>();
         JsonObject json = getJson();
         JsonArray tests = json.getAsJsonArray("tests");
 
@@ -27,15 +30,25 @@ public class TestRegistry {
         return list;
     }
 
-    private AcpTest getTest(JsonObject test) {
+
+    /**
+     * @param test The JSON object for the test.
+     * @return The test as a record object.
+     */
+    private TestObject getTest(JsonObject test) {
         String name = test.get("name").getAsString();
         String version = test.get("version").getAsString();
         String loader = test.get("loader").getAsString();
         List<String> tasks = getTasks(test.getAsJsonArray("tasks").asList());
 
-        return new AcpTest(name, version, loader, tasks);
+        return new TestObject(name, version, loader, tasks);
     }
 
+
+    /**
+     * @param elements The JSON elements of all the tasks.
+     * @return The test tasks as a String list.
+     */
     public List<String> getTasks(List<JsonElement> elements) {
         List<String> tasks = new ArrayList<>();
 

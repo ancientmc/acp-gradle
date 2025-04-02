@@ -13,6 +13,7 @@ import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
+import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,11 @@ public class AcpPlugin implements Plugin<Project> {
 
         List<String> configurations = Arrays.asList("jarsplitter", "mcinjector", "autorenamingtool", "fernflower", "diffpatch", "binpatch", "specialsource");
         configurations.forEach(cfg -> project.getConfigurations().create(cfg));
+
+        // Set Minecraft to compile against Java 8.
+        project.getTasks().named("compileJava", JavaCompile.class).configure(action -> {
+            action.getOptions().setCompilerArgs(Arrays.asList("-g:none", "-source", "8", "-target", "8"));
+        });
 
         initialize.configure(task -> {
             task.setGroup("acp");
@@ -81,6 +87,7 @@ public class AcpPlugin implements Plugin<Project> {
 
     public static void makeDirs(Project project) {
         List<File> dirs = Arrays.asList(project.file(Paths.DIR_MODDED_PATCHES), project.file(Paths.DIR_REOBF_CLASSES));
+
         dirs.forEach(dir -> {
             try {
                 if (!dir.exists()) {

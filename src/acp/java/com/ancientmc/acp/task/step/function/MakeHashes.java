@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,11 +21,6 @@ import java.util.Map;
 public class MakeHashes extends Step {
 
     /**
-     * The gradle project.
-     */
-    protected Project project;
-
-    /**
      * The source directory.
      */
     protected File sourceDirectory;
@@ -38,18 +32,18 @@ public class MakeHashes extends Step {
 
     protected File output;
 
-    @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
+    public MakeHashes(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
 
-        if (condition) {
-            try {
-                Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-                Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-                write(sources, resources);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    @Override
+    public void action() {
+        try {
+            Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+            write(sources, resources);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -97,11 +91,6 @@ public class MakeHashes extends Step {
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public MakeHashes setProject(Project project) {
-        this.project = project;
-        return this;
     }
 
     public MakeHashes setClassDirectory(File sourceDirectory) {

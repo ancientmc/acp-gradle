@@ -23,32 +23,37 @@ import static org.gradle.testkit.runner.TaskOutcome.UP_TO_DATE;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AcpWorkspaceTests {
+
     /**
      * The JSON file containing our tests.
      */
-    private static final File JSON_FILE = new File("tests.json");
+    private static final File JSON_FILE = new File("test_data/tests.json");
 
     /**
      * The list of our tests.
      */
-    private static final List<AcpTest> TESTS = new TestRegistry(JSON_FILE).get();
+    private static final List<TestObject> TESTS = new TestRegistry(JSON_FILE).get();
 
     /**
-     * The root directory for our test workspace.
+     * The root directory for our test workspaces.
      */
     private static final File ROOT_TEST_DIR = new File("acp_test");
+
+    /**
+     * The template data directory containing files added to our test workspaces.
+     */
     private static final File TEST_DATA = new File("test_data");
 
     @Test
     public void testAll() {
         TESTS.forEach(test -> {
             setup(test);
-            File testDir = new File(ROOT_TEST_DIR, test.version());
+            File testDir = new File(ROOT_TEST_DIR, test.name());
             doTest(test, testDir);
         });
     }
 
-    public void doTest(AcpTest test, File testDir) {
+    public void doTest(TestObject test, File testDir) {
         System.out.println("Test is: " + test.name());
 
         test.tasks().forEach(task -> {
@@ -67,13 +72,18 @@ public class AcpWorkspaceTests {
         });
     }
 
-    public void setup(AcpTest test) {
+
+    /**
+     * Sets up the test for
+     * @param test The test object.
+     */
+    public void setup(TestObject test) {
         try {
             if (!ROOT_TEST_DIR.exists()) {
                 Files.createDirectories(ROOT_TEST_DIR.toPath());
             }
 
-            File testDir = new File(ROOT_TEST_DIR, test.version());
+            File testDir = new File(ROOT_TEST_DIR, test.name());
             File mainData = new File(TEST_DATA, "main");
             Collection<File> mainFiles = FileUtils.listFiles(mainData, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
 
@@ -87,7 +97,7 @@ public class AcpWorkspaceTests {
         }
     }
 
-    public void copyFile(File original, File testDir, AcpTest test) {
+    public void copyFile(File original, File testDir, TestObject test) {
         try {
             File newFile = new File(testDir, original.getName());
             List<String> lines = Files.readAllLines(original.toPath());
@@ -96,6 +106,7 @@ public class AcpWorkspaceTests {
             lines.forEach(line -> {
                 line = line.replace("{version}", test.version());
                 line = line.replace("{loader}", test.loader());
+                line = line.replace("{name}", test.name());
                 newLines.add(line);
             });
 
@@ -115,5 +126,4 @@ public class AcpWorkspaceTests {
             throw new RuntimeException(e);
         }
     }
-
 }

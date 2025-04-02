@@ -4,7 +4,6 @@ import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,11 +12,6 @@ import java.util.List;
  * Step used to execute Java-based tools needed during decompilation.
  */
 public class JavaExecStep extends Step {
-
-    /**
-     * The gradle project.
-     */
-    protected Project project;
 
     /**
      * The configuration for our tool being executed.
@@ -34,26 +28,21 @@ public class JavaExecStep extends Step {
      */
     protected List<String> args;
 
-    @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
-
-        if (condition) {
-            project.javaexec(action -> {
-                action.setClasspath(project.files(configuration));
-                action.getMainClass().set(mainClass);
-                action.setArgs(args);
-
-                if (isMakeDiffPatchesStep(args)) {
-                    action.setIgnoreExitValue(true);
-                }
-            });
-        }
+    public JavaExecStep(Project project, String phase, String message) {
+        build(project, phase, message);
     }
 
-    public JavaExecStep setProject(Project project) {
-        this.project = project;
-        return this;
+    @Override
+    public void action() {
+        project.javaexec(action -> {
+            action.setClasspath(project.files(configuration));
+            action.getMainClass().set(mainClass);
+            action.setArgs(args);
+
+            if (isMakeDiffPatchesStep(args)) {
+                action.setIgnoreExitValue(true);
+            }
+        });
     }
 
     public JavaExecStep setConfiguration(String configuration) {

@@ -15,21 +15,20 @@ import java.util.Map;
 public class ResolveTools extends Step {
 
     /**
-     * The gradle project.
-     */
-    private Project project;
-
-    /**
      * The gradle properties file, which contains a list of tools ACP uses to deobfuscate and decompile Minecraft.
      */
     private File properties;
+
+    public ResolveTools(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
 
     /**
      * Execution method. The properties file is read line-by-line and converted to a hash-map. That map is then used to resolve each tool dependency
      * into its corresponding configuration.
      */
     @Override
-    public void exec() {
+    public void action() {
         try {
             List<String> lines = Files.readAllLines(properties.toPath());
             Map<String, String> map = getConfigMap(lines);
@@ -76,11 +75,6 @@ public class ResolveTools extends Step {
         });
 
         return map;
-    }
-
-    public ResolveTools setProject(Project project) {
-        this.project = project;
-        return this;
     }
 
     public ResolveTools setProperties(File properties) {

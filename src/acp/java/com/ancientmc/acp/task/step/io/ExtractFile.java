@@ -2,7 +2,6 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.util.List;
@@ -15,17 +14,12 @@ public class ExtractFile extends Step {
     /**
      * The input archive file getting extracted.
      */
-    protected File input;
+    private File input;
 
     /**
      * The output directory that the archive contents are extracted into.
      */
-    protected File output;
-
-    /**
-     * The Gradle project.
-     */
-    protected Project project;
+    private File output;
 
     /**
      * Paths and files excluded from extraction.
@@ -34,33 +28,27 @@ public class ExtractFile extends Step {
 
     protected List<String> inclusions;
 
-    /**
-     * Main extraction method. Uses Gradle's copy task and zip-tree function.
-     * @param logger The gradle logger.
-     * @param condition Boolean condition that determines if the step gets executed.
-     */
-    @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
-
-        if (condition) {
-            project.copy(action -> {
-                action.from(project.zipTree(input));
-                action.into(output);
-
-                if (inclusions != null) {
-                    action.include(inclusions);
-                }
-
-                if (exclusions != null) {
-                    action.exclude(exclusions);
-                }
-            });
-        }
+    public ExtractFile(Project project, String phase, String message) {
+        build(project, phase, message);
     }
 
-    public File getOutput() {
-        return output;
+    /**
+     * Main extraction method. Uses Gradle's copy task and zip-tree function.
+     */
+    @Override
+    public void action() {
+        project.copy(action -> {
+            action.from(project.zipTree(input));
+            action.into(output);
+
+            if (inclusions != null) {
+                action.include(inclusions);
+            }
+
+            if (exclusions != null) {
+                action.exclude(exclusions);
+            }
+        });
     }
 
     public ExtractFile setInput(File input) {
@@ -80,11 +68,6 @@ public class ExtractFile extends Step {
 
     public ExtractFile setInclusions(List<String> inclusions) {
         this.inclusions = inclusions;
-        return this;
-    }
-
-    public ExtractFile setProject(Project project) {
-        this.project = project;
         return this;
     }
 }

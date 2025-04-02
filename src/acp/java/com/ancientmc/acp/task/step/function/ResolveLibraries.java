@@ -19,17 +19,17 @@ public class ResolveLibraries extends Step {
     private List<String> libraries;
 
     /**
-     * The Gradle project.
-     */
-    private Project project;
-
-    /**
      * A list of all of Minecraft's libraries get parsed through and resolved via a Gradle listener.
      * The list of libraries obtained via a method in the Json utilities class.
      * @see Json#getLibraries(List)
      */
+
+    public ResolveLibraries(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
+
     @Override
-    public void exec() {
+    public void action() {
         DependencySet dependencies = project.getConfigurations().named("implementation").get().getDependencies();
 
         libraries.forEach(lib -> {
@@ -43,11 +43,6 @@ public class ResolveLibraries extends Step {
 
     public ResolveLibraries setLibraries(List<String> libraries) {
         this.libraries = libraries;
-        return this;
-    }
-
-    public ResolveLibraries setProject(Project project) {
-        this.project = project;
         return this;
     }
 }

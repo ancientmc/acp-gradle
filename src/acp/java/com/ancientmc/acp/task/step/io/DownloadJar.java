@@ -2,7 +2,7 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.logging.Logger;
+import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,23 +13,20 @@ import java.net.URL;
  */
 public class DownloadJar extends DownloadFile {
 
+    public DownloadJar(Project project, String phase, String message) {
+        super(project, phase, message);
+    }
+
     /**
      * This method parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
-     * @param logger The gradle logger.
-     * @param condition Boolean condition that determines if the step gets executed.
      * @see Json#getJarUrl(File, String)
      */
-    @Override
-    public void exec(Logger logger, boolean condition) {
-        printMessage(logger, message, condition);
-
-        if (condition) {
-            try {
-                File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
-                FileUtils.copyURLToFile(input, jar);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    public void action() {
+        try {
+            File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
+            FileUtils.copyURLToFile(input, jar);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

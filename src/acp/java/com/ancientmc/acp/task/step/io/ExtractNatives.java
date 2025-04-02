@@ -4,7 +4,6 @@ import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,38 +27,31 @@ public class ExtractNatives extends Step {
      */
     private File output;
 
-    /**
-     * The gradle project.
-     */
-    private Project project;
+    public ExtractNatives(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
 
     /**
      * To extract the natives, we first download the JAR files in the URLS. Then for each file, we extract the native libraries
      * from their JAR files into the output folder.
-     * @param logger The gradle logger.
-     * @param condition Boolean condition that determines if the step gets executed.
      */
     @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
+    public void action() {
+        try {
+            List<File> jars = new ArrayList<>();
 
-        if (condition) {
-            try {
-                List<File> jars = new ArrayList<>();
-
-                for (URL url : urls) {
-                    String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-                    FileUtils.copyURLToFile(url, new File(output, path));
-                    jars.add(new File(output, path));
-                }
-
-                jars.forEach(jar -> project.copy(action -> {
-                    action.from(project.zipTree(jar));
-                    action.into(project.file(output));
-                }));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            for (URL url : urls) {
+                String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+                FileUtils.copyURLToFile(url, new File(output, path));
+                jars.add(new File(output, path));
             }
+
+            jars.forEach(jar -> project.copy(action -> {
+                action.from(project.zipTree(jar));
+                action.into(project.file(output));
+            }));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -74,11 +66,6 @@ public class ExtractNatives extends Step {
 
     public ExtractNatives setOutput(File output) {
         this.output = output;
-        return this;
-    }
-
-    public ExtractNatives setProject(Project project) {
-        this.project = project;
         return this;
     }
 }

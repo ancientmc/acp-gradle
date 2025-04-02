@@ -3,7 +3,6 @@ package com.ancientmc.acp.task.step.function;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,9 +24,13 @@ public class RepackageDefaults extends JavaExecStep {
      */
     protected File tsrg;
 
+    public RepackageDefaults(Project project, String phase, String message) {
+        super(project, phase, message);
+    }
+
     @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
+    public void action() {
+        super.action();
     }
 
     /**
@@ -53,11 +56,6 @@ public class RepackageDefaults extends JavaExecStep {
     public String getPackage() throws IOException {
         List<String> lines = Files.readAllLines(tsrg.toPath());
         return lines.stream().anyMatch(l -> l.contains("com/mojang/minecraft/")) ? "com/mojang/minecraft/src" : "net/minecraft/src";
-    }
-
-    public RepackageDefaults setProject(Project project) {
-        super.setProject(project);
-        return this;
     }
 
     public RepackageDefaults setConfiguration(String configuration) {

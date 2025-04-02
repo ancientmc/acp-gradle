@@ -2,9 +2,10 @@ package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.*;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.logging.Logger;
 import org.gradle.internal.os.OperatingSystem;
 
 import javax.tools.*;
@@ -37,18 +38,17 @@ public class JavaCompileStep extends Step {
      */
     protected File outputDirectory;
 
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
-
-        if (condition) {
-            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-            StandardJavaFileManager manager = compiler.getStandardFileManager(null, Locale.ENGLISH, Charset.defaultCharset());
-            Iterable<? extends JavaFileObject> sources = getSources(manager, sourceDirectory);
-            String classpath = getClasspath(classpathCollection);
-            compile(compiler, manager, sources, classpath);
-        }
+    public JavaCompileStep(Project project, String phase, String message) {
+        build(project, phase, message);
     }
 
+    public void action() {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        StandardJavaFileManager manager = compiler.getStandardFileManager(null, Locale.ENGLISH, Charset.defaultCharset());
+        Iterable<? extends JavaFileObject> sources = getSources(manager, sourceDirectory);
+        String classpath = getClasspath(classpathCollection);
+        compile(compiler, manager, sources, classpath);
+    }
 
     /**
      * Compiles the game.
@@ -66,7 +66,6 @@ public class JavaCompileStep extends Step {
         System.setProperty("java.library.path", nativesDirectory.getAbsolutePath());
         compiler.getTask(null, manager, null, options, null, sources).call();
     }
-
 
     /**
      * Gets the sources as an iterable list of JavaFileObjects.

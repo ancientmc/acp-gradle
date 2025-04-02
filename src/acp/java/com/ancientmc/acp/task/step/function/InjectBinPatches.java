@@ -7,7 +7,6 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +20,10 @@ import java.util.stream.Collectors;
  * makes temporary JAR files for each implemented LZMA.
  */
 public class InjectBinPatches extends Step {
+
+    public InjectBinPatches(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
 
     /**
      * The base input JAR.
@@ -37,35 +40,26 @@ public class InjectBinPatches extends Step {
      */
     protected File patchDirectory;
 
-    /**
-     * The Gradle project.
-     */
-    protected Project project;
-
     @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
+    public void action() {
+        List<File> files = getFiles(patchDirectory);
 
-        if (condition) {
-            List<File> files = getFiles(patchDirectory);
+        files.forEach(lzma -> {
+            File currIn = getCurrentInput(input, files, lzma);
+            File currOut = getCurrentOutput(output, files, lzma);
 
-            files.forEach(lzma -> {
-                File currIn = getCurrentInput(input, files, lzma);
-                File currOut = getCurrentOutput(output, files, lzma);
-
-                project.javaexec(action -> {
-                    Configuration binpatch = project.getConfigurations().findByName("binpatch");
-                    action.getMainClass().set("net.neoforged.binarypatcher.ConsoleTool");
-                    action.setClasspath(project.files(binpatch));
-                    action.args("--clean", currIn.getAbsolutePath(), "--apply", lzma.getAbsolutePath(), "--output", currOut.getAbsolutePath(), "--unpatched");
-                });
+            project.javaexec(action -> {
+                Configuration binpatch = project.getConfigurations().findByName("binpatch");
+                action.getMainClass().set("net.neoforged.binarypatcher.ConsoleTool");
+                action.setClasspath(project.files(binpatch));
+                action.args("--clean", currIn.getAbsolutePath(), "--apply", lzma.getAbsolutePath(), "--output", currOut.getAbsolutePath(), "--unpatched");
             });
+        });
 
-            try {
-                FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+        try {
+            FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -132,11 +126,6 @@ public class InjectBinPatches extends Step {
 
     public InjectBinPatches setPatchDirectory(File patchDirectory) {
         this.patchDirectory = patchDirectory;
-        return this;
-    }
-
-    public InjectBinPatches setProject(Project project) {
-        this.project = project;
         return this;
     }
 }

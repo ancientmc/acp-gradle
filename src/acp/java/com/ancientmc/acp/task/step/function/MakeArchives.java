@@ -4,7 +4,6 @@ import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,11 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class MakeArchives extends Step {
-
-    /**
-     * The Gradle project.
-     */
-    protected Project project;
 
     /**
      * The TSRG file.
@@ -46,7 +40,11 @@ public class MakeArchives extends Step {
      */
     protected File archiveDirectory;
 
-    public void exec(Logger logger, boolean condition) {
+    public MakeArchives(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
+
+    public void action() {
         try {
             if (!archiveDirectory.exists()) {
                 Files.createDirectories(archiveDirectory.toPath());
@@ -118,11 +116,6 @@ public class MakeArchives extends Step {
         return map.entrySet().stream()
                 .filter(entry -> name.equals(entry.getValue()))
                 .map(Map.Entry::getKey).findAny().orElse(null);
-    }
-
-    public MakeArchives setProject(Project project) {
-        this.project = project;
-        return this;
     }
 
     public MakeArchives setSrg(File srg) {

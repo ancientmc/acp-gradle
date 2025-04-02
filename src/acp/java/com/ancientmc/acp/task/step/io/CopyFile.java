@@ -2,7 +2,6 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
-import org.gradle.api.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,49 +17,40 @@ public class CopyFile extends Step {
     /**
      * The input file getting copied.
      */
-    protected File input;
+    private File input;
 
     /**
      * The output directory that the input is copied into.
      */
-    protected File output;
+    private File output;
 
     /**
      * Paths and files excluded from being copied.
      */
-    protected List<String> exclusions;
+    private List<String> exclusions;
 
-    /**
-     * The Gradle project.
-     */
-    private Project project;
-
-    @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
-
-        if (condition) {
-            try {
-                if (!output.exists()) {
-                    Files.createDirectories(output.toPath());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-
-            project.copy(c -> {
-                c.from(input);
-                c.into(output);
-
-                if (exclusions != null) {
-                    c.exclude(exclusions);
-                }
-            });
-        }
+    public CopyFile(Project project, String phase, String message) {
+        build(project, phase, message);
     }
 
-    public File getOutput() {
-        return output;
+    @Override
+    public void action() {
+        try {
+            if (!output.exists()) {
+                Files.createDirectories(output.toPath());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        project.copy(c -> {
+            c.from(input);
+            c.into(output);
+
+            if (exclusions != null) {
+                c.exclude(exclusions);
+            }
+        });
     }
 
     public CopyFile setInput(File input) {
@@ -80,10 +70,5 @@ public class CopyFile extends Step {
 
     public CopyFile setExclusions(String exclusions) {
         return setExclusions(Collections.singletonList(exclusions));
-    }
-
-    public CopyFile setProject(Project project) {
-        this.project = project;
-        return this;
     }
 }

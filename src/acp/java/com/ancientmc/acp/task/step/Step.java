@@ -1,14 +1,11 @@
 package com.ancientmc.acp.task.step;
 
-import com.ancientmc.acp.task.step.io.DownloadFile;
-import org.gradle.api.logging.Logger;
-
-import java.io.File;
+import org.gradle.api.Project;
 
 /**
  * Base class for steps, which are essentially mini-functions that occur within Gradle tasks.
  */
-public class Step {
+public abstract class Step {
 
     /**
      * The message that is printed in the console upon the step's execution.
@@ -16,69 +13,44 @@ public class Step {
     protected String message;
 
     /**
-     * A generic output file. Allows a step to call the output of a previous step as its input.
+     * The gradle project.
      */
-    protected File output;
+    protected Project project;
 
     /**
-     * Prints the message into the console. Determined by the condition specified.
-     * @param logger The Gradle logger.
-     * @param message The message getting printed.
-     * @param condition Boolean condition that determines if the message is printed.
+     * The condition that determines if a step is executed.
      */
-    public void printMessage(Logger logger, String message, boolean condition) {
+    protected boolean condition;
+
+    /**
+     * Main execution method for all inheritors of the Step class. If the condition is met, the message is printed and the
+     * action is performed.
+     */
+    public void exec() {
         if (condition) {
-            logger.lifecycle(message);
+            project.getLogger().lifecycle(message);
+            action();
         }
     }
 
     /**
-     * Variation of the exec(logger, condition) method for if we want to skip the logging process and conditions.
-     * Used during dependency (library) resolution, as that occurs in its own little realm separate from the rest
-     * of the initialization stuff.
+     * Performs the main action for this step.
      */
-    public void exec() {
-        exec(null, true);
-    }
+    public abstract void action();
 
-    /**
-     * Main execution method for all inheritors of the Step class.
-     * @param logger The gradle logger.
-     * @param condition Boolean condition that determines if the step gets executed.
-     */
-    public void exec(Logger logger, boolean condition) {
-        printMessage(logger, message, condition);
-    }
-
-    /**
-     * Gets the output from a file-based step. Usually used when getting a downloaded file in inherited Step classes.
-     * @return The output of the step.
-     * @see DownloadFile#getOutput() DownloadFileStep.getOutput() for the most used example.
-     */
-    public File getOutput() {
-        return output;
-    }
-
-    /**
-     * Sets the message printed to the console. This method also acts as a pseudo-build method for finalizing a Step object.
-     * It should always be called last in the setter chains.
-     * @param message The message printed to the console.
-     * @return This step.
-     */
-    public Step setMessage(String message) {
-        this.message = message;
+    protected Step build(Project project, String phase, String message) {
+        this.project = project;
+        this.message = "[acp." + phase + "] Step -> " + message + "...";
         return this;
     }
 
-    /**
-     * Sets the step execution message printed to tne console. This method also acts as a pseudo-build method for finalizing a Step object.
-     * It should always be called last in the setter chains.
-     * @param phase The phase of action. Used phases are "init" for the Initialize task, "decomp" for the Decompile task, and "mod" for the BuildMod task.
-     * @param message The message of the step's action.
-     * @return This step.
-     */
-    public Step setMessage(String phase, String message) {
-        this.message = "[acp." + phase + "] Step -> " + message + "...";
+    public Step setProject(Project project) {
+        this.project = project;
+        return this;
+    }
+
+    public Step setCondition(boolean condition) {
+        this.condition = condition;
         return this;
     }
 }

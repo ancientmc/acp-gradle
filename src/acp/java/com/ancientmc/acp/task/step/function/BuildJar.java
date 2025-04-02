@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.gradle.api.logging.Logger;
+import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,31 +36,33 @@ public class BuildJar extends Step {
      */
     protected File output;
 
+    public BuildJar(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
+
     @Override
-    public void exec(Logger logger, boolean condition) {
-        if (condition) {
-            try {
-                if (!output.getParentFile().exists()) {
-                    Files.createDirectories(output.getParentFile().toPath());
-                }
-
-                JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
-                Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-                Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-
-                if (!classes.isEmpty()) {
-                    classes.forEach(cls -> addEntry(out, classDirectory, cls));
-                }
-
-                if (!resources.isEmpty()) {
-                    resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
-                }
-
-                out.finish();
-                out.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public void action() {
+        try {
+            if (!output.getParentFile().exists()) {
+                Files.createDirectories(output.getParentFile().toPath());
             }
+
+            JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
+            Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+
+            if (!classes.isEmpty()) {
+                classes.forEach(cls -> addEntry(out, classDirectory, cls));
+            }
+
+            if (!resources.isEmpty()) {
+                resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
+            }
+
+            out.finish();
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

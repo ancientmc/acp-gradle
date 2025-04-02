@@ -12,7 +12,7 @@
     },
     {
       "name": "classic_modded",
-      "version": "c0.0.14a_08",
+      "version": "c0.0.15a-05311904",
       "loader": "vanilla",
       "tasks": [
         { "name": "decompile" },
@@ -34,7 +34,7 @@
     {
       "name": "legacyAlpha_modded",
       "version": "a1.2.6-legacy",
-      "loader": "vanilla",
+      "loader": "risugami",
       "tasks": [
         { "name": "decompile" },
         { "name": "injectMod" },

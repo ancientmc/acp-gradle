@@ -5,7 +5,7 @@ import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.logging.Logger;
+import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,26 +36,26 @@ public class DownloadAssets extends Step {
      */
     private File output;
 
+    public DownloadAssets(Project project, String phase, String message) {
+        build(project, phase, message);
+    }
+
     @Override
-    public void exec(Logger logger, boolean condition) {
-        super.exec(logger, condition);
-
-        if (condition) {
-            try {
-                if (!output.exists()) {
-                    FileUtils.forceMkdir(output);
-                }
-
-                JsonObject indexObj = Json.get(index);
-                Map<String, String> assets = getAssets(indexObj);
-                List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
-
-                if (assets != null) {
-                    download(assets, omniArchiveAssets, output);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+    public void action() {
+        try {
+            if (!output.exists()) {
+                FileUtils.forceMkdir(output);
             }
+
+            JsonObject indexObj = Json.get(index);
+            Map<String, String> assets = getAssets(indexObj);
+            List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
+
+            if (assets != null) {
+                download(assets, omniArchiveAssets, output);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -155,10 +155,6 @@ public class DownloadAssets extends Step {
 
         in.close();
         out.close();
-    }
-
-    public File getOutput() {
-        return output;
     }
 
     public DownloadAssets setIndex(URL index) {
