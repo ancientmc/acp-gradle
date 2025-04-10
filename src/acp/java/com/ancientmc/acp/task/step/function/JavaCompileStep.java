@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -38,8 +39,8 @@ public class JavaCompileStep extends Step {
      */
     protected File outputDirectory;
 
-    public JavaCompileStep(Project project, String phase, String message) {
-        build(project, phase, message);
+    public JavaCompileStep(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     public void action() {

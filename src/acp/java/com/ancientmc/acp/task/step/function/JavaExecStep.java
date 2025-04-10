@@ -1,10 +1,14 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.process.JavaExecSpec;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,8 +32,8 @@ public class JavaExecStep extends Step {
      */
     protected List<String> args;
 
-    public JavaExecStep(Project project, String phase, String message) {
-        build(project, phase, message);
+    public JavaExecStep(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override
@@ -38,12 +42,23 @@ public class JavaExecStep extends Step {
             action.setClasspath(project.files(configuration));
             action.getMainClass().set(mainClass);
             action.setArgs(args);
+            log(action);
 
             if (isMakeDiffPatchesStep(args)) {
                 action.setIgnoreExitValue(true);
             }
         });
     }
+
+    public void log(JavaExecSpec action) {
+        try {
+            // This will not work
+            action.setStandardOutput(Files.newOutputStream(logger.file.toPath()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     public JavaExecStep setConfiguration(String configuration) {
         this.configuration = project.getConfigurations().named(configuration).get();

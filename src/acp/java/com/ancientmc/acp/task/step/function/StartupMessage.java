@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -20,13 +21,15 @@ public class StartupMessage extends Step {
      */
     private String minecraftVersion;
 
-    public StartupMessage(Project project) {
+    public StartupMessage(Project project, AcpLogger logger) {
+        this.logger = logger;
         this.project = project;
         this.message = getStartupMessage();
     }
 
     @Override
     public void action() { } // blank because nothing besides the message printing actually happens.
+
 
     /**
      * @return The startup message used upon booting the ACP initializer for the first time.

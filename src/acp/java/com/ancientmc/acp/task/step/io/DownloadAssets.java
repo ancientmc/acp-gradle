@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
@@ -36,8 +37,8 @@ public class DownloadAssets extends Step {
      */
     private File output;
 
-    public DownloadAssets(Project project, String phase, String message) {
-        build(project, phase, message);
+    public DownloadAssets(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override
@@ -47,14 +48,17 @@ public class DownloadAssets extends Step {
                 FileUtils.forceMkdir(output);
             }
 
+            logger.file(project, "Json index -> {}", index.getPath());
             JsonObject indexObj = Json.get(index);
             Map<String, String> assets = getAssets(indexObj);
             List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
 
-            if (assets != null) {
+            if (assets != null && omniArchiveAssets != null) {
+                logger.file(project, "Asset size -> {}", Integer.toString(assets.size() + omniArchiveAssets.size()));
                 download(assets, omniArchiveAssets, output);
             }
         } catch (IOException e) {
+            logger.error(project, e, "Asset download error.");
             throw new RuntimeException(e);
         }
     }
@@ -65,7 +69,7 @@ public class DownloadAssets extends Step {
      * @return The assets as a map. The key is the name of the asset, while the value is its hash. Returns null if the index is empty.
      * @throws IOException exception.
      */
-    public static Map<String, String> getAssets(JsonObject index) throws IOException {
+    public Map<String, String> getAssets(JsonObject index) throws IOException {
         Map<String, String> assets = new HashMap<>();
         JsonObject objects = index.getAsJsonObject("objects");
 
@@ -87,7 +91,7 @@ public class DownloadAssets extends Step {
      * @param index The asset index JSON object.
      * @return The list of resources only found on OmniArchive.
      */
-    public static List<String> getOmniArchiveAssets(JsonObject index) {
+    public List<String> getOmniArchiveAssets(JsonObject index) {
         List<String> assets = new ArrayList<>();
         JsonObject objects = index.getAsJsonObject("objects");
 
@@ -115,7 +119,7 @@ public class DownloadAssets extends Step {
      * @param directory The "run\resources" directory path in the ACP workspace.
      * @throws IOException exception.
      */
-    public static void download(Map<String, String> map, List<String> omniArchiveAssets, File directory) throws IOException {
+    public void download(Map<String, String> map, List<String> omniArchiveAssets, File directory) throws IOException {
         if(!directory.exists()) {
             FileUtils.forceMkdir(directory);
         }
@@ -131,8 +135,11 @@ public class DownloadAssets extends Step {
                     FileUtils.forceMkdir(file.getParentFile());
                 }
 
+                logger.file(project, "Asset url -> {}", url.getPath());
+                logger.file(project, "Asset file path -> {}", file.getAbsolutePath());
                 writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
             } catch (IOException e) {
+                logger.error(project, e, "File writing error.");
                 throw new RuntimeException(e);
             }
         });
@@ -144,7 +151,7 @@ public class DownloadAssets extends Step {
      * @param out The output file in the "run\resources" directory.
      * @throws IOException exception.
      */
-    public static void writeToFile(InputStream in, OutputStream out) throws IOException {
+    public void writeToFile(InputStream in, OutputStream out) throws IOException {
         byte[] b = new byte[1024];
         int len;
 

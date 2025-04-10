@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -32,8 +33,8 @@ public class MakeHashes extends Step {
 
     protected File output;
 
-    public MakeHashes(Project project, String phase, String message) {
-        build(project, phase, message);
+    public MakeHashes(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override

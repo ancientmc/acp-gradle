@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -24,8 +25,8 @@ public class RepackageDefaults extends JavaExecStep {
      */
     protected File tsrg;
 
-    public RepackageDefaults(Project project, String phase, String message) {
-        super(project, phase, message);
+    public RepackageDefaults(Project project, AcpLogger logger, String message) {
+        super(project, logger, message);
     }
 
     @Override

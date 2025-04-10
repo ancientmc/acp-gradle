@@ -9,7 +9,9 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class for JSON parsing, mainly Minecraft's version JSON.
@@ -86,6 +88,27 @@ public class Json {
         }
 
         return libraries;
+    }
+
+
+    /**
+     * Gets a map of tools needed by ACP for its functions. The key is the gradle configuration for the tool, and the value is the tool's maven path.
+     * @param json The JSON file the tools are parsed from. Stored in the ACP directory as 'gradle/tools.json'.
+     * @return The map of tools.
+     * @throws IOException
+     */
+    public static Map<String, String> getTools(File json) throws IOException {
+        Map<String, String> tools = new HashMap<>();
+        JsonObject jsonObject = get(json);
+        JsonArray toolsArray = jsonObject.getAsJsonArray("tools");
+
+        for (JsonElement entry : toolsArray.asList()) {
+            String configuration = entry.getAsJsonObject().getAsJsonPrimitive("configuration").getAsString();
+            String tool = entry.getAsJsonObject().getAsJsonPrimitive("tool").getAsString();
+            tools.put(configuration, tool);
+        }
+
+        return tools;
     }
 
     /**

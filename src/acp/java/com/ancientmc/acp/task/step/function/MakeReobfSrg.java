@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import net.neoforged.srgutils.IMappingFile;
@@ -18,8 +19,8 @@ public class MakeReobfSrg extends Step {
 
     protected File output;
 
-    public MakeReobfSrg(Project project, String phase, String message) {
-        build(project, phase, message);
+    public MakeReobfSrg(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override

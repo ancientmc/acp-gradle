@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.apache.commons.io.FileUtils;
@@ -27,8 +28,8 @@ public class ExtractNatives extends Step {
      */
     private File output;
 
-    public ExtractNatives(Project project, String phase, String message) {
-        build(project, phase, message);
+    public ExtractNatives(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     /**

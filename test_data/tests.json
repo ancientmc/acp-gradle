@@ -1,7 +1,7 @@
 {
   "tests": [
     {
-      "name": "classic_vanilla",
+      "name": "classic_vanilla_one",
       "version": "c0.0.13a_03",
       "loader": "vanilla",
       "tasks": [
@@ -11,12 +11,11 @@
       ]
     },
     {
-      "name": "classic_modded",
-      "version": "c0.0.15a-05311904",
+      "name": "classic_vanilla_two",
+      "version": "c0.0.16a-081047",
       "loader": "vanilla",
       "tasks": [
         { "name": "decompile" },
-        { "name": "injectMod" },
         { "name": "runClient" },
         { "name": "buildMod" }
       ]

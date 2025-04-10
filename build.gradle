@@ -4,16 +4,8 @@ plugins {
     id 'maven-publish'
 }
 
-import java.text.DecimalFormat
-import java.text.NumberFormat
-
-static String getYearDate() {
-    NumberFormat formatter = new DecimalFormat('000')
-    return '25' + formatter.format(Calendar.instance.get(Calendar.DAY_OF_YEAR))
-}
-
 group 'com.ancientmc'
-version '0.3.1.' + yearDate
+version '0.4.0'
 
 java {
     withSourcesJar()
@@ -34,18 +26,17 @@ sourceSets {
 configurations {
     acpImplementation
     implementation.extendsFrom acpImplementation
-    autorenamingtool
+    testImplementation.extendsFrom acpImplementation
 }
 
 dependencies {
     acpImplementation gradleApi()
-    acpImplementation 'com.google.code.gson:gson:2.11.0'
-    acpImplementation 'commons-io:commons-io:2.18.0'
-    acpImplementation 'net.neoforged:srgutils:1.0.9'
-    acpImplementation 'org.apache.commons:commons-compress:1.27.1'
+    acpImplementation libs.commons.compress
+    acpImplementation libs.commons.io
+    acpImplementation libs.gson
+    acpImplementation libs.srgutils
 
     testImplementation gradleTestKit()
-    testImplementation 'commons-io:commons-io:2.18.0'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
 }
 

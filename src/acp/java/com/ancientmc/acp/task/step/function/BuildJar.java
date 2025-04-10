@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
@@ -36,8 +37,8 @@ public class BuildJar extends Step {
      */
     protected File output;
 
-    public BuildJar(Project project, String phase, String message) {
-        build(project, phase, message);
+    public BuildJar(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override

@@ -1,9 +1,11 @@
 package com.ancientmc.acp.task.step;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import org.gradle.api.Project;
 
 /**
  * Base class for steps, which are essentially mini-functions that occur within Gradle tasks.
+ * @author moist-mason
  */
 public abstract class Step {
 
@@ -23,12 +25,17 @@ public abstract class Step {
     protected boolean condition;
 
     /**
+     * ACP's logger.
+     */
+    protected AcpLogger logger;
+
+    /**
      * Main execution method for all inheritors of the Step class. If the condition is met, the message is printed and the
      * action is performed.
      */
     public void exec() {
         if (condition) {
-            project.getLogger().lifecycle(message);
+            logger.all(project, message);
             action();
         }
     }
@@ -41,6 +48,13 @@ public abstract class Step {
     protected Step build(Project project, String phase, String message) {
         this.project = project;
         this.message = "[acp." + phase + "] Step -> " + message + "...";
+        return this;
+    }
+
+    protected Step build(Project project, AcpLogger logger, String message) {
+        this.project = project;
+        this.logger = logger;
+        this.message = "[acp." + logger.phase + "] Step -> " + message + "...";
         return this;
     }
 

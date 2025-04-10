@@ -6,15 +6,3 @@ pluginManagement {
 }
 
 rootProject.name = 'acp-gradle'
-
-/**
- * Include test directories as projects if they exist.
- */
-def acpDir = new File(rootDir, 'acp_test/')
-if (acpDir.exists()) {
-    acpDir.eachDir { dir ->
-        def proj = rootDir.toPath().relativize(dir.toPath()).toFile()
-        include proj.path
-        project(':' + proj.path).name + dir.name
-    }
-}

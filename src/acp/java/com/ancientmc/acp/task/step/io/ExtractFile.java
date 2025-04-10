@@ -1,5 +1,7 @@
 package com.ancientmc.acp.task.step.io;
 
+import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.logger.QuickLog;
 import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
 
@@ -8,8 +10,9 @@ import java.util.List;
 
 /**
  * Extracts a single archive file.
+ * @author moist-mason
  */
-public class ExtractFile extends Step {
+public class ExtractFile extends Step implements QuickLog {
 
     /**
      * The input archive file getting extracted.
@@ -28,8 +31,8 @@ public class ExtractFile extends Step {
 
     protected List<String> inclusions;
 
-    public ExtractFile(Project project, String phase, String message) {
-        build(project, phase, message);
+    public ExtractFile(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     /**
@@ -37,6 +40,7 @@ public class ExtractFile extends Step {
      */
     @Override
     public void action() {
+        log();
         project.copy(action -> {
             action.from(project.zipTree(input));
             action.into(output);
@@ -50,6 +54,14 @@ public class ExtractFile extends Step {
             }
         });
     }
+
+
+    @Override
+    public void log() {
+        logger.file(project, "Input archive -> {}", input.getAbsolutePath());
+        logger.file(project, "Output directory -> {}", output.getAbsolutePath());
+    }
+
 
     public ExtractFile setInput(File input) {
         this.input = input;

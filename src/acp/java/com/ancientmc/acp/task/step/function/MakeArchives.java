@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
@@ -40,8 +41,8 @@ public class MakeArchives extends Step {
      */
     protected File archiveDirectory;
 
-    public MakeArchives(Project project, String phase, String message) {
-        build(project, phase, message);
+    public MakeArchives(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     public void action() {

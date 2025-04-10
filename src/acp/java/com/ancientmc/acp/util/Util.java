@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
@@ -157,6 +158,22 @@ public class Util {
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    /**
+     * Checks if a project configuration(s) is not empty, i.e. if its dependencies have been installed during the configuration phase.
+     * @param project The gradle project.
+     * @param names The name(s) of the configuration.
+     * @return true if the configuration(s) isn't empty.
+     */
+    public static boolean dependencyCondition(Project project, String... names) {
+        for (String name : names) {
+            Configuration cfg = project.getConfigurations().named(name).get();
+            return !cfg.getDependencies().isEmpty();
+        }
+
+        return false;
     }
 
     /**

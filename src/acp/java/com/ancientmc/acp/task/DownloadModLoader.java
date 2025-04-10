@@ -2,7 +2,6 @@ package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
@@ -17,8 +16,9 @@ import java.net.URL;
 /**
  * Downloads the LZMA for the ModLoader into a specified folder. The LZMA will get injected later
  * via the injectModPatches task during setup.
+ * @author moist-mason
  */
-public abstract class DownloadModLoader extends DefaultTask {
+public abstract class DownloadModLoader extends AcpTask {
 
     @TaskAction
     public void exec() {
@@ -59,14 +59,22 @@ public abstract class DownloadModLoader extends DefaultTask {
      * @return The maven path.
      */
     private String getModLoaderPath(String loader) {
-        if (loader.equals("forge")) {
-            return "net.minecraftforge:forge";
-        } else if (loader.equals("risugami")) {
-            return "risugami:modloader";
-        } else {
-            getLogger().error("Unrecognized mod loader: {}", loader);
-            return null;
-        }
+        return switch (loader) {
+            case "forge" -> "net.minecraftforge:forge";
+            case "risugami" -> "risugami:modloader";
+            default -> nullAndError(loader);
+        };
+    }
+
+
+    /**
+     * Prints an error and returns null if the ModLoader type is not acceptable.
+     * @param loader The ModLoader type.
+     * @return null.
+     */
+    private String nullAndError(String loader) {
+        getLogger().error("Unrecognized mod loader: {}", loader);
+        return null;
     }
 
     /**

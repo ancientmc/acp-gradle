@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
@@ -24,8 +25,8 @@ public class ResolveLibraries extends Step {
      * @see Json#getLibraries(List)
      */
 
-    public ResolveLibraries(Project project, String phase, String message) {
-        build(project, phase, message);
+    public ResolveLibraries(Project project, AcpLogger logger, String message) {
+        build(project, logger, message);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class ResolveLibraries extends Step {
         libraries.forEach(lib -> {
             Dependency dependency = project.getDependencies().create(lib);
             if (!dependencies.contains(dependency)) {
-                project.getLogger().info("Resolve {}", lib);
+                logger.file(project, "Resolving library -> {}", lib);
                 dependencies.add(dependency);
             }
         });
