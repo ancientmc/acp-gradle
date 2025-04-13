@@ -1,7 +1,7 @@
 {
   "tests": [
     {
-      "name": "classic_vanilla_one",
+      "name": "classic_one",
       "version": "c0.0.13a_03",
       "loader": "vanilla",
       "tasks": [
@@ -11,8 +11,8 @@
       ]
     },
     {
-      "name": "classic_vanilla_two",
-      "version": "c0.0.16a-081047",
+      "name": "classic_two",
+      "version": "c0.0.16a_02-081047",
       "loader": "vanilla",
       "tasks": [
         { "name": "decompile" },

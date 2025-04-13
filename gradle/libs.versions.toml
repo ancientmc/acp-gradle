@@ -1,8 +1,8 @@
 [versions]
 commons-compress = "1.27.1"
-commons-io = "2.18.0"
-gson = "2.12.1"
-srgutils = "1.0.9"
+commons-io = "2.19.0"
+gson = "2.13.0"
+srgutils = "1.0.10"
 
 [libraries]
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commons-compress" }

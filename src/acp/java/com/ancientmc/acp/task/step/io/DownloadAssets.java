@@ -22,6 +22,7 @@ import java.util.Map;
 /**
  * This step downloads the asset files. Instead of downloading the asset hashes in their pure forms, it goes the extra mile
  * and converts those hash files into the actual resource files used by the game.
+ * @author moist-mason
  */
 public class DownloadAssets extends Step {
 
@@ -48,7 +49,7 @@ public class DownloadAssets extends Step {
                 FileUtils.forceMkdir(output);
             }
 
-            logger.file(project, "Json index -> {}", index.getPath());
+            logger.file(project, "Json index -> {}", index.toString());
             JsonObject indexObj = Json.get(index);
             Map<String, String> assets = getAssets(indexObj);
             List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
@@ -135,8 +136,7 @@ public class DownloadAssets extends Step {
                     FileUtils.forceMkdir(file.getParentFile());
                 }
 
-                logger.file(project, "Asset url -> {}", url.getPath());
-                logger.file(project, "Asset file path -> {}", file.getAbsolutePath());
+                logger.functions().urlToFile(url, file);
                 writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
             } catch (IOException e) {
                 logger.error(project, e, "File writing error.");

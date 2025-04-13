@@ -1,7 +1,6 @@
 package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.logger.AcpLogger;
-import com.ancientmc.acp.logger.QuickLog;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files can be injected, as this task
  * makes temporary JAR files for each implemented LZMA.
  */
-public class InjectBinPatches extends Step implements QuickLog {
+public class InjectBinPatches extends Step {
 
     public InjectBinPatches(Project project, AcpLogger logger, String message) {
         build(project, logger, message);
@@ -64,13 +63,6 @@ public class InjectBinPatches extends Step implements QuickLog {
             throw new RuntimeException(e);
         }
     }
-
-
-    @Override
-    public void log() {
-
-    }
-
 
     /**
      * Gets a filtered list of LZMA files from the patch directory. It is filtered to only include LZMAs, and

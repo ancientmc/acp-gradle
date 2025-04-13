@@ -1,7 +1,6 @@
 package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
-import com.ancientmc.acp.logger.QuickLog;
 import com.ancientmc.acp.task.step.Step;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -12,8 +11,9 @@ import java.net.URL;
 
 /**
  * Downloads a file from a URL link.
+ * @author moist-mason
  */
-public class DownloadFile extends Step implements QuickLog {
+public class DownloadFile extends Step {
 
     /**
      * The input URL.
@@ -32,21 +32,13 @@ public class DownloadFile extends Step implements QuickLog {
     @Override
     public void action() {
         try {
-            log();
+            logger.functions().urlToFile(input, output);
             FileUtils.copyURLToFile(input, output);
         } catch (IOException e) {
             logger.error(project, e, "Download error.");
             throw new RuntimeException(e);
         }
     }
-
-
-    @Override
-    public void log() {
-        logger.file(project, "Input -> {}", input.toString());
-        logger.file(project, "Output -> {}", output.getPath());
-    }
-
 
     public DownloadFile setInput(URL input) {
         this.input = input;

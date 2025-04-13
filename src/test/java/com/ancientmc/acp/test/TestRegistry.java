@@ -9,25 +9,31 @@ import java.util.List;
 public class TestRegistry {
     private final File jsonFile;
 
+    public final List<TestObject> tests;
+
     public TestRegistry(File jsonFile) {
         this.jsonFile = jsonFile;
+        this.tests = getTests();
     }
-
 
     /**
      * @return The list of test objects that will be run.
      */
-    public List<TestObject> get() {
+    public List<TestObject> getTests() {
         List<TestObject> list = new ArrayList<>();
         JsonObject json = getJson();
         JsonArray tests = json.getAsJsonArray("tests");
 
         tests.asList().forEach(e -> {
             JsonObject test = e.getAsJsonObject();
-            list.add(getTest(test));
+            list.add(createTest(test));
         });
 
         return list;
+    }
+
+    public TestObject getTest(String name) {
+        return tests.stream().filter(o -> o.name().equals(name)).findFirst().orElseThrow();
     }
 
 
@@ -35,7 +41,7 @@ public class TestRegistry {
      * @param test The JSON object for the test.
      * @return The test as a record object.
      */
-    private TestObject getTest(JsonObject test) {
+    private TestObject createTest(JsonObject test) {
         String name = test.get("name").getAsString();
         String version = test.get("version").getAsString();
         String loader = test.get("loader").getAsString();

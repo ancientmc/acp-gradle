@@ -30,12 +30,11 @@ public class StartupMessage extends Step {
     @Override
     public void action() { } // blank because nothing besides the message printing actually happens.
 
-
     /**
      * @return The startup message used upon booting the ACP initializer for the first time.
      */
     private String getStartupMessage() {
-        List<String> lines = Arrays.asList("Ancient Coder Pack",
+        List<String> lines = Arrays.asList("\nAncient Coder Pack",
                 "Copyright (c) AncientMC",
                 "ACP Version: " + project.getProperties().get("acp_version").toString(),
                 "ACP-Gradle Version: " + getPluginVersion(),

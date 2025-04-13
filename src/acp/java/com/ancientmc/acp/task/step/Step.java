@@ -35,7 +35,7 @@ public abstract class Step {
      */
     public void exec() {
         if (condition) {
-            logger.all(project, message);
+            logger.console(project, message);
             action();
         }
     }
@@ -45,16 +45,10 @@ public abstract class Step {
      */
     public abstract void action();
 
-    protected Step build(Project project, String phase, String message) {
-        this.project = project;
-        this.message = "[acp." + phase + "] Step -> " + message + "...";
-        return this;
-    }
-
     protected Step build(Project project, AcpLogger logger, String message) {
         this.project = project;
         this.logger = logger;
-        this.message = "[acp." + logger.phase + "] Step -> " + message + "...";
+        this.message = "Step -> " + message + "...";
         return this;
     }
 

@@ -1,21 +1,12 @@
 package com.ancientmc.acp.test;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.testkit.runner.BuildResult;
 import org.gradle.testkit.runner.GradleRunner;
 import org.gradle.testkit.runner.TaskOutcome;
 import org.junit.jupiter.api.Test;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import static org.gradle.testkit.runner.TaskOutcome.SUCCESS;
@@ -25,44 +16,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AcpTest {
 
     /**
-     * The JSON file containing our tests.
+     * The registry for all our tests.
      */
-    private static final File JSON_FILE = new File("test_data/tests.json");
+    public static final TestRegistry REGISTRY = new TestRegistry(new File("test_data/tests.json"));
 
-    /**
-     * The list of our tests.
-     */
-    private static final List<TestObject> TESTS = new TestRegistry(JSON_FILE).get();
+    // All versions
+    @Test public void testAll() { REGISTRY.tests.forEach(o -> doTest(o.name())); }
 
-    /**
-     * The root directory for our test workspaces.
-     */
-    private static final File ROOT_TEST_DIR = new File("acp_test/versions/");
+    // Individual versions
+    @Test public void testClassicOne() { doTest("classic_one"); }
+    @Test public void testClassicTwo() { doTest("classic_two"); }
+    @Test public void testAlphaLegacyVanilla() { doTest("legacyAlpha_vanilla"); }
+    @Test public void testAlphaLegacyModded() { doTest("legacyAlpha_modded"); }
 
-    /**
-     * The template data directory containing files added to our test workspaces.
-     */
-    private static final File TEST_DATA = new File("test_data");
 
-    @Test
-    public void testAll() {
-        TESTS.forEach(test -> {
-            setup(test);
-            File testDir = new File(ROOT_TEST_DIR, test.name());
-            doTest(test, testDir);
-        });
-    }
-
-    public static void main(String[] args) {
-        TESTS.forEach(test -> {
-            setup(test);
-            File testDir = new File(ROOT_TEST_DIR, test.name());
-            doTest(test, testDir);
-        });
-    }
-
-    public static void doTest(TestObject test, File testDir) {
+    public void doTest(String name) {
+        TestObject test = getTest(name);
         System.out.println("Test is: " + test.name());
+        TestSetup.start(test);
+        execute(test);
+    }
+
+    public static void execute(TestObject test) {
+        File testDir = new File(TestPaths.ROOT_TEST_DIR, test.name());
 
         test.tasks().forEach(task -> {
             BuildResult result = GradleRunner.create()
@@ -80,66 +56,7 @@ public class AcpTest {
         });
     }
 
-
-    /**
-     * Sets up the test for
-     * @param test The test object.
-     */
-    public static void setup(TestObject test) {
-        try {
-            if (!ROOT_TEST_DIR.exists()) {
-                Files.createDirectories(ROOT_TEST_DIR.toPath());
-            }
-
-            File testDir = new File(ROOT_TEST_DIR, test.name());
-            File mainData = new File(TEST_DATA, "main");
-            Collection<File> mainFiles = FileUtils.listFiles(mainData, TrueFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
-
-            if (!testDir.exists()) {
-                Files.createDirectories(testDir.toPath());
-            }
-
-            for (File original : mainFiles) {
-                String path = mainData.toPath().relativize(original.toPath()).toString();
-                File copied = new File(testDir, path);
-
-                if (!copied.getParentFile().exists()) {
-                    Files.createDirectories(copied.getParentFile().toPath());
-                }
-
-                copyFile(original, copied, test);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void copyFile(File original, File copied, TestObject test) {
-        try {
-            List<String> lines = Files.readAllLines(original.toPath());
-            List<String> newLines = new ArrayList<>();
-
-            lines.forEach(line -> {
-                line = line.replace("{version}", test.version());
-                line = line.replace("{loader}", test.loader());
-                line = line.replace("{name}", test.name());
-                newLines.add(line);
-            });
-
-            write(copied, newLines);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void write(File file, List<String> lines) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (String line : lines) {
-                writer.write(line + "\n");
-                writer.flush();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static TestObject getTest(String name) {
+        return REGISTRY.getTest(name);
     }
 }

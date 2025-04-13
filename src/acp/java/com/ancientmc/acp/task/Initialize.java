@@ -22,7 +22,6 @@ public abstract class Initialize extends AcpTask {
         Project project = getProject();
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
         String version = Util.getMinecraftVersion(project);
-        System.out.println("Phase -> " + getPhase().get());
         setLogger();
 
         try {
@@ -62,7 +61,7 @@ public abstract class Initialize extends AcpTask {
 
             Step resolveTools = new ResolveTools(project, logger, "Resolving ACP tools")
                     .setTools(Json.getTools(project.file(Paths.TOOLS_JSON)))
-                    .setCondition(Util.dependencyCondition(project, "fernflower", "binpatch", "mcinjector"));
+                    .setCondition(Util.dependencyCondition(project, "fernflower"));
             resolveTools.exec();
 
             Step extractNatives = new ExtractNatives(project, logger, "Extracting natives")

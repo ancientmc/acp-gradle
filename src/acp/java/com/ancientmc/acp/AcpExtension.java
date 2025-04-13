@@ -3,6 +3,9 @@ package com.ancientmc.acp;
 import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 
+/**
+ * @author moist-mason
+ */
 public class AcpExtension {
 
     /**

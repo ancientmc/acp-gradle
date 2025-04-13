@@ -15,17 +15,13 @@ import java.util.Arrays;
  * Builds the mod's files for distribution: DiffPatches, LZMA binary patches, and ZIPs/TARs containing compiled classes.
  */
 public abstract class BuildMod extends AcpTask {
-    public static final String PHASE = "mod";
-
-    public BuildMod() {
-        super();
-    }
 
     @TaskAction
     public void exec() {
         Project project = getProject();
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
         String lzmaPath = "build/modding/patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
+        setLogger();
 
         Step moddedCompile = new JavaCompileStep(project, logger, "Compiling the game")
                 .setSourceDirectory(project.file(Paths.DIR_SRC))

@@ -18,6 +18,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author moist-mason
+ */
 public class AcpPlugin implements Plugin<Project> {
 
     @Override
@@ -90,7 +93,6 @@ public class AcpPlugin implements Plugin<Project> {
             makeDirs(proj);
         });
     }
-
 
     /**
      * Creates directories not created elsewhere in advance.

@@ -34,7 +34,7 @@ public class ResolveTools extends Step {
         Dependency dependency = project.getDependencies().create(tool);
 
         if (!cfg.getDependencies().contains(dependency)) {
-            logger.file(project, "Resolve -> {}", tool);
+            logger.functions().resolve(tool);
             cfg.getDependencies().add(dependency);
         }
     }

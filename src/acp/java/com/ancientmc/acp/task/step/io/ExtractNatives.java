@@ -48,16 +48,13 @@ public class ExtractNatives extends Step {
             }
 
             jars.forEach(jar -> project.copy(action -> {
+                logger.functions().fileToFile(jar, output);
                 action.from(project.zipTree(jar));
                 action.into(project.file(output));
             }));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public File getOutput() {
-        return output;
     }
 
     public ExtractNatives setUrls(List<URL> urls) {

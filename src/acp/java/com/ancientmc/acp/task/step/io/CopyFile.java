@@ -1,7 +1,6 @@
 package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
-import com.ancientmc.acp.logger.QuickLog;
 import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Project;
 
@@ -15,7 +14,7 @@ import java.util.List;
  * Copies a file. Done using the Gradle API's CopySpec function.
  * @author moist-mason
  */
-public class CopyFile extends Step implements QuickLog {
+public class CopyFile extends Step {
 
     /**
      * The input file getting copied.
@@ -46,7 +45,7 @@ public class CopyFile extends Step implements QuickLog {
             throw new RuntimeException(e);
         }
 
-        log();
+        logger.functions().fileToFile(input, output);
         project.copy(c -> {
             c.from(input);
             c.into(output);
@@ -56,14 +55,6 @@ public class CopyFile extends Step implements QuickLog {
             }
         });
     }
-
-
-    @Override
-    public void log() {
-        logger.file(project, "Input -> {}", input.getAbsolutePath());
-        logger.file(project, "Output -> {}", output.getAbsolutePath());
-    }
-
 
     public CopyFile setInput(File input) {
         this.input = input;

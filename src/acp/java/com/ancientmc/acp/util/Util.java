@@ -162,18 +162,14 @@ public class Util {
 
 
     /**
-     * Checks if a project configuration(s) is not empty, i.e. if its dependencies have been installed during the configuration phase.
+     * Checks if a project configuration is empty, i.e. if its dependencies haven't been installed during the configuration phase.
      * @param project The gradle project.
-     * @param names The name(s) of the configuration.
-     * @return true if the configuration(s) isn't empty.
+     * @param name The name of the configuration.
+     * @return true if the configuration(s) is empty.
      */
-    public static boolean dependencyCondition(Project project, String... names) {
-        for (String name : names) {
-            Configuration cfg = project.getConfigurations().named(name).get();
-            return !cfg.getDependencies().isEmpty();
-        }
-
-        return false;
+    public static boolean dependencyCondition(Project project, String name) {
+        Configuration cfg = project.getConfigurations().named(name).get();
+        return cfg.getDependencies().isEmpty();
     }
 
     /**

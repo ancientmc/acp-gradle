@@ -22,22 +22,22 @@ public class JavaCompileStep extends Step {
     /**
      * The source directory.
      */
-    protected File sourceDirectory;
+    private File sourceDirectory;
 
     /**
      * The classpath containing JAR libraries.
      */
-    protected FileCollection classpathCollection;
+    private FileCollection classpathCollection;
 
     /**
      * The directory containing native libraries.
      */
-    protected File nativesDirectory;
+    private File nativesDirectory;
 
     /**
      * The output directory for our classes.
      */
-    protected File outputDirectory;
+    private File outputDirectory;
 
     public JavaCompileStep(Project project, AcpLogger logger, String message) {
         build(project, logger, message);

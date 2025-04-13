@@ -24,14 +24,17 @@ public class MakeHashes extends Step {
     /**
      * The source directory.
      */
-    protected File sourceDirectory;
+    private File sourceDirectory;
 
     /**
      * The resource directory.
      */
-    protected File resourceDirectory;
+    private File resourceDirectory;
 
-    protected File output;
+    /**
+     * The output hash file.
+     */
+    private File output;
 
     public MakeHashes(Project project, AcpLogger logger, String message) {
         build(project, logger, message);
@@ -75,7 +78,11 @@ public class MakeHashes extends Step {
         }
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
+            logger.file(project, "Hash file -> {}", output.getAbsolutePath());
+
             for (Map.Entry<String, String> entry : map.entrySet()) {
+                logger.file(project, "File -> {}", entry.getKey());
+                logger.file(project, "Hash -> {}", entry.getValue());
                 writer.write(entry.getKey() + " " + entry.getValue() + "\n");
                 writer.flush();
             }

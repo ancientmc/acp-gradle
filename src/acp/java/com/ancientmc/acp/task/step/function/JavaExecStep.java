@@ -5,10 +5,10 @@ import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.process.JavaExecSpec;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,27 +38,29 @@ public class JavaExecStep extends Step {
 
     @Override
     public void action() {
+        logger.file(project, "Tool -> {}", configuration.getName());
+        OutputStream out = new ByteArrayOutputStream();
+
         project.javaexec(action -> {
             action.setClasspath(project.files(configuration));
             action.getMainClass().set(mainClass);
             action.setArgs(args);
-            log(action);
 
             if (isMakeDiffPatchesStep(args)) {
                 action.setIgnoreExitValue(true);
             }
-        });
-    }
 
-    public void log(JavaExecSpec action) {
+            action.setStandardOutput(out);
+        });
+
         try {
-            // This will not work
-            action.setStandardOutput(Files.newOutputStream(logger.file.toPath()));
+            out.flush();
+            out.close();
+            logger.file(project, "Output -> {}", out.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-
 
     public JavaExecStep setConfiguration(String configuration) {
         this.configuration = project.getConfigurations().named(configuration).get();

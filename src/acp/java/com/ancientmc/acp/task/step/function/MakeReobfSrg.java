@@ -32,11 +32,11 @@ public class MakeReobfSrg extends Step {
             BufferedWriter writer = new BufferedWriter(new FileWriter(output));
             List<String> lines = Files.readAllLines(temp.toPath());
 
-                /*
-                Adds lines to strip the package of any straggling classes with the "net/minecraft/src" or the "com/mojang/minecraft/src/" packages.
-                Since the vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
-                into the /src/ path.
-                */
+            /*
+             * Adds lines to strip the package of any straggling classes with the "net/minecraft/src" or the "com/mojang/minecraft/src/" packages.
+             * Since the vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
+             * into the /src/ path.
+             */
             writer.write("PK: net/minecraft/src .\n");
             writer.write("PK: com/mojang/minecraft/src .\n");
 

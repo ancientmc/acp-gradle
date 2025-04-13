@@ -11,6 +11,7 @@ import java.net.URL;
 
 /**
  * Extension of the DownloadFile step that allows for extra configuration for jar downloading.
+ * @author moist-mason
  */
 public class DownloadJar extends DownloadFile {
 
@@ -19,30 +20,20 @@ public class DownloadJar extends DownloadFile {
     }
 
     /**
-     * This method parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
+     * Parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
      * @see Json#getJarUrl(File, String)
      */
     public void action() {
         try {
             File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
-            log(jar);
+
+            logger.functions().urlToFile(input, jar);
             FileUtils.copyURLToFile(input, jar);
         } catch (IOException e) {
             logger.error(project, e, "Download error.");
             throw new RuntimeException(e);
         }
     }
-
-
-    /**
-     * Based on the parent class's log action to account for the JAR's path.
-     * @param jar The JAR path.
-     */
-    public void log(File jar) {
-        logger.file(project, "Input -> {}", input.getPath());
-        logger.file(project, "Output -> {}", jar.getAbsolutePath());
-    }
-
 
     public DownloadJar setInput(URL input) {
         super.setInput(input);
