@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -86,7 +87,7 @@ public class MakeArchives extends Step {
             // Mod version -> version in build.gradle or somewhere else defined by the end-user.
             String version = project.getVersion().toString();
 
-            Util.compress(moddedFiles, archiveDirectory, version);
+            FileUtil.compress(moddedFiles, archiveDirectory, version);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

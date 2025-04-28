@@ -4,6 +4,10 @@ package com.ancientmc.acp.util;
  * File containing all paths used by ACP.
  */
 public class Paths {
+
+    /**
+     * Directories
+     */
     public static final String DIR_CFG = "cfg/";
     public static final String DIR_INJECT = DIR_CFG + "inject/";
     public static final String DIR_TEMP = DIR_CFG + "temp/";
@@ -22,10 +26,20 @@ public class Paths {
     public static final String DIR_REOBF_CLASSES = "build/modding/moddedClasses/reobf/";
     public static final String DIR_MODDED_CLASSES = "build/modding/moddedClasses/deobf/";
     public static final String DIR_MODDED_PATCHES = "build/modding/patches/";
+
+    /**
+     * ACP files.
+     */
     public static final String ACP_DATA = DIR_CFG + "data.zip";
+    public static final String TOOLS_JSON = "gradle/tools.json";
+    public static final String TSRG = DIR_CFG + "cuneiform.tsrg";
+    public static final String REOBF_SRG = "build/modding/reobf.srg";
+
+    /**
+     * Minecraft files.
+     */
     public static final String VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
     public static final String JSON = DIR_TEMP + "version.json";
-    public static final String TOOLS_JSON = "gradle/tools.json";
     public static final String CLIENT_JAR = DIR_TEMP + "client.jar";
     public static final String SLIM_JAR = DIR_TEMP + "slim.jar";
     public static final String EXTRA_JAR = DIR_TEMP + "extra.jar";
@@ -37,6 +51,4 @@ public class Paths {
     public static final String VANILLA_JAR = "build/modding/vanillaFiles/vanilla.jar";
     public static final String INTERM_JAR = "build/libs/intermediate.jar";
     public static final String REOBF_JAR = "build/libs/reobf.jar";
-    public static final String TSRG = DIR_CFG + "cuneiform.tsrg";
-    public static final String REOBF_SRG = "build/modding/reobf.srg";
 }

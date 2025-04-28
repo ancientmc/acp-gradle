@@ -47,7 +47,7 @@ public class TestSetup {
         }
     }
 
-    public static void copyFile(File original, File copied, TestObject test) {
+    private static void copyFile(File original, File copied, TestObject test) {
         try {
             List<String> lines = Files.readAllLines(original.toPath());
             List<String> newLines = new ArrayList<>();
@@ -65,7 +65,7 @@ public class TestSetup {
         }
     }
 
-    public static void write(File file, List<String> lines) {
+    private static void write(File file, List<String> lines) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (String line : lines) {
                 writer.write(line + "\n");

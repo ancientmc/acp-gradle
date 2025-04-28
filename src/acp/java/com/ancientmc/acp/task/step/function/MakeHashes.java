@@ -57,7 +57,6 @@ public class MakeHashes extends Step {
         sources.forEach(src -> {
             String hash = getHash(src);
             String name = src.getAbsolutePath();
-            System.out.println(name);
             name = name.replace(".class", "")
                     .replace(sourceDirectory.getAbsolutePath() + File.separator, "")
                     .replace(File.separator, "/");
@@ -67,7 +66,6 @@ public class MakeHashes extends Step {
         resources.forEach(rs -> {
             String hash = getHash(rs);
             String name = rs.getAbsolutePath();
-            System.out.println(name);
             name = name.replace(resourceDirectory.getAbsolutePath() + File.separator, "")
                     .replace(File.separator, "/");
             map.put(name, hash);

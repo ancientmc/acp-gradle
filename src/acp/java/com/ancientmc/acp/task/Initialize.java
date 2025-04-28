@@ -6,6 +6,7 @@ import com.ancientmc.acp.task.step.function.ResolveLibraries;
 import com.ancientmc.acp.task.step.function.ResolveTools;
 import com.ancientmc.acp.task.step.function.StartupMessage;
 import com.ancientmc.acp.task.step.io.*;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
@@ -25,8 +26,7 @@ public abstract class Initialize extends AcpTask {
         setLogger();
 
         try {
-            Step startupMessage = new StartupMessage(project, logger)
-                    .setMinecraftVersion(version)
+            Step startupMessage = new StartupMessage(project, version, logger)
                     .setCondition(!project.file(Paths.DIR_CFG).exists() && !project.file(Paths.DIR_RUN).exists());
             startupMessage.exec();
 
@@ -56,12 +56,12 @@ public abstract class Initialize extends AcpTask {
 
             Step resolveLibraries = new ResolveLibraries(project, logger, "Resolving Minecraft libraries")
                     .setLibraries(Json.getLibraries(Arrays.asList(project.file(Paths.JSON), project.file(Paths.DIR_CFG + "jardep.json"))))
-                    .setCondition(Util.dependencyCondition(project, "runtimeClasspath"));
+                    .setCondition(FileUtil.dependencyCondition(project, "runtimeClasspath"));
             resolveLibraries.exec();
 
             Step resolveTools = new ResolveTools(project, logger, "Resolving ACP tools")
                     .setTools(Json.getTools(project.file(Paths.TOOLS_JSON)))
-                    .setCondition(Util.dependencyCondition(project, "fernflower"));
+                    .setCondition(FileUtil.dependencyCondition(project, "fernflower"));
             resolveTools.exec();
 
             Step extractNatives = new ExtractNatives(project, logger, "Extracting natives")
@@ -73,7 +73,7 @@ public abstract class Initialize extends AcpTask {
             Step downloadAssets = new DownloadAssets(project, logger, "Downloading assets")
                     .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
-                    .setCondition(Util.directoryCondition(project.file(Paths.DIR_ASSETS)));
+                    .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_ASSETS)));
             downloadAssets.exec();
 
             Step downloadClient = new DownloadJar(project, logger, "Downloading client JAR")

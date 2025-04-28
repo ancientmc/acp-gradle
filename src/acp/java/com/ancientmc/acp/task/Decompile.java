@@ -1,11 +1,10 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.task.step.io.*;
 import com.ancientmc.acp.task.step.function.*;
-import com.ancientmc.acp.task.step.io.CopyFile;
-import com.ancientmc.acp.task.step.io.ExtractFile;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Paths;
-import com.ancientmc.acp.util.Util;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
@@ -76,8 +75,8 @@ public abstract class Decompile extends AcpTask {
         Step unzip = new ExtractFile(project, logger, "Unzipping Minecraft's sources")
                 .setInput(project.file(Paths.FINAL_JAR))
                 .setOutput(project.file(Paths.DIR_SRC))
-                .setCondition(Util.directoryCondition(project.file(Paths.DIR_SRC + "com/mojang/minecraft/"))
-                        || Util.directoryCondition(project.file(Paths.DIR_SRC + "net/minecraft/")));
+                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_SRC + "com/mojang/minecraft/"))
+                        || FileUtil.directoryCondition(project.file(Paths.DIR_SRC + "net/minecraft/")));
         unzip.exec();
 
         Step patch = new JavaExecStep(project, logger, "Patching source files")
@@ -92,20 +91,20 @@ public abstract class Decompile extends AcpTask {
                 .setInput(project.file(Paths.EXTRA_JAR))
                 .setOutput(project.file(Paths.DIR_RESOURCES))
                 .setExclusions(Arrays.asList("com/jcraft/**", "paulscode/**", "META-INF/**"))
-                .setCondition(Util.directoryCondition(project.file(Paths.DIR_RESOURCES)));
+                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_RESOURCES)));
         extractResources.exec();
 
         Step backupSrc = new CopyFile(project, logger, "Backing up source files")
                 .setInput(project.file(Paths.DIR_SRC))
                 .setOutput(project.file(Paths.DIR_VANILLA_SRC))
                 .setExclusions("acp/")
-                .setCondition(Util.directoryCondition(project.file(Paths.DIR_VANILLA_SRC)));
+                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_SRC)));
         backupSrc.exec();
 
         Step backupResources = new CopyFile(project, logger, "Backing up JAR resources")
                 .setInput(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.DIR_VANILLA_RESOURCES))
-                .setCondition(Util.directoryCondition(project.file(Paths.DIR_VANILLA_RESOURCES)));
+                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_RESOURCES)));
         backupResources.exec();
 
         Step vanillaCompile = new JavaCompileStep(project, logger, "Recompiling the game")
@@ -113,7 +112,7 @@ public abstract class Decompile extends AcpTask {
                 .setClasspathCollection(project.getExtensions().getByType(SourceSetContainer.class).named("main").get().getCompileClasspath())
                 .setNativesDirectory(project.file(Paths.DIR_NATIVES))
                 .setOutputDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
-                .setCondition(Util.directoryCondition(project.file(Paths.DIR_VANILLA_CLASSES)));
+                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_CLASSES)));
         vanillaCompile.exec();
 
         Step buildVanillaJar = new BuildJar(project, logger, "Rebuilding vanilla JAR")

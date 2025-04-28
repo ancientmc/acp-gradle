@@ -2,7 +2,6 @@ package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
-import org.gradle.api.DefaultTask;
 import org.gradle.api.Project;
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.tasks.Input;

@@ -9,6 +9,9 @@ import org.gradle.api.artifacts.Dependency;
 import java.io.File;
 import java.util.Map;
 
+/**
+ * @author moist-mason
+ */
 public class ResolveTools extends Step {
 
     /**

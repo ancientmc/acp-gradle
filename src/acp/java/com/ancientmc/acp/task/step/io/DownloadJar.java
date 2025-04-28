@@ -26,7 +26,6 @@ public class DownloadJar extends DownloadFile {
     public void action() {
         try {
             File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
-
             logger.functions().urlToFile(input, jar);
             FileUtils.copyURLToFile(input, jar);
         } catch (IOException e) {

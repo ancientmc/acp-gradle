@@ -35,8 +35,7 @@ public class AcpPlugin implements Plugin<Project> {
         TaskProvider<BuildMod> buildMod = project.getTasks().register("buildMod", BuildMod.class);
         TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
         TaskProvider<JavaExec> runClient = project.getTasks().register("runClient", JavaExec.class);
-        TaskProvider<Clean> softClean = project.getTasks().register("softClean", Clean.class);
-        TaskProvider<Clean> hardClean = project.getTasks().register("hardClean", Clean.class);
+        TaskProvider<Clean> cleanup = project.getTasks().register("cleanup", Clean.class);
 
         List<String> configurations = Arrays.asList("jarsplitter", "mcinjector", "autorenamingtool", "fernflower", "diffpatch", "binpatch", "specialsource");
         configurations.forEach(cfg -> project.getConfigurations().create(cfg));
@@ -77,15 +76,9 @@ public class AcpPlugin implements Plugin<Project> {
             task.setSystemProperties(Collections.singletonMap("java.library.path", Paths.DIR_NATIVES));
         });
 
-        softClean.configure(task -> {
+        cleanup.configure(task -> {
             task.getPhase().set("clean");
             task.setDescription("Cleans directories of files relating to decompiling and mod building.");
-        });
-
-        hardClean.configure(task -> {
-            task.getPhase().set("clean");
-            task.setDescription("Same as softClean, but also deletes the 'cfg/' and 'run/' folders.");
-            task.getAdditionalPaths().set(Arrays.asList(Paths.DIR_CFG, Paths.DIR_RUN));
         });
 
         project.afterEvaluate(proj -> {

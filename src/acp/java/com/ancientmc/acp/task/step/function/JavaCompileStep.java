@@ -65,7 +65,15 @@ public class JavaCompileStep extends Step {
                 "-d", outputDirectory.getAbsolutePath()
         );
         System.setProperty("java.library.path", nativesDirectory.getAbsolutePath());
+        log(classpath, options);
         compiler.getTask(null, manager, null, options, null, sources).call();
+    }
+
+    public void log(String classpath, List<String> options) {
+        logger.file(project, "Source directory -> {}", sourceDirectory.getAbsolutePath());
+        logger.file(project, "Classpath -> {}", classpath);
+        logger.file(project, "Output directory -> {}", outputDirectory.getAbsolutePath());
+        logger.file(project, "Options -> {}", String.join(" ", options));
     }
 
     /**

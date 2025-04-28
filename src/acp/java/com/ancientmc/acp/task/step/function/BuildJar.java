@@ -48,6 +48,10 @@ public class BuildJar extends Step {
                 Files.createDirectories(output.getParentFile().toPath());
             }
 
+            logger.file(project, "Class directory -> {}", classDirectory.getAbsolutePath());
+            logger.file(project, "Resource directory -> {}", resourceDirectory.getAbsolutePath());
+            logger.file(project, "Output -> {}", output.getAbsolutePath());
+
             JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
             Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
             Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
@@ -67,9 +71,10 @@ public class BuildJar extends Step {
         }
     }
 
-    public static void addEntry(JarArchiveOutputStream out, File directory, File file) {
+    public void addEntry(JarArchiveOutputStream out, File directory, File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             String path = getPath(directory, file);
+            logger.file(project, "Entry -> {}", path);
             out.putArchiveEntry(new JarArchiveEntry(path));
             IOUtils.copy(in, out);
             in.close();

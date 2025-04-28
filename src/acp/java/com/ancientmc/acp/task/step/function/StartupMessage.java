@@ -19,11 +19,12 @@ public class StartupMessage extends Step {
     /**
      * The Minecraft version.
      */
-    private String minecraftVersion;
+    private final String minecraftVersion;
 
-    public StartupMessage(Project project, AcpLogger logger) {
+    public StartupMessage(Project project, String minecraftVersion, AcpLogger logger) {
         this.logger = logger;
         this.project = project;
+        this.minecraftVersion = minecraftVersion;
         this.message = getStartupMessage();
     }
 
@@ -60,10 +61,5 @@ public class StartupMessage extends Step {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public StartupMessage setMinecraftVersion(String minecraftVersion) {
-        this.minecraftVersion = minecraftVersion;
-        return this;
     }
 }

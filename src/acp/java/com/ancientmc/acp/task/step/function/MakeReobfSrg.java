@@ -28,6 +28,7 @@ public class MakeReobfSrg extends Step {
         File temp = project.file(Paths.DIR_TEMP + "temp.srg");
 
         try {
+            logger.functions().fileToFile(input, output);
             IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
             BufferedWriter writer = new BufferedWriter(new FileWriter(output));
             List<String> lines = Files.readAllLines(temp.toPath());

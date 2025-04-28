@@ -95,7 +95,7 @@ public class Json {
      * Gets a map of tools needed by ACP for its functions. The key is the gradle configuration for the tool, and the value is the tool's maven path.
      * @param json The JSON file the tools are parsed from. Stored in the ACP directory as 'gradle/tools.json'.
      * @return The map of tools.
-     * @throws IOException
+     * @throws IOException exception.
      */
     public static Map<String, String> getTools(File json) throws IOException {
         Map<String, String> tools = new HashMap<>();
