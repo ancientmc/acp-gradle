@@ -1,7 +1,7 @@
 [versions]
 commons-compress = "1.27.1"
 commons-io = "2.19.0"
-gson = "2.13.0"
+gson = "2.13.1"
 srgutils = "1.0.10"
 
 [libraries]

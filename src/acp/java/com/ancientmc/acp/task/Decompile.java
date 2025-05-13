@@ -125,8 +125,8 @@ public abstract class Decompile extends AcpTask {
         Step makeVanillaHashes = new MakeHashes(project, logger, "Generating vanilla hashes")
                 .setClassDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_VANILLA_RESOURCES))
-                .setOutput(project.file("build/modding/hashes/vanilla.md5"))
-                .setCondition(!project.file("build/modding/hashes/vanilla.md5").exists());
+                .setOutput(project.file(Paths.VANILLA_HASH_FILE))
+                .setCondition(!project.file(Paths.VANILLA_HASH_FILE).exists());
         makeVanillaHashes.exec();
 
         logger.write();

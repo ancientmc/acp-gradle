@@ -45,7 +45,7 @@ gradlePlugin {
     vcsUrl = 'https://github.com/ancientmc/acp-gradle'
     plugins.register('acp') {
         id = 'com.ancientmc.acp'
-        displayName = 'acp-gradle'
+        displayName = project.name
         description = 'Gradle plugin for Ancient Coder Pack (ACP) processes.'
         implementationClass = 'com.ancientmc.acp.AcpPlugin'
     }
@@ -60,7 +60,7 @@ jar {
     from sourceSets.acp.output
     manifest {
         attributes(
-                'Specification-Title': 'ACP Gradle',
+                'Specification-Title': project.name,
                 'Specification-Vendor': 'AncientMC',
                 'Specification-Version': archiveVersion,
                 'Implementation-Title': 'com.ancientmc:acp-gradle',

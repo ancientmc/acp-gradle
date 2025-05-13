@@ -43,6 +43,7 @@ public class JavaCompileStep extends Step {
         build(project, logger, message);
     }
 
+    @Override
     public void action() {
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         StandardJavaFileManager manager = compiler.getStandardFileManager(null, Locale.ENGLISH, Charset.defaultCharset());

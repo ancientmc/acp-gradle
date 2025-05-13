@@ -30,7 +30,7 @@ public class RepackageDefaults extends JavaExecStep {
     }
 
     @Override
-    public void action() {
+    public void action() throws IOException {
         super.action();
     }
 

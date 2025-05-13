@@ -4,8 +4,6 @@ import org.gradle.api.Project;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Contains methods for logger functions used several times.
@@ -27,7 +25,6 @@ public class LogFunctions {
         this.logger = logger;
         this.project = project;
     }
-
 
     /**
      * Used to print the input and output of a downloaded URL.

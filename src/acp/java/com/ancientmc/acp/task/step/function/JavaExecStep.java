@@ -37,7 +37,7 @@ public class JavaExecStep extends Step {
     }
 
     @Override
-    public void action() {
+    public void action() throws IOException {
         OutputStream out = new ByteArrayOutputStream();
 
         project.javaexec(action -> {
@@ -52,18 +52,14 @@ public class JavaExecStep extends Step {
             action.setStandardOutput(out);
         });
 
-        try {
-            out.flush();
-            out.close();
-            log(configuration.getName(), out.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        out.flush();
+        out.close();
+        log(configuration.getName(), out.toString());
     }
 
     public void log(String tool, String out) {
         logger.file(project, "Tool -> {}", tool);
-        logger.file(project, "Output -> {}", "\n");
+        logger.file(project, "Output ->");
         List<String> elements = Arrays.asList(out.split("\n"));
         elements.forEach(e -> logger.file(project, "\t\t" + e));
     }

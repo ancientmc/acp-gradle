@@ -2,6 +2,7 @@ package com.ancientmc.acp.util;
 
 /**
  * File containing all paths used by ACP.
+ * @author moist-mason
  */
 public class Paths {
 
@@ -20,12 +21,14 @@ public class Paths {
     public static final String DIR_SRC = "src/main/java/";
     public static final String DIR_RESOURCES = "src/main/resources";
     public static final String DIR_LOG = "log/";
-    public static final String DIR_VANILLA_SRC = "build/modding/vanillaFiles/src/";
-    public static final String DIR_VANILLA_CLASSES = "build/modding/vanillaFiles/classes/";
-    public static final String DIR_VANILLA_RESOURCES = "build/modding/vanillaFiles/resources/";
-    public static final String DIR_REOBF_CLASSES = "build/modding/moddedClasses/reobf/";
-    public static final String DIR_MODDED_CLASSES = "build/modding/moddedClasses/deobf/";
-    public static final String DIR_MODDED_PATCHES = "build/modding/patches/";
+    public static final String DIR_BUILD_VANILLA = "build/acp/vanilla/";
+    public static final String DIR_BUILD_MODDED = "build/acp/modded/";
+    public static final String DIR_VANILLA_SRC = DIR_BUILD_VANILLA + "src/";
+    public static final String DIR_VANILLA_CLASSES = DIR_BUILD_VANILLA + "classes/";
+    public static final String DIR_VANILLA_RESOURCES = DIR_BUILD_VANILLA + "resources/";
+    public static final String DIR_REOBF_CLASSES = DIR_BUILD_MODDED + "classes/reobf/";
+    public static final String DIR_MODDED_CLASSES = DIR_BUILD_MODDED + "classes/deobf/";
+    public static final String DIR_MODDED_PATCHES = DIR_BUILD_MODDED + "patches/";
 
     /**
      * ACP files.
@@ -33,7 +36,9 @@ public class Paths {
     public static final String ACP_DATA = DIR_CFG + "data.zip";
     public static final String TOOLS_JSON = "gradle/tools.json";
     public static final String TSRG = DIR_CFG + "cuneiform.tsrg";
-    public static final String REOBF_SRG = "build/modding/reobf.srg";
+    public static final String REOBF_SRG = DIR_BUILD_MODDED + "reobf.srg";
+    public static final String VANILLA_HASH_FILE = DIR_BUILD_MODDED + "hashes/vanilla.md5";
+    public static final String MODDED_HASH_FILE = DIR_BUILD_MODDED + "hashes/modded.md5";
 
     /**
      * Minecraft files.
@@ -48,7 +53,7 @@ public class Paths {
     public static final String REPACKAGED_JAR = DIR_TEMP + "repackaged.jar";
     public static final String INJECT_JAR = DIR_TEMP + "inject.jar";
     public static final String FINAL_JAR = DIR_TEMP + "final.jar";
-    public static final String VANILLA_JAR = "build/modding/vanillaFiles/vanilla.jar";
-    public static final String INTERM_JAR = "build/libs/intermediate.jar";
-    public static final String REOBF_JAR = "build/libs/reobf.jar";
+    public static final String VANILLA_JAR = DIR_BUILD_VANILLA + "vanilla.jar";
+    public static final String INTERM_JAR = DIR_BUILD_MODDED + "jars/intermediate.jar";
+    public static final String REOBF_JAR = DIR_BUILD_MODDED + "jars/reobf.jar";
 }

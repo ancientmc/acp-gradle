@@ -41,14 +41,10 @@ public class MakeHashes extends Step {
     }
 
     @Override
-    public void action() {
-        try {
-            Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            write(sources, resources);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public void action() throws IOException {
+        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        write(sources, resources);
     }
 
     public void write(Collection<File> sources, Collection<File> resources) throws IOException {

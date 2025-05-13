@@ -6,16 +6,17 @@ import com.ancientmc.acp.task.step.function.ResolveLibraries;
 import com.ancientmc.acp.task.step.function.ResolveTools;
 import com.ancientmc.acp.task.step.function.StartupMessage;
 import com.ancientmc.acp.task.step.io.*;
-import com.ancientmc.acp.util.FileUtil;
-import com.ancientmc.acp.util.Json;
-import com.ancientmc.acp.util.Paths;
-import com.ancientmc.acp.util.Util;
+import com.ancientmc.acp.util.*;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Initializes the workspace.
+ * @author moist-mason
+ */
 public abstract class Initialize extends AcpTask {
 
     @TaskAction
@@ -90,7 +91,7 @@ public abstract class Initialize extends AcpTask {
 
             logger.write();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException(e.getMessage(), logger, project, e);
         }
     }
 }

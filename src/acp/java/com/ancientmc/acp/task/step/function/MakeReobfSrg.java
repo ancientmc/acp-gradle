@@ -24,32 +24,28 @@ public class MakeReobfSrg extends Step {
     }
 
     @Override
-    public void action() {
+    public void action() throws IOException {
         File temp = project.file(Paths.DIR_TEMP + "temp.srg");
 
-        try {
-            logger.functions().fileToFile(input, output);
-            IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(output));
-            List<String> lines = Files.readAllLines(temp.toPath());
+        logger.functions().fileToFile(input, output);
+        IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(output));
+        List<String> lines = Files.readAllLines(temp.toPath());
 
-            /*
-             * Adds lines to strip the package of any straggling classes with the "net/minecraft/src" or the "com/mojang/minecraft/src/" packages.
-             * Since the vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
-             * into the /src/ path.
-             */
-            writer.write("PK: net/minecraft/src .\n");
-            writer.write("PK: com/mojang/minecraft/src .\n");
+        /*
+         * Adds lines to strip the package of any straggling classes with the "net/minecraft/src" or the "com/mojang/minecraft/src/" packages.
+         * Since the vanilla classes are already accounted for in the SRG, by process of elimination this leaves mod classes who get put
+         * into the /src/ path.
+         */
+        writer.write("PK: net/minecraft/src .\n");
+        writer.write("PK: com/mojang/minecraft/src .\n");
 
-            for(String line : lines) {
-                writer.write(line + "\n");
-            }
-
-            writer.close();
-            FileUtils.forceDelete(temp);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        for(String line : lines) {
+            writer.write(line + "\n");
         }
+
+        writer.close();
+        FileUtils.forceDelete(temp);
     }
 
     public MakeReobfSrg setInput(File input) {

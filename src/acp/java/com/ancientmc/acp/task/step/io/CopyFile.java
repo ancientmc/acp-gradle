@@ -36,13 +36,9 @@ public class CopyFile extends Step {
     }
 
     @Override
-    public void action() {
-        try {
-            if (!output.exists()) {
-                Files.createDirectories(output.toPath());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void action() throws IOException {
+        if (!output.exists()) {
+            Files.createDirectories(output.toPath());
         }
 
         logger.functions().fileToFile(input, output);

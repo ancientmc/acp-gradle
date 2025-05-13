@@ -42,7 +42,7 @@ public class InjectBinPatches extends Step {
     protected File patchDirectory;
 
     @Override
-    public void action() {
+    public void action() throws IOException {
         List<File> files = getFiles(patchDirectory);
 
         files.forEach(lzma -> {
@@ -57,11 +57,7 @@ public class InjectBinPatches extends Step {
             });
         });
 
-        try {
-            FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        FileUtils.deleteDirectory(project.file(Paths.DIR_TEMP + "modjars/"));
     }
 
     /**

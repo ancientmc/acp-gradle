@@ -19,6 +19,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Utility class for file-related functions.
+ * @author moist-mason
+ */
 public class FileUtil {
 
     /**

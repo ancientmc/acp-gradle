@@ -37,24 +37,20 @@ public class ExtractNatives extends Step {
      * from their JAR files into the output folder.
      */
     @Override
-    public void action() {
-        try {
-            List<File> jars = new ArrayList<>();
+    public void action() throws IOException {
+        List<File> jars = new ArrayList<>();
 
-            for (URL url : urls) {
-                String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-                FileUtils.copyURLToFile(url, new File(output, path));
-                jars.add(new File(output, path));
-            }
-
-            jars.forEach(jar -> project.copy(action -> {
-                logger.functions().fileToFile(jar, output);
-                action.from(project.zipTree(jar));
-                action.into(project.file(output));
-            }));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        for (URL url : urls) {
+            String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
+            FileUtils.copyURLToFile(url, new File(output, path));
+            jars.add(new File(output, path));
         }
+
+        jars.forEach(jar -> project.copy(action -> {
+            logger.functions().fileToFile(jar, output);
+            action.from(project.zipTree(jar));
+            action.into(project.file(output));
+        }));
     }
 
     public ExtractNatives setUrls(List<URL> urls) {

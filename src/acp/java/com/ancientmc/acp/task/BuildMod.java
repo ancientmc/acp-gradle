@@ -20,7 +20,7 @@ public abstract class BuildMod extends AcpTask {
     public void exec() {
         Project project = getProject();
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
-        String lzmaPath = "build/modding/patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
+        String lzmaPath = Paths.DIR_BUILD_MODDED + "patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
         setLogger();
 
         Step moddedCompile = new JavaCompileStep(project, logger, "Compiling the game")
@@ -75,7 +75,7 @@ public abstract class BuildMod extends AcpTask {
         Step makeModdedHashes = new MakeHashes(project, logger, "Generating modded hashes")
                 .setClassDirectory(project.file(Paths.DIR_MODDED_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
-                .setOutput(project.file("build/modding/hashes/modded.md5"))
+                .setOutput(project.file(Paths.MODDED_HASH_FILE))
                 .setCondition(true);
         makeModdedHashes.exec();
 
@@ -83,9 +83,11 @@ public abstract class BuildMod extends AcpTask {
                 .setSrg(project.file(Paths.TSRG))
                 .setObfDirectory(project.file(Paths.DIR_REOBF_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
-                .setHashDirectory(project.file("build/modding/hashes"))
-                .setArchiveDirectory(project.file("build/modding/archives/" + extension.getModName().get() + "/"))
+                .setHashDirectory(project.file(Paths.DIR_BUILD_MODDED + "hashes/"))
+                .setArchiveDirectory(project.file(Paths.DIR_BUILD_MODDED + "archives/" + extension.getModName().get() + "/"))
                 .setCondition(true);
         makeArchives.exec();
+
+        logger.write();
     }
 }

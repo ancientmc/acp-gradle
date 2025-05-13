@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.AcpException;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
@@ -42,33 +43,29 @@ public class BuildJar extends Step {
     }
 
     @Override
-    public void action() {
-        try {
-            if (!output.getParentFile().exists()) {
-                Files.createDirectories(output.getParentFile().toPath());
-            }
-
-            logger.file(project, "Class directory -> {}", classDirectory.getAbsolutePath());
-            logger.file(project, "Resource directory -> {}", resourceDirectory.getAbsolutePath());
-            logger.file(project, "Output -> {}", output.getAbsolutePath());
-
-            JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
-            Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-            Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-
-            if (!classes.isEmpty()) {
-                classes.forEach(cls -> addEntry(out, classDirectory, cls));
-            }
-
-            if (!resources.isEmpty()) {
-                resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
-            }
-
-            out.finish();
-            out.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void action() throws IOException {
+        if (!output.getParentFile().exists()) {
+            Files.createDirectories(output.getParentFile().toPath());
         }
+
+        logger.file(project, "Class directory -> {}", classDirectory.getAbsolutePath());
+        logger.file(project, "Resource directory -> {}", resourceDirectory.getAbsolutePath());
+        logger.file(project, "Output -> {}", output.getAbsolutePath());
+
+        JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
+        Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+
+        if (!classes.isEmpty()) {
+            classes.forEach(cls -> addEntry(out, classDirectory, cls));
+        }
+
+        if (!resources.isEmpty()) {
+            resources.forEach(rs -> addEntry(out, resourceDirectory, rs));
+        }
+
+        out.finish();
+        out.close();
     }
 
     public void addEntry(JarArchiveOutputStream out, File directory, File file) {
@@ -81,7 +78,7 @@ public class BuildJar extends Step {
             out.closeArchiveEntry();
             out.flush();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException(e.getMessage(), logger, project, e);
         }
     }
 

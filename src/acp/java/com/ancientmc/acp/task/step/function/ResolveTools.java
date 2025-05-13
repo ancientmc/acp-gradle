@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
@@ -17,7 +18,7 @@ public class ResolveTools extends Step {
     /**
      * The tool map. Retrieved from a function in the JSON utility class. They key is the tool's configuration, while the
      * value is the tool's maven path.
-     * @see com.ancientmc.acp.util.Json#getTools(File)
+     * @see Json#getTools(File)
      */
     private Map<String, String> tools;
 

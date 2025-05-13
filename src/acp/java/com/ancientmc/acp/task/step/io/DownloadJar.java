@@ -23,22 +23,20 @@ public class DownloadJar extends DownloadFile {
      * Parses through the JSON file to find the jar URL. The URL is retrieved via a method in the Json utilities class.
      * @see Json#getJarUrl(File, String)
      */
-    public void action() {
-        try {
-            File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
-            logger.functions().urlToFile(input, jar);
-            FileUtils.copyURLToFile(input, jar);
-        } catch (IOException e) {
-            logger.error(project, e, "Download error.");
-            throw new RuntimeException(e);
-        }
+    @Override
+    public void action() throws IOException {
+        File jar = new File(output, input.getPath().contains("client") ? "client.jar" : "server.jar");
+        logger.functions().urlToFile(input, jar);
+        FileUtils.copyURLToFile(input, jar);
     }
 
+    @Override
     public DownloadJar setInput(URL input) {
         super.setInput(input);
         return this;
     }
 
+    @Override
     public DownloadJar setOutput(File output) {
         super.setOutput(output);
         return this;

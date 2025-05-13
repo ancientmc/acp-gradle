@@ -1,7 +1,10 @@
 package com.ancientmc.acp.task.step;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.util.AcpException;
 import org.gradle.api.Project;
+
+import java.io.IOException;
 
 /**
  * Base class for steps, which are essentially mini-functions that occur within Gradle tasks.
@@ -34,16 +37,22 @@ public abstract class Step {
      * action is performed.
      */
     public void exec() {
-        if (condition) {
-            logger.console(project, message);
-            action();
+        try {
+            if (condition) {
+                logger.console(project, message);
+                action();
+            } else {
+                logger.file(project, "Skipping {}", message);
+            }
+        } catch (IOException e) {
+            throw new AcpException(e.getMessage(), logger, project, e);
         }
     }
 
     /**
      * Performs the main action for this step.
      */
-    public abstract void action();
+    public abstract void action() throws IOException;
 
     protected Step build(Project project, AcpLogger logger, String message) {
         this.project = project;

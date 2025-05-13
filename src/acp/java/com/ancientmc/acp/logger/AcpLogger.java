@@ -21,27 +21,22 @@ public class AcpLogger {
     /**
      * The gradle project.
      */
-    public Project project;
-
-    /**
-     * The log file. A new file is created for every called logger instance.
-     */
-    public File file;
+    private final Project project;
 
     /**
      * The file writer.
      */
-    public Writer writer;
+    private final Writer writer;
 
     /**
      * The execution phase for ACP. Dependent on the task.
      */
-    public String phase;
+    private final String phase;
 
     /**
      * The lines that will be output into the log file.
      */
-    public List<String> lines;
+    private final List<String> lines;
 
     /**
      * ACP's namespace.
@@ -51,9 +46,8 @@ public class AcpLogger {
     public AcpLogger(String phase, Project project) {
         this.project = project;
         this.phase = phase;
-        this.file = getNewLogFile(phase);
         this.lines = new ArrayList<>();
-        this.writer = getWriter(file);
+        this.writer = getWriter(getNewLogFile(phase));
     }
 
     public Writer getWriter(File file) {
@@ -71,7 +65,7 @@ public class AcpLogger {
      * @param inputs Any additional inputs that are inserted into the message.
      */
     public void file(Project project, String message, String... inputs) {
-        log(project, phase, LogLevel.ALL, message, inputs);
+        log(project, phase, false, message, inputs);
     }
 
     /**
@@ -81,7 +75,7 @@ public class AcpLogger {
      * @param inputs Any additional inputs that are inserted into the message.
      */
     public void console(Project project, String message, String... inputs) {
-        log(project, phase, LogLevel.CONSOLE, message, inputs);
+        log(project, phase, true, message, inputs);
     }
 
     /**
@@ -91,8 +85,8 @@ public class AcpLogger {
      * @param message The error message.
      */
     public void error(Project project, Throwable throwable, String message) {
-        log(project, phase, LogLevel.CONSOLE, message, throwable.getLocalizedMessage());
-        log(project, phase, LogLevel.CONSOLE, "Stack trace -> {}", Arrays.toString(throwable.getStackTrace()));
+        log(project, phase, true, message, throwable.getLocalizedMessage());
+        log(project, phase, true, "Stack trace -> {}", Arrays.toString(throwable.getStackTrace()));
         write();
     }
 
@@ -100,10 +94,10 @@ public class AcpLogger {
         return new LogFunctions(this, project);
     }
 
-    private void log(Project project, String phase, LogLevel level, String message, String... data) {
+    private void log(Project project, String phase, boolean console, String message, String... data) {
         message = message.replace("{}", String.join(", ", data));
 
-        if (level.inConsole()) {
+        if (console) {
             print(project, phase, message);
         } else {
             message = "\t\t" + message; // Log file-only messages are indented twice.
@@ -169,21 +163,6 @@ public class AcpLogger {
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    enum LogLevel {
-        CONSOLE(true),
-        ALL(false);
-
-        private final boolean consoleOnly;
-
-        LogLevel(boolean console) {
-            this.consoleOnly = console;
-        }
-
-        public boolean inConsole() {
-            return consoleOnly;
         }
     }
 }

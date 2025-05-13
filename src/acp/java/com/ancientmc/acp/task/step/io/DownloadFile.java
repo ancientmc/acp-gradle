@@ -30,14 +30,9 @@ public class DownloadFile extends Step {
     }
 
     @Override
-    public void action() {
-        try {
-            logger.functions().urlToFile(input, output);
-            FileUtils.copyURLToFile(input, output);
-        } catch (IOException e) {
-            logger.error(project, e, "Download error.");
-            throw new RuntimeException(e);
-        }
+    public void action() throws IOException {
+        logger.functions().urlToFile(input, output);
+        FileUtils.copyURLToFile(input, output);
     }
 
     public DownloadFile setInput(URL input) {

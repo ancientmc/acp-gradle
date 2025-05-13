@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
@@ -43,24 +44,19 @@ public class DownloadAssets extends Step {
     }
 
     @Override
-    public void action() {
-        try {
-            if (!output.exists()) {
-                FileUtils.forceMkdir(output);
-            }
+    public void action() throws IOException {
+        if (!output.exists()) {
+            FileUtils.forceMkdir(output);
+        }
 
-            logger.file(project, "Json index -> {}", index.toString());
-            JsonObject indexObj = Json.get(index);
-            Map<String, String> assets = getAssets(indexObj);
-            List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
+        logger.file(project, "Json index -> {}", index.toString());
+        JsonObject indexObj = Json.get(index);
+        Map<String, String> assets = getAssets(indexObj);
+        List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
 
-            if (assets != null && omniArchiveAssets != null) {
-                logger.file(project, "Asset size -> {}", Integer.toString(assets.size() + omniArchiveAssets.size()));
-                download(assets, omniArchiveAssets, output);
-            }
-        } catch (IOException e) {
-            logger.error(project, e, "Asset download error.");
-            throw new RuntimeException(e);
+        if (assets != null && omniArchiveAssets != null) {
+            logger.file(project, "Asset size -> {}", Integer.toString(assets.size() + omniArchiveAssets.size()));
+            download(assets, omniArchiveAssets, output);
         }
     }
 
@@ -68,9 +64,8 @@ public class DownloadAssets extends Step {
      * Retrieves a hash map of all the assets.
      * @param index The asset index JSON object.
      * @return The assets as a map. The key is the name of the asset, while the value is its hash. Returns null if the index is empty.
-     * @throws IOException exception.
      */
-    public Map<String, String> getAssets(JsonObject index) throws IOException {
+    public Map<String, String> getAssets(JsonObject index) {
         Map<String, String> assets = new HashMap<>();
         JsonObject objects = index.getAsJsonObject("objects");
 
@@ -139,8 +134,7 @@ public class DownloadAssets extends Step {
                 logger.functions().urlToFile(url, file);
                 writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
             } catch (IOException e) {
-                logger.error(project, e, "File writing error.");
-                throw new RuntimeException(e);
+                throw new AcpException(e.getMessage(), logger, project, e);
             }
         });
     }

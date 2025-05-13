@@ -20,77 +20,74 @@ public class MakeArchives extends Step {
     /**
      * The TSRG file.
      */
-    protected File srg;
+    private File srg;
 
     /**
      * The directory containing our obfuscated class files (build/modding/reobfClasses/)
      */
-    protected File obfDirectory;
+    private File obfDirectory;
 
     /**
      * The directory containing our resources (src/main/resources/).
      */
-    protected File resourceDirectory;
+    private File resourceDirectory;
 
     /**
      * The directory containing our hash files.
      */
-    protected File hashDirectory;
+    private File hashDirectory;
 
     /**
      * The directory where the ZIP and TAR archives get put into.
      */
-    protected File archiveDirectory;
+    private File archiveDirectory;
 
     public MakeArchives(Project project, AcpLogger logger, String message) {
         build(project, logger, message);
     }
 
-    public void action() {
-        try {
-            if (!archiveDirectory.exists()) {
-                Files.createDirectories(archiveDirectory.toPath());
-            }
-
-            Map<String, String> vanillaMap = getHashMap(new File(hashDirectory, "vanilla.md5"));
-            Map<String, String> moddedMap = getHashMap(new File(hashDirectory, "modded.md5"));
-            Map<String, String> classMap = Util.getClassMap(srg);
-
-            // Remove ACP start classes from map.
-            List<Map.Entry<String, String>> entries = moddedMap.entrySet().stream()
-                    .filter(e -> e.getKey().startsWith("acp/client/")).toList();
-            entries.forEach(moddedMap.entrySet()::remove);
-
-            // key -> the file. value -> the file path.
-            Map<File, String> moddedFiles = new HashMap<>();
-
-            moddedMap.forEach((name, hash) -> {
-                if (!vanillaMap.containsValue(hash)) {
-                    if (name.startsWith("net/minecraft/") || (name.startsWith("com/mojang"))) {
-
-                        // For non-Minecraft classes, get the name without the package.
-                        String strippedName = name.substring(name.lastIndexOf('/') + 1);
-
-                        String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
-                        File moddedClass = project.file(obfDirectory.getPath() + "/" + className + ".class");
-                        moddedFiles.put(moddedClass, className + ".class");
-
-                    } else {
-
-                        // Add resources
-                        File moddedResource = project.file(resourceDirectory.getPath() + "/" + name);
-                        moddedFiles.put(moddedResource, name);
-                    }
-                }
-            });
-
-            // Mod version -> version in build.gradle or somewhere else defined by the end-user.
-            String version = project.getVersion().toString();
-
-            FileUtil.compress(moddedFiles, archiveDirectory, version);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    @Override
+    public void action() throws IOException {
+        if (!archiveDirectory.exists()) {
+            Files.createDirectories(archiveDirectory.toPath());
         }
+
+        Map<String, String> vanillaMap = getHashMap(new File(hashDirectory, "vanilla.md5"));
+        Map<String, String> moddedMap = getHashMap(new File(hashDirectory, "modded.md5"));
+        Map<String, String> classMap = Util.getClassMap(srg);
+
+        // Remove ACP start classes from map.
+        List<Map.Entry<String, String>> entries = moddedMap.entrySet().stream()
+                .filter(e -> e.getKey().startsWith("acp/client/")).toList();
+        entries.forEach(moddedMap.entrySet()::remove);
+
+        // key -> the file. value -> the file path.
+        Map<File, String> moddedFiles = new HashMap<>();
+
+        moddedMap.forEach((name, hash) -> {
+            if (!vanillaMap.containsValue(hash)) {
+                if (name.startsWith("net/minecraft/") || (name.startsWith("com/mojang"))) {
+
+                    // For non-Minecraft classes, get the name without the package.
+                    String strippedName = name.substring(name.lastIndexOf('/') + 1);
+
+                    String className = classMap.containsValue(name) ? getObfName(name, classMap) : strippedName;
+                    File moddedClass = project.file(obfDirectory.getPath() + "/" + className + ".class");
+                    moddedFiles.put(moddedClass, className + ".class");
+
+                } else {
+
+                    // Add resources
+                    File moddedResource = project.file(resourceDirectory.getPath() + "/" + name);
+                    moddedFiles.put(moddedResource, name);
+                }
+            }
+        });
+
+        // Mod version -> version in build.gradle or somewhere else defined by the end-user.
+        String version = project.getVersion().toString();
+
+        FileUtil.compress(moddedFiles, archiveDirectory, version);
     }
 
     /**

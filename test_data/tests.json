@@ -12,7 +12,7 @@
     },
     {
       "name": "classic_two",
-      "version": "c0.0.16a_02-081047",
+      "version": "c0.0.18a_02",
       "loader": "vanilla",
       "tasks": [
         { "name": "decompile" },
@@ -35,6 +35,7 @@
       "version": "a1.2.6-legacy",
       "loader": "risugami",
       "tasks": [
+        { "name": "downloadModLoader" },
         { "name": "decompile" },
         { "name": "injectMod" },
         { "name": "runClient" },
