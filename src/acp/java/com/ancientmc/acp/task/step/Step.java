@@ -38,12 +38,8 @@ public abstract class Step {
      */
     public void exec() {
         try {
-            if (condition) {
-                logger.console(project, message);
-                action();
-            } else {
-                logger.console(project, "SKIPPED " + message);
-            }
+            logger.console(project, message);
+            action();
         } catch (IOException e) {
             throw new AcpException(e.getMessage(), logger, project, e);
         }
