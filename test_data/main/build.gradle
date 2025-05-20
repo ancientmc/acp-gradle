@@ -4,11 +4,7 @@ buildscript {
         maven { url = 'https://maven.neoforged.net' }
     }
     dependencies {
-        classpath files('../../plugins/acp.jar')
-        classpath 'com.google.code.gson:gson:2.13.0'
-        classpath 'commons-io:commons-io:2.19.0'
-        classpath 'net.neoforged:srgutils:1.0.10'
-        classpath 'org.apache.commons:commons-compress:1.27.1'
+        classpath files('../../plugin/acp.jar')
     }
 }
 

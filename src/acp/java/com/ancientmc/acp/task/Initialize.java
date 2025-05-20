@@ -91,7 +91,7 @@ public abstract class Initialize extends AcpTask {
 
             logger.write();
         } catch (IOException e) {
-            throw new AcpException(e.getMessage(), logger, project, e);
+            throw new AcpException("Initialization error.", logger, project, e);
         }
     }
 }

@@ -86,8 +86,17 @@ public class AcpLogger {
      */
     public void error(Project project, Throwable throwable, String message) {
         log(project, phase, true, message, throwable.getLocalizedMessage());
-        log(project, phase, true, "Stack trace -> {}", Arrays.toString(throwable.getStackTrace()));
+        log(project, phase, true, "Stack trace -> {}", formatStackTrace(throwable.getStackTrace()));
         write();
+    }
+
+    public String formatStackTrace(StackTraceElement[] elements) {
+        List<String> list = new ArrayList<>();
+        for (StackTraceElement e : elements) {
+            list.add(e.toString());
+        }
+
+        return String.join("\n", list);
     }
 
     public LogFunctions functions() {

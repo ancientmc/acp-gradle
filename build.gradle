@@ -1,11 +1,12 @@
 plugins {
+    id 'com.gradleup.shadow' version '9.0.0-beta13'
     id 'java-library'
     id 'java-gradle-plugin'
     id 'maven-publish'
 }
 
 group 'com.ancientmc'
-version '0.4.0'
+version '0.4.0.B1'
 
 java {
     withSourcesJar()
@@ -15,7 +16,6 @@ java {
 
 repositories {
     mavenCentral()
-    mavenLocal()
     maven { url = 'https://maven.neoforged.net/' }
 }
 
@@ -37,7 +37,7 @@ dependencies {
     acpImplementation libs.srgutils
 
     testImplementation gradleTestKit()
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
+    testImplementation libs.junit.jupiter
 }
 
 gradlePlugin {
@@ -56,18 +56,25 @@ javadoc {
     destinationDir = project.file('build/docs/')
 }
 
+def meta = [
+        'Specification-Title': project.name,
+        'Specification-Vendor': 'AncientMC',
+        'Specification-Version': project.version,
+        'Implementation-Title': 'com.ancientmc:acp-gradle',
+        'Implementation-Vendor': 'AncientMC',
+        'Implementation-Version': project.version
+]
+
 jar {
     from sourceSets.acp.output
-    manifest {
-        attributes(
-                'Specification-Title': project.name,
-                'Specification-Vendor': 'AncientMC',
-                'Specification-Version': archiveVersion,
-                'Implementation-Title': 'com.ancientmc:acp-gradle',
-                'Implementation-Vendor': 'AncientMC',
-                'Implementation-Version': archiveVersion,
-        )
-    }
+    manifest { attributes (meta) }
+}
+
+shadowJar {
+    archiveFileName = 'acp.jar'
+    from sourceSets.acp.output
+    manifest { attributes (meta) }
+    destinationDirectory = file('acp_test/plugin/')
 }
 
 sourcesJar {
@@ -78,15 +85,8 @@ javadocJar {
     from javadoc.destinationDir
 }
 
-tasks.register('testJar', Copy) {
-    dependsOn jar
-    from jar
-    into('acp_test/plugins/')
-    rename { 'acp.jar' }
-}
-
 test {
-    dependsOn testJar
+    dependsOn shadowJar
     useJUnitPlatform()
 }
 

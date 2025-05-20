@@ -57,7 +57,7 @@ public class StartupMessage extends Step {
                 return manifest.getMainAttributes().getValue("Implementation-Version");
             }
 
-            return null;
+            return "unknown";
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

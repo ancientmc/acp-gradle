@@ -42,7 +42,7 @@ public abstract class Step {
                 logger.console(project, message);
                 action();
             } else {
-                logger.file(project, "Skipping {}", message);
+                logger.console(project, "SKIPPED " + message);
             }
         } catch (IOException e) {
             throw new AcpException(e.getMessage(), logger, project, e);

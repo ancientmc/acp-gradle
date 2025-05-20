@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class TestSetup {
+
     /**
      * Starts the setup for this test.
      * @param test The test object.

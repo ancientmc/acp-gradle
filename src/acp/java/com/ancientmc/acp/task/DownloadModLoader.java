@@ -39,8 +39,9 @@ public abstract class DownloadModLoader extends AcpTask {
             File output = new File(directory, "modloader.lzma");
             logger.functions().urlToFile(url, output);
             FileUtils.copyURLToFile(url, output);
+            logger.write();
         } catch (IOException e) {
-            throw new AcpException(e.getMessage(), logger, getProject(), e);
+            throw new AcpException("ModLoader download error.", logger, getProject(), e);
         }
     }
 
@@ -67,19 +68,8 @@ public abstract class DownloadModLoader extends AcpTask {
         return switch (loader) {
             case "forge" -> "net.minecraftforge:forge";
             case "risugami" -> "risugami:modloader";
-            default -> nullAndError(loader);
+            default -> throw new AcpException("Unrecognized mod loader", logger, getProject(), new IOException(""));
         };
-    }
-
-
-    /**
-     * Prints an error and returns null if the ModLoader type is not acceptable.
-     * @param loader The ModLoader type.
-     * @return null.
-     */
-    private String nullAndError(String loader) {
-        getLogger().error("Unrecognized mod loader: {}", loader);
-        return null;
     }
 
     /**
