@@ -38,8 +38,10 @@ public abstract class Step {
      */
     public void exec() {
         try {
-            logger.console(project, message);
-            action();
+            if (condition) {
+                logger.console(project, message);
+                action();
+            }
         } catch (IOException e) {
             throw new AcpException(e.getMessage(), logger, project, e);
         }
