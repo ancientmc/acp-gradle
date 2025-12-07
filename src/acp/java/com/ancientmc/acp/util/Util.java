@@ -2,6 +2,7 @@ package com.ancientmc.acp.util;
 
 import net.neoforged.srgutils.IMappingFile;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Configuration;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
@@ -52,6 +53,17 @@ public class Util {
         String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
         String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
         return Util.getUrl(repo + newPath);
+    }
+
+    /**
+     * Checks if a project configuration is empty, i.e. if its dependencies haven't been installed during the configuration phase.
+     * @param project The gradle project.
+     * @param name The name of the configuration.
+     * @return true if the configuration(s) is empty.
+     */
+    public static boolean dependencyCondition(Project project, String name) {
+        Configuration cfg = project.getConfigurations().named(name).get();
+        return cfg.getDependencies().isEmpty();
     }
 
     /**

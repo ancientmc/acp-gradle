@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -137,12 +136,12 @@ public class AcpLogger {
     }
 
     private String getTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
         return LocalTime.now().format(formatter);
     }
 
     private String getDateTime() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy.HH-mm-ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy.HH-mm-ss-SSS");
         return LocalDateTime.now().format(formatter);
     }
 

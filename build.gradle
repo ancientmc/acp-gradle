@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.ancientmc'
-version '0.4.0.B1'
+version '0.4.0.B2'
 
 java {
     withSourcesJar()
@@ -38,6 +38,7 @@ dependencies {
 
     testImplementation gradleTestKit()
     testImplementation libs.junit.jupiter
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 gradlePlugin {

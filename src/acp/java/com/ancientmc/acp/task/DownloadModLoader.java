@@ -1,6 +1,7 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.util.AcpException;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Util;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.file.DirectoryProperty;
@@ -31,9 +32,7 @@ public abstract class DownloadModLoader extends AcpTask {
             File directory = getOutputDir().getAsFile().get();
             String repo = Util.getAncientMcMaven();
 
-            if (!directory.exists()) {
-                FileUtils.forceMkdir(directory);
-            }
+            FileUtil.createDirectory(directory);
 
             URL url = getURL(repo, version, loader);
             File output = new File(directory, "modloader.lzma");
@@ -41,7 +40,7 @@ public abstract class DownloadModLoader extends AcpTask {
             FileUtils.copyURLToFile(url, output);
             logger.write();
         } catch (IOException e) {
-            throw new AcpException("ModLoader download error.", logger, getProject(), e);
+            throw new AcpException("Mod loader download error: ", logger, getProject(), e);
         }
     }
 

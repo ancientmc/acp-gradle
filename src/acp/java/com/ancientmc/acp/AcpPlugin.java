@@ -1,6 +1,7 @@
 package com.ancientmc.acp;
 
 import com.ancientmc.acp.task.*;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Paths;
 import com.ancientmc.acp.util.Util;
 import org.gradle.api.Plugin;
@@ -13,7 +14,6 @@ import org.gradle.api.tasks.compile.JavaCompile;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -96,9 +96,7 @@ public class AcpPlugin implements Plugin<Project> {
 
         dirs.forEach(dir -> {
             try {
-                if (!dir.exists()) {
-                    Files.createDirectories(dir.toPath());
-                }
+                FileUtil.createDirectory(dir);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

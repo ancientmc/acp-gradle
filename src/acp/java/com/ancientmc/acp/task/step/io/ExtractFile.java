@@ -2,9 +2,11 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,11 +26,14 @@ public class ExtractFile extends Step {
     private File output;
 
     /**
+     * Paths and files included in extraction.
+     */
+    private List<String> inclusions;
+
+    /**
      * Paths and files excluded from extraction.
      */
-    protected List<String> exclusions;
-
-    protected List<String> inclusions;
+    private List<String> exclusions;
 
     public ExtractFile(Project project, AcpLogger logger, String message) {
         build(project, logger, message);
@@ -38,7 +43,8 @@ public class ExtractFile extends Step {
      * Main extraction method. Uses Gradle's copy task and zip-tree function.
      */
     @Override
-    public void action() {
+    public void action() throws IOException {
+        FileUtil.createDirectory(output);
         logger.functions().fileToFile(input, output);
         project.copy(action -> {
             action.from(project.zipTree(input));
@@ -64,13 +70,13 @@ public class ExtractFile extends Step {
         return this;
     }
 
-    public ExtractFile setExclusions(List<String> exclusions) {
-        this.exclusions = exclusions;
+    public ExtractFile setInclusions(List<String> inclusions) {
+        this.inclusions = inclusions;
         return this;
     }
 
-    public ExtractFile setInclusions(List<String> inclusions) {
-        this.inclusions = inclusions;
+    public ExtractFile setExclusions(List<String> exclusions) {
+        this.exclusions = exclusions;
         return this;
     }
 }

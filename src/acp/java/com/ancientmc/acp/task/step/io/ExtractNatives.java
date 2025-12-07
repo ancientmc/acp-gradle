@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Extracts native libraries required for Minecraft to run into the designated folder.
+ * @author moist-mason
  */
 public class ExtractNatives extends Step {
 

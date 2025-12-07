@@ -13,6 +13,7 @@ import java.util.Arrays;
 
 /**
  * Builds the mod's files for distribution: DiffPatches, LZMA binary patches, and ZIPs/TARs containing compiled classes.
+ * @author moist-mason
  */
 public abstract class BuildMod extends AcpTask {
 
@@ -28,7 +29,7 @@ public abstract class BuildMod extends AcpTask {
                 .setClasspathCollection(project.getExtensions().getByType(SourceSetContainer.class).named("main").get().getCompileClasspath())
                 .setNativesDirectory(project.file(Paths.DIR_NATIVES))
                 .setOutputDirectory(project.file(Paths.DIR_MODDED_CLASSES))
-                .setCondition(true);
+                .setCondition(true); // Most of the conditionals in this task are true to ensure the build process occurs with every change a user makes to their mod.
         moddedCompile.exec();
 
         Step makeDiffPatches = new JavaExecStep(project, logger, "Making DIFF patches")

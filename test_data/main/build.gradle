@@ -41,11 +41,11 @@ tasks.named('runClient')
 tasks.named('buildMod')
 
 tasks.register('injectMod') {
-    def files = files('mod_files').asFileTree
+    def files = files('test_data/ruby/').asFileTree
     files.each { file ->
         project.copy {
             def type = 'src/main/' + file.name.endsWith('.java') ? 'java/' : 'resources/'
-            def parent = project.file('mod_files/' + type).toPath().relativize(file.parentFile.toPath()).toString().replace(File.separator, '/')
+            def parent = project.file('test_data/ruby/' + type).toPath().relativize(file.parentFile.toPath()).toString().replace(File.separator, '/')
             from (file.absolutePath)
             into (project.file(type + '/' + parent))
         }

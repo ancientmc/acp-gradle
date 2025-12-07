@@ -9,7 +9,6 @@ import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
 
-import java.io.File;
 import java.util.Arrays;
 
 /**
@@ -31,9 +30,8 @@ public abstract class Decompile extends AcpTask {
         splitJar.exec();
 
         String toInject = Paths.SLIM_JAR;
-        File modPatches = project.file(Paths.DIR_MODPATCHES);
 
-        if (modPatches.exists()) {
+        if (project.file(Paths.DIR_MODPATCHES).exists()) {
             Step injectModPatches = new InjectBinPatches(project, logger, "Injecting mod loader and mod library patches")
                     .setInput(project.file(Paths.SLIM_JAR))
                     .setOutput(project.file(Paths.MODLOADER_JAR))

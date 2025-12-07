@@ -8,7 +8,6 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,10 +65,7 @@ public abstract class Clean extends AcpTask {
      * @return a list of every path whose content will be entirely deleted.
      */
     public static List<String> getUnfilteredPaths() {
-        return List.of(
-                Paths.DIR_RESOURCES,
-                "build/modding/"
-        );
+        return List.of(Paths.DIR_RESOURCES, Paths.DIR_BUILD_MODDED);
     }
 
     /**
@@ -78,11 +74,8 @@ public abstract class Clean extends AcpTask {
      * @return The inputs.
      */
     public static Map<String, FileFilter> getFilteredPaths() {
-        Map<String, FileFilter> inputs = new HashMap<>();
-        inputs.put(Paths.DIR_SRC, SRC_FILTER);
-        inputs.put(Paths.DIR_TEMP, TEMP_FILTER);
-        inputs.put(Paths.DIR_RUN, RUN_FILTER);
-
-        return inputs;
+        return Map.of(Paths.DIR_SRC, SRC_FILTER,
+                Paths.DIR_TEMP, TEMP_FILTER,
+                Paths.DIR_RUN, RUN_FILTER);
     }
 }

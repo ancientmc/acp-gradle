@@ -48,9 +48,7 @@ public class MakeArchives extends Step {
 
     @Override
     public void action() throws IOException {
-        if (!archiveDirectory.exists()) {
-            Files.createDirectories(archiveDirectory.toPath());
-        }
+        FileUtil.createDirectory(archiveDirectory);
 
         Map<String, String> vanillaMap = getHashMap(new File(hashDirectory, "vanilla.md5"));
         Map<String, String> moddedMap = getHashMap(new File(hashDirectory, "modded.md5"));

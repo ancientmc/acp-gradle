@@ -57,12 +57,12 @@ public abstract class Initialize extends AcpTask {
 
             Step resolveLibraries = new ResolveLibraries(project, logger, "Resolving Minecraft libraries")
                     .setLibraries(Json.getLibraries(Arrays.asList(project.file(Paths.JSON), project.file(Paths.DIR_CFG + "jardep.json"))))
-                    .setCondition(FileUtil.dependencyCondition(project, "runtimeClasspath"));
+                    .setCondition(Util.dependencyCondition(project, "runtimeClasspath"));
             resolveLibraries.exec();
 
             Step resolveTools = new ResolveTools(project, logger, "Resolving ACP tools")
                     .setTools(Json.getTools(project.file(Paths.TOOLS_JSON)))
-                    .setCondition(FileUtil.dependencyCondition(project, "fernflower"));
+                    .setCondition(Util.dependencyCondition(project, "fernflower"));
             resolveTools.exec();
 
             Step extractNatives = new ExtractNatives(project, logger, "Extracting natives")
@@ -74,7 +74,8 @@ public abstract class Initialize extends AcpTask {
             Step downloadAssets = new DownloadAssets(project, logger, "Downloading assets")
                     .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
-                    .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_ASSETS)));
+                    .setCondition(Json.areAssetsPresent(project.file(Paths.JSON)) &&
+                            FileUtil.directoryCondition(project.file(Paths.DIR_ASSETS)));
             downloadAssets.exec();
 
             Step downloadClient = new DownloadJar(project, logger, "Downloading client JAR")

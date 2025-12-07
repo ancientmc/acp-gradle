@@ -3,6 +3,7 @@ package com.ancientmc.acp.task.step.io;
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.AcpException;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
@@ -45,9 +46,7 @@ public class DownloadAssets extends Step {
 
     @Override
     public void action() throws IOException {
-        if (!output.exists()) {
-            FileUtils.forceMkdir(output);
-        }
+        FileUtil.createDirectory(output);
 
         logger.file(project, "Json index -> {}", index.toString());
         JsonObject indexObj = Json.get(index);
@@ -127,9 +126,7 @@ public class DownloadAssets extends Step {
                 URL url = Util.getUrl(domain + path);
                 File file = new File(directory, key);
 
-                if (!file.getParentFile().exists()) {
-                    FileUtils.forceMkdir(file.getParentFile());
-                }
+                FileUtil.createDirectory(file.getParentFile());
 
                 logger.functions().urlToFile(url, file);
                 writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));

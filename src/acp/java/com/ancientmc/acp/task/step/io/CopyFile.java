@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -37,9 +38,7 @@ public class CopyFile extends Step {
 
     @Override
     public void action() throws IOException {
-        if (!output.exists()) {
-            Files.createDirectories(output.toPath());
-        }
+        FileUtil.createDirectory(output);
 
         logger.functions().fileToFile(input, output);
         project.copy(c -> {

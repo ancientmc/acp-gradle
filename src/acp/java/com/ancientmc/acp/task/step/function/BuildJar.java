@@ -3,6 +3,7 @@ package com.ancientmc.acp.task.step.function;
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.AcpException;
+import com.ancientmc.acp.util.FileUtil;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
 import org.apache.commons.compress.archivers.jar.JarArchiveOutputStream;
 import org.apache.commons.io.FileUtils;
@@ -15,7 +16,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collection;
 
 /**
@@ -44,9 +44,7 @@ public class BuildJar extends Step {
 
     @Override
     public void action() throws IOException {
-        if (!output.getParentFile().exists()) {
-            Files.createDirectories(output.getParentFile().toPath());
-        }
+        FileUtil.createDirectory(output.getParentFile());
 
         logger.file(project, "Class directory -> {}", classDirectory.getAbsolutePath());
         logger.file(project, "Resource directory -> {}", resourceDirectory.getAbsolutePath());

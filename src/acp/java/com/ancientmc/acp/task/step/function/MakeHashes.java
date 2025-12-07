@@ -2,6 +2,8 @@ package com.ancientmc.acp.task.step.function;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.AcpException;
+import com.ancientmc.acp.util.FileUtil;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -67,9 +69,7 @@ public class MakeHashes extends Step {
             map.put(name, hash);
         });
 
-        if (!output.getParentFile().exists()) {
-            Files.createDirectories(output.getParentFile().toPath());
-        }
+        FileUtil.createDirectory(output.getParentFile());
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
             logger.file(project, "Hash file -> {}", output.getAbsolutePath());
@@ -81,17 +81,17 @@ public class MakeHashes extends Step {
                 writer.flush();
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException("File writing error: ", logger, project, e);
         }
     }
 
-    public static String getHash(File file) {
+    public String getHash(File file) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] bytes = md.digest(Files.readAllBytes(file.toPath()));
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException("Hash generation error: ", logger, project, e);
         }
     }
 

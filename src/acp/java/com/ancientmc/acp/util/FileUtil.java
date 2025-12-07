@@ -7,8 +7,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.gradle.api.Project;
-import org.gradle.api.artifacts.Configuration;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,15 +84,16 @@ public class FileUtil {
         gzipOut.close();
     }
 
+
     /**
-     * Checks if a project configuration is empty, i.e. if its dependencies haven't been installed during the configuration phase.
-     * @param project The gradle project.
-     * @param name The name of the configuration.
-     * @return true if the configuration(s) is empty.
+     * Checks if a directory exists, and creates it if not.
+     * @param directory The directory being created.
+     * @throws IOException
      */
-    public static boolean dependencyCondition(Project project, String name) {
-        Configuration cfg = project.getConfigurations().named(name).get();
-        return cfg.getDependencies().isEmpty();
+    public static void createDirectory(File directory) throws IOException {
+        if (!directory.exists()) {
+            Files.createDirectories(directory.toPath());
+        }
     }
 
     /**

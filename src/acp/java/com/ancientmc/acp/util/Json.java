@@ -151,6 +151,19 @@ public class Json {
         return Util.getUrl(jsonObj.getAsJsonObject("assetIndex").get("url").getAsString());
     }
 
+
+    /**
+     * This is called when a version's asset index's collection of hash values are filled. This isn't the case for older versions.
+     * OmniArchive uses empty JSON files for versions with no sounds (and therefore no assets to pull from).
+     * @param json The version JSON file.
+     * @return true if the asset index file has objects.
+     */
+    public static boolean areAssetsPresent(File json) throws IOException {
+        URL indexUrl = getAssetIndexUrl(json);
+        JsonObject assetIndex = get(indexUrl);
+        return !assetIndex.getAsJsonObject("objects").isEmpty();
+    }
+
     /**
      * Gets the URL for Minecraft's JAR file(s).
      * @param json The Minecraft Version JSON.
