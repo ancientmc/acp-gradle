@@ -84,7 +84,6 @@ public class FileUtil {
         gzipOut.close();
     }
 
-
     /**
      * Checks if a directory exists, and creates it if not.
      * @param directory The directory being created.

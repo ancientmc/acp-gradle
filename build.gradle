@@ -94,7 +94,7 @@ test {
 tasks.withType(Test).configureEach {
     testLogging {
         showExceptions true
-        exceptionFormat "full"
+        exceptionFormat 'full'
         showCauses true
         showStackTraces true
     }

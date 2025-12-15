@@ -36,6 +36,7 @@ public class AcpPlugin implements Plugin<Project> {
         TaskProvider<DownloadModLoader> downloadModLoader = project.getTasks().register("downloadModLoader", DownloadModLoader.class);
         TaskProvider<JavaExec> runClient = project.getTasks().register("runClient", JavaExec.class);
         TaskProvider<Clean> cleanup = project.getTasks().register("cleanup", Clean.class);
+        TaskProvider<ListSupportedVersions> supportedVersions = project.getTasks().register("supportedVersions", ListSupportedVersions.class);
 
         List<String> configurations = Arrays.asList("jarsplitter", "mcinjector", "autorenamingtool", "fernflower", "diffpatch", "binpatch", "specialsource");
         configurations.forEach(cfg -> project.getConfigurations().create(cfg));
@@ -79,6 +80,12 @@ public class AcpPlugin implements Plugin<Project> {
         cleanup.configure(task -> {
             task.getPhase().set("clean");
             task.setDescription("Cleans directories of files relating to decompiling and mod building.");
+        });
+
+        supportedVersions.configure(task -> {
+            task.getPhase().set("versions");
+            task.getXmlUrl().set("https://raw.githubusercontent.com/ancientmc/ancientmc-maven/refs/heads/maven/com/ancientmc/versions/maven-metadata.xml");
+            task.setDescription("Shows supported versions that ACP can decompile and recompile.");
         });
 
         project.afterEvaluate(proj -> {

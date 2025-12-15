@@ -29,6 +29,9 @@ public class AcpTest {
     @Test public void testAlphaLegacyVanilla() { doTest("legacyAlpha_vanilla"); }
     @Test public void testAlphaLegacyModded() { doTest("legacyAlpha_modded"); }
 
+    // Non-version-specific tasks
+    @Test public void testSupportVersionsTask() { doTest("supported_versions"); }
+    @Test public void testCleanupTask() { doTest("cleanup"); }
 
     public void doTest(String name) {
         TestObject test = getTest(name);
@@ -41,6 +44,8 @@ public class AcpTest {
         File testDir = new File(TestPaths.ROOT_TEST_DIR, test.name());
 
         test.tasks().forEach(task -> {
+            System.out.println("> Running task " + task);
+
             BuildResult result = GradleRunner.create()
                     .withProjectDir(testDir)
                     .withPluginClasspath()
@@ -53,6 +58,8 @@ public class AcpTest {
                 assertTrue(outcomes.stream().anyMatch(outcome -> outcome == result.task(":" + task).getOutcome()));
                 System.out.println("> Task " + task + " successful");
             }
+
+            System.out.println("> OUTPUT:\n" + result.getOutput());
         });
     }
 

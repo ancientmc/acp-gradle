@@ -41,6 +41,23 @@
         { "name": "runClient" },
         { "name": "buildMod" }
       ]
+    },
+    {
+      "name": "cleanup",
+      "version": "c0.0.13a_03",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "cleanup" }
+      ]
+    },
+    {
+      "name": "supported_versions",
+      "version": "c0.0.13a_03",
+      "loader": "vanilla",
+      "tasks": [
+        { "name":  "supportedVersions" }
+      ]
     }
   ]
 }
