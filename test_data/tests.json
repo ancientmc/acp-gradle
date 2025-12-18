@@ -12,7 +12,7 @@
     },
     {
       "name": "classic_two",
-      "version": "c0.0.18a_02",
+      "version": "c0.0.20a_02",
       "loader": "vanilla",
       "tasks": [
         { "name": "decompile" },

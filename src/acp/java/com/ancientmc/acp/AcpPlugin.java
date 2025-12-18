@@ -11,6 +11,9 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.jvm.toolchain.JavaLanguageVersion;
+import org.gradle.jvm.toolchain.JavaLauncher;
+import org.gradle.jvm.toolchain.JavaToolchainService;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,9 +44,16 @@ public class AcpPlugin implements Plugin<Project> {
         List<String> configurations = Arrays.asList("jarsplitter", "mcinjector", "autorenamingtool", "fernflower", "diffpatch", "binpatch", "specialsource");
         configurations.forEach(cfg -> project.getConfigurations().create(cfg));
 
-        // Set Minecraft to compile against Java 8.
-        project.getTasks().named("compileJava", JavaCompile.class).configure(task -> {
-            task.getOptions().setCompilerArgs(Arrays.asList("-g:none", "-source", "8", "-target", "8"));
+        // Set Minecraft to run and compile against Java 8. This avoids any issues that come with running Minecraft on newer JDKs, such as wonky window sizes.
+        // This is only in relation to Gradle tasks (javaexec, compileJava). When ACP compiles Minecraft's code during the decompile and buildMod tasks,
+        // it still uses Java 21, but its source and target compatibilities are set to Java 8.
+        JavaToolchainService toolchains = project.getExtensions().getByType(JavaToolchainService.class);
+        project.getTasks().withType(JavaCompile.class).configureEach(task -> {
+            task.getJavaCompiler().set(toolchains.compilerFor(spec -> spec.getLanguageVersion().set(JavaLanguageVersion.of(8))));
+        });
+
+        project.getTasks().withType(JavaExec.class).configureEach(task -> {
+            task.getJavaLauncher().set(toolchains.launcherFor(spec -> spec.getLanguageVersion().set(JavaLanguageVersion.of(8))));
         });
 
         initialize.configure(task -> {
