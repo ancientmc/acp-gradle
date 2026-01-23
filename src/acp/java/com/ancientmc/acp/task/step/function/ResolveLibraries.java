@@ -26,7 +26,7 @@ public class ResolveLibraries extends Step {
      * A list of all of Minecraft's libraries get parsed through and resolved via a Gradle listener.
      */
     public ResolveLibraries(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
@@ -35,6 +35,7 @@ public class ResolveLibraries extends Step {
 
         libraries.forEach(lib -> {
             Dependency dependency = project.getDependencies().create(lib);
+
             if (!dependencies.contains(dependency)) {
                 logger.functions().resolve(lib);
                 dependencies.add(dependency);

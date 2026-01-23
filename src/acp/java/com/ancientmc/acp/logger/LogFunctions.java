@@ -1,5 +1,6 @@
 package com.ancientmc.acp.logger;
 
+import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -31,8 +32,19 @@ public class LogFunctions {
      * @param input The URL.
      * @param output The downloaded file.
      */
-    public void urlToFile(URL input, File output) {
+    public void download(URL input, File output) {
         io(input.toString(), output.getAbsolutePath());
+        success(output.exists(), "Downloaded successfully");
+    }
+
+    public void copy(File input, File output) {
+        fileToFile(input, output);
+        success(output.exists(), "Copied successfully");
+    }
+
+    public void extract(File input, File output) {
+        fileToFile(input, output);
+        success(!FileUtil.directoryCondition(output), "Extracted successfully");
     }
 
     /**
@@ -59,5 +71,15 @@ public class LogFunctions {
     private void io(String input, String output) {
         logger.file(project, "Input -> {}", input);
         logger.file(project, "Output -> {}", output);
+    }
+
+
+    /**
+     * Prints the message if the success condition is true.
+     */
+    private void success(boolean condition, String message) {
+        if (condition) {
+            logger.file(project, message);
+        }
     }
 }

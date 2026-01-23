@@ -11,7 +11,6 @@ import org.gradle.api.artifacts.Configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,23 +23,23 @@ import java.util.stream.Collectors;
 public class InjectBinPatches extends Step {
 
     public InjectBinPatches(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     /**
      * The base input JAR.
      */
-    protected File input;
+    private File input;
 
     /**
      * The base output JAR.
      */
-    protected File output;
+    private File output;
 
     /**
      * The patch directory containing the LZMA files.
      */
-    protected File patchDirectory;
+    private File patchDirectory;
 
     @Override
     public void action() throws IOException {

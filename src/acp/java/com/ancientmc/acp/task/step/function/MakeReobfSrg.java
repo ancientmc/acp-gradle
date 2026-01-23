@@ -14,19 +14,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+/** TODO: I am sick of this and the MakeReobfSrg class. Find another remapper that can recognize package mapping in TSRGv2? */
 public class MakeReobfSrg extends Step {
     protected File input;
 
     protected File output;
 
     public MakeReobfSrg(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
     public void action() throws IOException {
         File temp = project.file(Paths.DIR_TEMP + "temp.srg");
-
         logger.functions().fileToFile(input, output);
         IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
         BufferedWriter writer = new BufferedWriter(new FileWriter(output));
@@ -40,7 +40,7 @@ public class MakeReobfSrg extends Step {
         writer.write("PK: net/minecraft/src .\n");
         writer.write("PK: com/mojang/minecraft/src .\n");
 
-        for(String line : lines) {
+        for (String line : lines) {
             writer.write(line + "\n");
         }
 

@@ -1,5 +1,6 @@
 package com.ancientmc.acp.logger;
 
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 
@@ -148,10 +149,7 @@ public class AcpLogger {
     private File getNewLogFile(String phase) {
         try {
             File parent = project.file(Paths.DIR_LOG + "/" + phase);
-
-            if (!parent.exists()) {
-                Files.createDirectories(parent.toPath());
-            }
+            FileUtil.createDirectory(parent);
 
             String name = String.join(".", NAMESPACE, phase, getDateTime(), "log");
             File file = new File(parent, name);

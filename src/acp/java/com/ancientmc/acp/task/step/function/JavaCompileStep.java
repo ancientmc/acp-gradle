@@ -40,7 +40,7 @@ public class JavaCompileStep extends Step {
     private File outputDirectory;
 
     public JavaCompileStep(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
@@ -84,8 +84,8 @@ public class JavaCompileStep extends Step {
      * @return The sources, excluding the "acp/client" package path.
      */
     public Iterable<? extends JavaFileObject> getSources(StandardJavaFileManager manager, File sourceDirectory) {
-        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-        sources = sources.stream().filter(file -> !file.getParentFile().getParentFile().getName().equals("acp")).toList(); // stupid way to remove all ACP launch classes.
+        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY)
+                .stream().filter(file -> !file.getParentFile().getParentFile().getName().equals("acp")).toList();
         return manager.getJavaFileObjects(sources.toArray(new File[0]));
     }
 

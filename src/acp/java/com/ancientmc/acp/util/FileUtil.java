@@ -1,5 +1,6 @@
 package com.ancientmc.acp.util;
 
+import com.ancientmc.acp.logger.AcpLogger;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
@@ -7,12 +8,15 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -84,10 +88,52 @@ public class FileUtil {
         gzipOut.close();
     }
 
+
+    /**
+     * Downloads a file from a URL, and creates the parent directory if needed.
+     * @param url The source URL.
+     * @param file The target file.
+     * @throws IOException exception.
+     */
+    public static void download(URL url, File file) throws IOException {
+        createDirectory(file.getParentFile());
+        FileUtils.copyURLToFile(url, file);
+    }
+
+    public static void copy(Project project, AcpLogger logger, Object input, File output, List<String> exclusions) throws IOException {
+        copy(project, logger, input, output, null, exclusions);
+    }
+
+    private static void copy(Project project, AcpLogger logger, Object input, File output, List<String> inclusions, List<String> exclusions) throws IOException {
+        createDirectory(output);
+        logger.functions().copy((File) input, output);
+
+        project.copy(c -> {
+            c.from(input);
+            c.into(output);
+
+            if (inclusions != null) {
+                c.include(inclusions);
+            }
+
+            if (exclusions != null) {
+                c.exclude(exclusions);
+            }
+        });
+    }
+
+    public static void extract(Project project, AcpLogger logger, File archive, File target) throws IOException {
+        copy(project, logger, project.zipTree(archive), target, null, null);
+    }
+
+    public static void extract(Project project, AcpLogger logger, File archive, File target, List<String> inclusions, List<String> exclusions) throws IOException {
+        copy(project, logger, project.zipTree(archive), target, inclusions, exclusions);
+    }
+
     /**
      * Checks if a directory exists, and creates it if not.
      * @param directory The directory being created.
-     * @throws IOException
+     * @throws IOException exception
      */
     public static void createDirectory(File directory) throws IOException {
         if (!directory.exists()) {

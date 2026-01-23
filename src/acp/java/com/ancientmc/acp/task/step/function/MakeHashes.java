@@ -11,7 +11,6 @@ import org.gradle.api.Project;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -39,50 +38,53 @@ public class MakeHashes extends Step {
     private File output;
 
     public MakeHashes(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
     public void action() throws IOException {
-        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-        Collection<File> resources = FileUtils.listFiles(resourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
+        Map<String, String> sources = getHashMap(sourceDirectory);
+        Map<String, String> resources = getHashMap(resourceDirectory);
         write(sources, resources);
     }
 
-    public void write(Collection<File> sources, Collection<File> resources) throws IOException {
+    public Map<String, String> getHashMap(File directory) {
+        Collection<File> files = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
         Map<String, String> map = new HashMap<>();
 
-        sources.forEach(src -> {
-            String hash = getHash(src);
-            String name = src.getAbsolutePath();
-            name = name.replace(".class", "")
-                    .replace(sourceDirectory.getAbsolutePath() + File.separator, "")
+        files.forEach(file -> {
+            String hash = getHash(file);
+            String name = file.getAbsolutePath().replace(".class", "")
+                    .replace(directory.getAbsolutePath() + File.separator, "")
                     .replace(File.separator, "/");
             map.put(name, hash);
         });
 
-        resources.forEach(rs -> {
-            String hash = getHash(rs);
-            String name = rs.getAbsolutePath();
-            name = name.replace(resourceDirectory.getAbsolutePath() + File.separator, "")
-                    .replace(File.separator, "/");
-            map.put(name, hash);
-        });
+        return map;
+    }
 
+    public void write(Map<String, String> sources, Map<String, String> resources) throws IOException {
         FileUtil.createDirectory(output.getParentFile());
+        logger.file(project, "Hash file -> {}", output.getAbsolutePath());
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(output))) {
-            logger.file(project, "Hash file -> {}", output.getAbsolutePath());
+        try (BufferedWriter writer = Files.newBufferedWriter(output.toPath())) {
+            for (Map.Entry<String, String> src : sources.entrySet()) {
+                writeLine(writer, src);
+            }
 
-            for (Map.Entry<String, String> entry : map.entrySet()) {
-                logger.file(project, "File -> {}", entry.getKey());
-                logger.file(project, "Hash -> {}", entry.getValue());
-                writer.write(entry.getKey() + " " + entry.getValue() + "\n");
-                writer.flush();
+            for (Map.Entry<String, String> rs : resources.entrySet()) {
+                writeLine(writer, rs);
             }
         } catch (IOException e) {
-            throw new AcpException("File writing error: ", logger, project, e);
+            throw new RuntimeException(e);
         }
+    }
+
+    public void writeLine(BufferedWriter writer, Map.Entry<String, String> entry) throws IOException {
+        logger.file(project, "File -> {}", entry.getKey());
+        logger.file(project, "Hash -> {}", entry.getValue());
+        writer.write(entry.getKey() + " " + entry.getValue() + "\n");
+        writer.flush();
     }
 
     public String getHash(File file) {

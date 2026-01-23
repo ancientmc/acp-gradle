@@ -7,7 +7,6 @@ import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,22 +32,13 @@ public class CopyFile extends Step {
     private List<String> exclusions;
 
     public CopyFile(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
     public void action() throws IOException {
-        FileUtil.createDirectory(output);
-
-        logger.functions().fileToFile(input, output);
-        project.copy(c -> {
-            c.from(input);
-            c.into(output);
-
-            if (exclusions != null) {
-                c.exclude(exclusions);
-            }
-        });
+        logger.functions().copy(input, output);
+        FileUtil.copy(project, logger, input, output, exclusions);
     }
 
     public CopyFile setInput(File input) {

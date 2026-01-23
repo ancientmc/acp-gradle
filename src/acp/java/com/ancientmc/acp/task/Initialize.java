@@ -72,15 +72,15 @@ public abstract class Initialize extends AcpTask {
             extractNatives.exec();
 
             Step downloadAssets = new DownloadAssets(project, logger, "Downloading assets")
-                    .setIndex(Json.getAssetIndexUrl(project.file(Paths.JSON)))
+                    .setIndexUrl(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
                     .setCondition(Json.areAssetsPresent(project.file(Paths.JSON)) &&
                             FileUtil.directoryCondition(project.file(Paths.DIR_ASSETS)));
             downloadAssets.exec();
 
-            Step downloadClient = new DownloadJar(project, logger, "Downloading client JAR")
+            Step downloadClient = new DownloadFile(project, logger, "Downloading client JAR")
                     .setInput(Json.getJarUrl(project.file(Paths.JSON), "client"))
-                    .setOutput(project.file(Paths.DIR_TEMP))
+                    .setOutput(project.file(Paths.CLIENT_JAR))
                     .setCondition(!project.file(Paths.CLIENT_JAR).exists());
             downloadClient.exec();
 

@@ -2,7 +2,7 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
-import org.apache.commons.io.FileUtils;
+import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -26,13 +26,13 @@ public class DownloadFile extends Step {
     protected File output;
 
     public DownloadFile(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
     public void action() throws IOException {
-        logger.functions().urlToFile(input, output);
-        FileUtils.copyURLToFile(input, output);
+        logger.functions().download(input, output);
+        FileUtil.download(input, output);
     }
 
     public DownloadFile setInput(URL input) {

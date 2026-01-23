@@ -2,8 +2,8 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -19,7 +19,7 @@ import java.util.List;
 public class ExtractNatives extends Step {
 
     /**
-     * The list of URLs for native libraries from Minecraft's website. The URLs are retrieved via a method in utils.Json
+     * The list of URLs for native libraries from Minecraft's website. The URLs are retrieved via a method in util.Json
      * @see Json#getNativeUrls(File)
      */
     private List<URL> urls;
@@ -30,7 +30,7 @@ public class ExtractNatives extends Step {
     private File output;
 
     public ExtractNatives(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     /**
@@ -43,15 +43,14 @@ public class ExtractNatives extends Step {
 
         for (URL url : urls) {
             String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-            FileUtils.copyURLToFile(url, new File(output, path));
+            FileUtil.download(url, new File(path));
             jars.add(new File(output, path));
         }
 
-        jars.forEach(jar -> project.copy(action -> {
-            logger.functions().fileToFile(jar, output);
-            action.from(project.zipTree(jar));
-            action.into(project.file(output));
-        }));
+        for (File jar : jars) {
+            logger.functions().extract(jar, output);
+            FileUtil.extract(project, logger, jar, output);
+        }
     }
 
     public ExtractNatives setUrls(List<URL> urls) {

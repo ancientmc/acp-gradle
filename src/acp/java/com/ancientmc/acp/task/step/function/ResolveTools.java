@@ -23,7 +23,7 @@ public class ResolveTools extends Step {
     private Map<String, String> tools;
 
     public ResolveTools(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override

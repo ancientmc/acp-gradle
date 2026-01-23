@@ -39,7 +39,7 @@ public class BuildJar extends Step {
     protected File output;
 
     public BuildJar(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
@@ -66,6 +66,7 @@ public class BuildJar extends Step {
         out.close();
     }
 
+    // TODO: make this look less like shit. Can any other library do this in less lines?
     public void addEntry(JarArchiveOutputStream out, File directory, File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             String path = getPath(directory, file);

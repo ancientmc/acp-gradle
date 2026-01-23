@@ -52,7 +52,7 @@ public abstract class Step {
      */
     public abstract void action() throws IOException;
 
-    protected Step build(Project project, AcpLogger logger, String message) {
+    protected Step setCore(Project project, AcpLogger logger, String message) {
         this.project = project;
         this.logger = logger;
         this.message = "Step -> " + message + "...";

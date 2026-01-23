@@ -33,7 +33,7 @@ public class JavaExecStep extends Step {
     protected List<String> args;
 
     public JavaExecStep(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override

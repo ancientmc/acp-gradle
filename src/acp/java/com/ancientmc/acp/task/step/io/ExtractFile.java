@@ -36,28 +36,13 @@ public class ExtractFile extends Step {
     private List<String> exclusions;
 
     public ExtractFile(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
-    /**
-     * Main extraction method. Uses Gradle's copy task and zip-tree function.
-     */
     @Override
     public void action() throws IOException {
-        FileUtil.createDirectory(output);
         logger.functions().fileToFile(input, output);
-        project.copy(action -> {
-            action.from(project.zipTree(input));
-            action.into(output);
-
-            if (inclusions != null) {
-                action.include(inclusions);
-            }
-
-            if (exclusions != null) {
-                action.exclude(exclusions);
-            }
-        });
+        FileUtil.extract(project, logger, input, output, inclusions, exclusions);
     }
 
     public ExtractFile setInput(File input) {

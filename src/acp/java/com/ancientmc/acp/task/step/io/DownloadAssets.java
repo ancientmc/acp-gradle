@@ -2,12 +2,10 @@ package com.ancientmc.acp.task.step.io;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.Step;
-import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
 import com.google.gson.JsonObject;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 
 import java.io.File;
@@ -16,10 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This step downloads the asset files. Instead of downloading the asset hashes in their pure forms, it goes the extra mile
@@ -33,7 +28,7 @@ public class DownloadAssets extends Step {
      * The URL is retrieved from a method in the Json utilities class.
      * @see Json#getAssetIndexUrl(File)
      */
-    private URL index;
+    private URL indexUrl;
 
     /**
      * The output file containing the resources: "run/resources" in the ACP workspace.
@@ -41,99 +36,52 @@ public class DownloadAssets extends Step {
     private File output;
 
     public DownloadAssets(Project project, AcpLogger logger, String message) {
-        build(project, logger, message);
+        setCore(project, logger, message);
     }
 
     @Override
     public void action() throws IOException {
         FileUtil.createDirectory(output);
 
-        logger.file(project, "Json index -> {}", index.toString());
-        JsonObject indexObj = Json.get(index);
-        Map<String, String> assets = getAssets(indexObj);
-        List<String> omniArchiveAssets = getOmniArchiveAssets(indexObj);
+        logger.file(project, "Json index -> {}", indexUrl.toString());
+        JsonObject index = Json.get(indexUrl);
+        List<Asset> assets = getAssets(index);
 
-        if (assets != null && omniArchiveAssets != null) {
-            logger.file(project, "Asset size -> {}", Integer.toString(assets.size() + omniArchiveAssets.size()));
-            download(assets, omniArchiveAssets, output);
+        if (assets != null) {
+            logger.file(project, "Asset size -> {}", Integer.toString(assets.size()));
+            download(assets, output);
         }
     }
 
-    /**
-     * Retrieves a hash map of all the assets.
-     * @param index The asset index JSON object.
-     * @return The assets as a map. The key is the name of the asset, while the value is its hash. Returns null if the index is empty.
-     */
-    public Map<String, String> getAssets(JsonObject index) {
-        Map<String, String> assets = new HashMap<>();
+    public List<Asset> getAssets(JsonObject index) {
+        List<Asset> assets = new ArrayList<>();
         JsonObject objects = index.getAsJsonObject("objects");
 
-        if (!objects.isEmpty()) {
-            objects.keySet().forEach(name -> {
-                String hash = objects.getAsJsonObject(name).get("hash").getAsString();
-                assets.put(name, hash);
-            });
-
-            return assets;
+        if (objects.isEmpty()) {
+            return Collections.emptyList();
         }
 
-        return null;
-    }
-
-    /**
-     * Some of the assets are *not* on Mojang's website but are in OmniArchive instead. This method retrieves them as a list,
-     * and we later call them as needed.
-     * @param index The asset index JSON object.
-     * @return The list of resources only found on OmniArchive.
-     */
-    public List<String> getOmniArchiveAssets(JsonObject index) {
-        List<String> assets = new ArrayList<>();
-        JsonObject objects = index.getAsJsonObject("objects");
-
-        if (!objects.isEmpty()) {
-            objects.keySet().forEach(name -> {
-                String hash = objects.getAsJsonObject(name).get("hash").getAsString();
-
-                // only the OmniArchive-exclusive assets have a URL property.
-                if (objects.getAsJsonObject(name).has("url")) {
-                    assets.add(hash);
-                }
-            });
-
-            return assets;
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets each asset from the hash map and sets it up for downloading.
-     * Each URL of a hash representing an asset is collected and written as a new file using its proper name.
-     * @param map The hash map containing the assets.
-     * @param omniArchiveAssets The list containing the hashes only found on OmniArchive.
-     * @param directory The "run\resources" directory path in the ACP workspace.
-     * @throws IOException exception.
-     */
-    public void download(Map<String, String> map, List<String> omniArchiveAssets, File directory) throws IOException {
-        if(!directory.exists()) {
-            FileUtils.forceMkdir(directory);
-        }
-
-        map.forEach((key, value) -> {
-            try {
-                String path = value.substring(0, 2) + '/' + value;
-                String domain = omniArchiveAssets.contains(value) ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";
-                URL url = Util.getUrl(domain + path);
-                File file = new File(directory, key);
-
-                FileUtil.createDirectory(file.getParentFile());
-
-                logger.functions().urlToFile(url, file);
-                writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
-            } catch (IOException e) {
-                throw new AcpException(e.getMessage(), logger, project, e);
-            }
+        objects.keySet().forEach(name -> {
+            String hash = objects.getAsJsonObject(name).get("hash").getAsString();
+            boolean omniArchive = objects.getAsJsonObject(name).has("url");
+            assets.add(new Asset(name, hash, omniArchive));
         });
+
+        return assets;
+    }
+
+    public void download(List<Asset> assets, File directory) throws IOException {
+        FileUtil.createDirectory(directory);
+
+        for (Asset asset : assets) {
+            URL url = asset.getUrl();
+            File file = new File(directory, asset.name);
+
+            FileUtil.createDirectory(file.getParentFile());
+            logger.functions().download(url, file);
+
+            writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
+        }
     }
 
     /**
@@ -155,13 +103,21 @@ public class DownloadAssets extends Step {
         out.close();
     }
 
-    public DownloadAssets setIndex(URL index) {
-        this.index = index;
+    public DownloadAssets setIndexUrl(URL indexUrl) {
+        this.indexUrl = indexUrl;
         return this;
     }
 
     public DownloadAssets setOutput(File output) {
         this.output = output;
         return this;
+    }
+
+    public record Asset(String name, String hash, boolean omniArchive) {
+        public URL getUrl() {
+            String path = hash.substring(0, 2) + '/' + hash;
+            String domain = omniArchive ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";
+            return Util.getUrl(domain + path);
+        }
     }
 }

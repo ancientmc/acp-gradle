@@ -26,7 +26,6 @@ public abstract class ListSupportedVersions extends AcpTask {
         try {
             String xmlUrl = getXmlUrl().get();
             List<String> versions = getVersions(Util.getUrl(xmlUrl));
-            versions = versions.stream().sorted(new LegacyAlphaLastComparator()).toList();
 
             log(versions);
             logger.write();
@@ -49,7 +48,7 @@ public abstract class ListSupportedVersions extends AcpTask {
             }
         }
 
-        return versions;
+        return versions.stream().sorted(new LegacyAlphaLastComparator()).toList();
     }
 
     public void log(List<String> versions) {
