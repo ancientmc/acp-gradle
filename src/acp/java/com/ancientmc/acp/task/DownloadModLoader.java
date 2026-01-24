@@ -34,8 +34,7 @@ public abstract class DownloadModLoader extends AcpTask {
 
             URL url = getURL(repo, version, loader);
             File output = new File(directory, "modloader.lzma");
-            logger.functions().download(url, output);
-            FileUtil.download(url, output);
+            FileUtil.download(logger, url, output);
             logger.write();
         } catch (IOException e) {
             throw new AcpException("Mod loader download error: ", logger, getProject(), e);

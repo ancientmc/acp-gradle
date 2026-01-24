@@ -44,13 +44,11 @@ public class ExtractNatives extends Step {
 
         for (URL url : urls) {
             String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-            FileUtil.download(url, new File(output, path));
-            System.out.println(path + " is downloaded :)");
+            FileUtil.download(logger, url, new File(output, path));
             jars.add(new File(output, path));
         }
 
         for (File jar : jars) {
-            logger.functions().extract(jar, output);
             FileUtil.extract(project, logger, jar, output);
         }
     }

@@ -31,8 +31,7 @@ public class DownloadFile extends Step {
 
     @Override
     public void action() throws IOException {
-        logger.functions().download(input, output);
-        FileUtil.download(input, output);
+        FileUtil.download(logger, input, output);
     }
 
     public DownloadFile setInput(URL input) {

@@ -41,7 +41,6 @@ public class ExtractFile extends Step {
 
     @Override
     public void action() throws IOException {
-        logger.functions().fileToFile(input, output);
         FileUtil.extract(project, logger, input, output, inclusions, exclusions);
     }
 

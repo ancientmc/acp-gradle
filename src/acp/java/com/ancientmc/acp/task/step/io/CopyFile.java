@@ -37,7 +37,6 @@ public class CopyFile extends Step {
 
     @Override
     public void action() throws IOException {
-        logger.functions().copy(input, output);
         FileUtil.copy(project, logger, input, output, exclusions);
     }
 

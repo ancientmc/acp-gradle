@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-/** TODO: I am sick of this and the MakeReobfSrg class. Find another remapper that can recognize package mapping in TSRGv2? */
+/** TODO: I am sick of this and the RepackageDefault class. Find another remapper that can recognize package mapping in TSRGv2? */
 public class MakeReobfSrg extends Step {
     protected File input;
 

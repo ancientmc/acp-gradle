@@ -91,13 +91,14 @@ public class FileUtil {
 
     /**
      * Downloads a file from a URL, and creates the parent directory if needed.
-     * @param url The source URL.
-     * @param file The target file.
+     * @param input The source URL.
+     * @param output The target file.
      * @throws IOException exception.
      */
-    public static void download(URL url, File file) throws IOException {
-        createDirectory(file.getParentFile());
-        FileUtils.copyURLToFile(url, file);
+    public static void download(AcpLogger logger, URL input, File output) throws IOException {
+        createDirectory(output.getParentFile());
+        logger.functions().download(input, output);
+        FileUtils.copyURLToFile(input, output);
     }
 
     public static void copy(Project project, AcpLogger logger, Object input, File output, List<String> exclusions) throws IOException {
