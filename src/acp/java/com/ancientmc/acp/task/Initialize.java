@@ -30,12 +30,14 @@ public abstract class Initialize extends AcpTask {
             Step startupMessage = new StartupMessage(project, version, logger)
                     .setCondition(!project.file(Paths.DIR_CFG).exists() && !project.file(Paths.DIR_RUN).exists());
             startupMessage.exec();
+            System.out.println("startup message printed");
 
             Step downloadAcpData = new DownloadFile(project, logger, "Downloading ACP data")
                     .setInput(Util.toMavenUrl(Util.getAncientMcMaven(), extension.getData().get(), "zip"))
                     .setOutput(project.file(Paths.ACP_DATA))
                     .setCondition(!project.file(Paths.ACP_DATA).exists());
             downloadAcpData.exec();
+            System.out.println("ACP data downloaded");
 
             Step extractAcpData = new ExtractFile(project, logger, "Extracting ACP data")
                     .setInput(project.file(Paths.ACP_DATA))

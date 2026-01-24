@@ -22,8 +22,10 @@ public class StartupMessage extends Step {
     private final String minecraftVersion;
 
     public StartupMessage(Project project, String minecraftVersion, AcpLogger logger) {
+        this.logger = logger;
+        this.project = project;
         this.minecraftVersion = minecraftVersion;
-        setCore(project, logger, getStartupMessage());
+        this.message = getStartupMessage();
     }
 
     @Override

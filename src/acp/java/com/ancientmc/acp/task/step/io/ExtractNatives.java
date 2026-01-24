@@ -40,10 +40,12 @@ public class ExtractNatives extends Step {
     @Override
     public void action() throws IOException {
         List<File> jars = new ArrayList<>();
+        FileUtil.createDirectory(output);
 
         for (URL url : urls) {
             String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
-            FileUtil.download(url, new File(path));
+            FileUtil.download(url, new File(output, path));
+            System.out.println(path + " is downloaded :)");
             jars.add(new File(output, path));
         }
 

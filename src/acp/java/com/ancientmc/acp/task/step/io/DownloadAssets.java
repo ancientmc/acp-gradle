@@ -10,10 +10,7 @@ import org.gradle.api.Project;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.util.*;
 
 /**
@@ -47,7 +44,7 @@ public class DownloadAssets extends Step {
         JsonObject index = Json.get(indexUrl);
         List<Asset> assets = getAssets(index);
 
-        if (assets != null) {
+        if (!assets.isEmpty()) {
             logger.file(project, "Asset size -> {}", Integer.toString(assets.size()));
             download(assets, output);
         }
@@ -76,31 +73,9 @@ public class DownloadAssets extends Step {
         for (Asset asset : assets) {
             URL url = asset.getUrl();
             File file = new File(directory, asset.name);
-
             FileUtil.createDirectory(file.getParentFile());
-            logger.functions().download(url, file);
-
-            writeToFile(url.openStream(), Files.newOutputStream(file.toPath()));
+            FileUtil.download(url, file);
         }
-    }
-
-    /**
-     * Writes an input URL of an asset hash to a file with its proper name.
-     * @param in The input asset hash URL on Minecraft's website.
-     * @param out The output file in the "run\resources" directory.
-     * @throws IOException exception.
-     */
-    public void writeToFile(InputStream in, OutputStream out) throws IOException {
-        byte[] b = new byte[1024];
-        int len;
-
-        while ((len = in.read(b)) > 0) {
-            out.write(b, 0, len);
-            out.flush();
-        }
-
-        in.close();
-        out.close();
     }
 
     public DownloadAssets setIndexUrl(URL indexUrl) {
@@ -113,7 +88,17 @@ public class DownloadAssets extends Step {
         return this;
     }
 
+    /**
+     * Object representation of a Minecraft asset.
+     * @param name The asset file name, as it is called by Minecraft.
+     * @param hash The hash that is stored on Minecraft's website.
+     * @param omniArchive Determines if the asset needs to be downloaded from OmniArchive's website or from Mojang's.
+     */
     public record Asset(String name, String hash, boolean omniArchive) {
+
+        /**
+         * @return the URL of this asset's hash.
+         */
         public URL getUrl() {
             String path = hash.substring(0, 2) + '/' + hash;
             String domain = omniArchive ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";

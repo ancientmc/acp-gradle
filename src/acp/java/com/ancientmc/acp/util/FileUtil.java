@@ -101,12 +101,14 @@ public class FileUtil {
     }
 
     public static void copy(Project project, AcpLogger logger, Object input, File output, List<String> exclusions) throws IOException {
-        copy(project, logger, input, output, null, exclusions);
+        logger.functions().copy((File) input, output);
+        copy(project, input, output, null, exclusions);
     }
 
-    private static void copy(Project project, AcpLogger logger, Object input, File output, List<String> inclusions, List<String> exclusions) throws IOException {
-        createDirectory(output);
-        logger.functions().copy((File) input, output);
+    private static void copy(Project project, Object input, File output, List<String> inclusions, List<String> exclusions) throws IOException {
+        if (output.isDirectory()) {
+            createDirectory(output);
+        }
 
         project.copy(c -> {
             c.from(input);
@@ -123,11 +125,13 @@ public class FileUtil {
     }
 
     public static void extract(Project project, AcpLogger logger, File archive, File target) throws IOException {
-        copy(project, logger, project.zipTree(archive), target, null, null);
+        logger.functions().extract(archive, target);
+        copy(project, project.zipTree(archive), target, null, null);
     }
 
     public static void extract(Project project, AcpLogger logger, File archive, File target, List<String> inclusions, List<String> exclusions) throws IOException {
-        copy(project, logger, project.zipTree(archive), target, inclusions, exclusions);
+        logger.functions().extract(archive, target);
+        copy(project, project.zipTree(archive), target, inclusions, exclusions);
     }
 
     /**
