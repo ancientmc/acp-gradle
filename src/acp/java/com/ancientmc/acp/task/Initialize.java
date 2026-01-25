@@ -1,11 +1,10 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.Step;
-import com.ancientmc.acp.task.step.function.ResolveLibraries;
-import com.ancientmc.acp.task.step.function.ResolveTools;
-import com.ancientmc.acp.task.step.function.StartupMessage;
-import com.ancientmc.acp.task.step.io.*;
+import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.ResolveLibraries;
+import com.ancientmc.acp.task.step.ResolveTools;
+import com.ancientmc.acp.task.step.StartupMessage;
 import com.ancientmc.acp.util.*;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;

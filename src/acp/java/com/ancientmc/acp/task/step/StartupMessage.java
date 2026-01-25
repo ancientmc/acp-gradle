@@ -1,7 +1,6 @@
-package com.ancientmc.acp.task.step.function;
+package com.ancientmc.acp.task.step;
 
 import com.ancientmc.acp.logger.AcpLogger;
-import com.ancientmc.acp.task.step.Step;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 

@@ -1,9 +1,7 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.Step;
-import com.ancientmc.acp.task.step.function.*;
-import com.ancientmc.acp.task.step.io.*;
+import com.ancientmc.acp.task.step.*;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
