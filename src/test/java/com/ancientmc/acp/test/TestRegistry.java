@@ -9,7 +9,7 @@ import java.util.List;
 public class TestRegistry {
     private final File jsonFile;
 
-    public final List<TestObject> tests;
+    private final List<TestObject> tests;
 
     public TestRegistry(File jsonFile) {
         this.jsonFile = jsonFile;

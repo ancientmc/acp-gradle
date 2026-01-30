@@ -17,12 +17,12 @@ public class DownloadFile extends Step {
     /**
      * The input URL.
      */
-    protected URL input;
+    private URL input;
 
     /**
      * The downloaded file.
      */
-    protected File output;
+    private File output;
 
     public DownloadFile(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);

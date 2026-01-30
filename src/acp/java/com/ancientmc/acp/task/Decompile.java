@@ -119,7 +119,7 @@ public abstract class Decompile extends AcpTask {
         buildVanillaJar.exec();
 
         Step makeVanillaHashes = new MakeHashes(project, logger, "Generating vanilla hashes")
-                .setClassDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
+                .setSourceDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_VANILLA_RESOURCES))
                 .setOutput(project.file(Paths.VANILLA_HASH_FILE))
                 .setCondition(!project.file(Paths.VANILLA_HASH_FILE).exists());

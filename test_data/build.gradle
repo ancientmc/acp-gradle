@@ -40,14 +40,14 @@ tasks.named('downloadModLoader')
 tasks.named('runClient')
 tasks.named('buildMod')
 
-tasks.register('injectMod') {
-    def files = files('test_data/ruby/').asFileTree
-    files.each { file ->
-        project.copy {
-            def type = 'src/main/' + file.name.endsWith('.java') ? 'java/' : 'resources/'
-            def parent = project.file('test_data/ruby/' + type).toPath().relativize(file.parentFile.toPath()).toString().replace(File.separator, '/')
-            from (file.absolutePath)
-            into (project.file(type + '/' + parent))
-        }
-    }
+tasks.register('injectModSrc', Copy) {
+    from files('ruby/src/main/java/')
+    into file('src/main/java/')
 }
+
+tasks.register('injectModResources', Copy) {
+    from files('ruby/src/main/resources/')
+    into file('src/main/resources/')
+}
+
+tasks.register('injectMod') { dependsOn (injectModSrc, injectModResources) }

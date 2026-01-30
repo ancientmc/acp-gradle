@@ -59,11 +59,6 @@ public abstract class Step {
         return this;
     }
 
-    public Step setProject(Project project) {
-        this.project = project;
-        return this;
-    }
-
     public Step setCondition(boolean condition) {
         this.condition = condition;
         return this;

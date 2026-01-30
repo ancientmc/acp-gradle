@@ -96,7 +96,7 @@ public class MakeHashes extends Step {
         }
     }
 
-    public MakeHashes setClassDirectory(File sourceDirectory) {
+    public MakeHashes setSourceDirectory(File sourceDirectory) {
         this.sourceDirectory = sourceDirectory;
         return this;
     }

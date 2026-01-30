@@ -11,7 +11,6 @@ import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -47,9 +46,8 @@ public abstract class DownloadModLoader extends AcpTask {
      * @param version The Minecraft version.
      * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge).
      * @return The URL for the ModLoader LZMA.
-     * @throws MalformedURLException exception.
-     */
-    private URL getURL(String repo, String version, String loader) throws IOException {
+    */
+    private URL getURL(String repo, String version, String loader) {
         String ml = getModLoaderPath(loader);
         String mavenPath = ml + ":" + version;
         return Util.toMavenUrl(repo, mavenPath, "lzma");

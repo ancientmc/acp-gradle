@@ -3,19 +3,14 @@ All written by moist-mason, hence the use of first person.
 CURRENT [0.4.0]
 - Logging
 	- Ensure that most exceptions call the AcpException class, so that they appear in logs if something arises.
-- Testing
-	- Fix mod injection in legacy modded test. Low priority because the code for mod stuff *should* work still.
 - General
 	- Figure out how to fix the dependency resolving messages from showing in logs, even if the dependencies are actually resolved.
 		- UPDATE 12/15: Dependency resolution needs to happen, so any condition that prevents the ResolveLibraries or ResolveTools steps will make
 		Java processes fail. I will continue to find a workaround but this may actually be a necessary evil.
-	- Figure out how to resolve the resolution problems that cause the game's display to not fit the entire window. This is 100% something that
-	occurred once ACP was updated from Java 8 to Java 21.
 
 FUTURE [1.0]
-- Likely rework of the ModLoader download system. Instead of LZMA I am considering using a DiffPatch system, which is
-what NeoForge uses. This will allow the ModLoader text to be more readable, and will be especially important as future versions of Minecraft,
-which rely on Forge, become supported by ACP.
-- Refactoring of older code that I haven't really touched in a while, like the classes for archive creation. I also
-want to take a look at the RepackageDefault and MakeReobfSrg classes, as I've honestly forgotten what those are for. I believe the RepackageDefault
-will not be used anymore if the ModLoader rework is achieved. MakeReobfSrg might still be.
+- General
+	- Rework of the ModLoader download system. Instead of LZMA I am considering using a DiffPatch system, which is
+    what NeoForge uses. This will allow the ModLoader text to be more readable, and will be especially important as future versions of Minecraft,
+    which rely on Forge, become supported by ACP. This will make the RepackageDefaults class obsolete.
+    - Include Reobfuscation SRGs (in .srg) format in the AcpGen data ZIPs, and remove the MakeReobfSrg step.

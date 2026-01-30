@@ -8,6 +8,7 @@ import com.google.gson.JsonParser;
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +26,7 @@ public class Json {
      * @throws IOException exception.
      */
     public static JsonObject get(File file) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(file));
+        BufferedReader reader = Files.newBufferedReader(file.toPath());
         return JsonParser.parseReader(reader).getAsJsonObject();
     }
 
@@ -47,20 +48,16 @@ public class Json {
      * @param version The Minecraft version, specified in the ACP end-user workspace.
      * @return The URL for the JSON file on Minecraft's website.
      */
-    public static URL getJsonUrl(File manifest, String version) {
-        try {
-            JsonObject manifestObj = get(manifest);
-            JsonArray versions = manifestObj.getAsJsonArray("versions");
+    public static URL getJsonUrl(File manifest, String version) throws IOException {
+        JsonObject manifestObj = get(manifest);
+        JsonArray versions = manifestObj.getAsJsonArray("versions");
 
-            for (JsonElement entry : versions.asList()) {
-                JsonElement id = entry.getAsJsonObject().get("id");
+        for (JsonElement entry : versions.asList()) {
+            JsonElement id = entry.getAsJsonObject().get("id");
 
-                if (id.getAsString().equals(version)) {
-                    return Util.getUrl(entry.getAsJsonObject().get("url").getAsString());
-                }
+            if (id.getAsString().equals(version)) {
+                return Util.getUrl(entry.getAsJsonObject().get("url").getAsString());
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
 
         return null;

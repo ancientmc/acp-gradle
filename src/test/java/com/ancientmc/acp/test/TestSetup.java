@@ -19,36 +19,54 @@ public class TestSetup {
      * Starts the setup for this test.
      * @param test The test object.
      */
-    public static void start(TestObject test) {
+    public static void start(TestObject test, boolean ruby) {
         try {
-            if (!TestPaths.ROOT_TEST_DIR.exists()) {
-                Files.createDirectories(TestPaths.ROOT_TEST_DIR.toPath());
-            }
-
+            createDirectory(TestPaths.ROOT_TEST_DIR);
             File testDir = new File(TestPaths.ROOT_TEST_DIR, test.name());
-            File mainData = new File(TestPaths.TEST_DATA, "main");
-            Collection<File> mainFiles = FileUtils.listFiles(mainData, TrueFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
-
-            if (!testDir.exists()) {
-                Files.createDirectories(testDir.toPath());
-            }
-
-            for (File original : mainFiles) {
-                String path = mainData.toPath().relativize(original.toPath()).toString();
-                File copied = new File(testDir, path);
-
-                if (!copied.getParentFile().exists()) {
-                    Files.createDirectories(copied.getParentFile().toPath());
-                }
-
-                copyFile(original, copied, test);
-            }
+            createDirectory(testDir);
+            copyFileTree(testDir, test, ruby);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static void copyFile(File original, File copied, TestObject test) {
+
+    /**
+     * Gets list of files to copy
+     * @param ruby If the ruby mod is being injected.
+     * @return The files.
+     */
+    private static Collection<File> getFiles(boolean ruby) {
+        Collection<File> files = FileUtils.listFiles(TestPaths.TEST_DATA, TrueFileFilter.INSTANCE, DirectoryFileFilter.INSTANCE);
+
+        if (!ruby) {
+            files.removeAll(files.stream().filter(x -> x.getAbsolutePath().contains("ruby")).toList());
+        }
+
+        return files;
+    }
+
+    private static void copyFileTree(File testDir, TestObject test, boolean ruby) throws IOException {
+        Collection<File> files = getFiles(ruby);
+
+        for (File original : files) {
+            String path = TestPaths.TEST_DATA.toPath().relativize(original.toPath()).toString();
+            File copied = new File(testDir, path);
+            System.out.println(copied.getAbsolutePath());
+
+            if (!copied.getParentFile().exists()) {
+                Files.createDirectories(copied.getParentFile().toPath());
+            }
+
+            if (!original.getName().endsWith(".png")) {
+                copyTextFile(original, copied, test);
+            } else {
+                FileUtils.copyFile(original, copied);
+            }
+        }
+    }
+
+    private static void copyTextFile(File original, File copied, TestObject test) {
         try {
             List<String> lines = Files.readAllLines(original.toPath());
             List<String> newLines = new ArrayList<>();
@@ -74,6 +92,12 @@ public class TestSetup {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static void createDirectory(File directory) throws IOException {
+        if (!directory.exists()) {
+            Files.createDirectories(directory.toPath());
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ancientmc.acp.task.step;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.util.AcpException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
@@ -38,8 +39,7 @@ public class StartupMessage extends Step {
                 "Copyright (c) AncientMC",
                 "ACP Version: " + project.getProperties().get("acp_version").toString(),
                 "ACP-Gradle Version: " + getPluginVersion(),
-                "Minecraft Version: " + minecraftVersion
-        );
+                "Minecraft Version: " + minecraftVersion);
         return String.join("\n", lines) + "\n";
     }
 
@@ -58,7 +58,7 @@ public class StartupMessage extends Step {
 
             return "unknown";
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException("Manifest parsing error", logger, project, e);
         }
     }
 }

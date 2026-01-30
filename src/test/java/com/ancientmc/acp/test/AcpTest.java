@@ -20,23 +20,20 @@ public class AcpTest {
      */
     public static final TestRegistry REGISTRY = new TestRegistry(new File("test_data/tests.json"));
 
-    // All versions
-    @Test public void testAll() { REGISTRY.tests.forEach(o -> doTest(o.name())); }
-
     // Individual versions
-    @Test public void testClassicOne() { doTest("classic_one"); }
-    @Test public void testClassicTwo() { doTest("classic_two"); }
-    @Test public void testAlphaLegacyVanilla() { doTest("legacyAlpha_vanilla"); }
-    @Test public void testAlphaLegacyModded() { doTest("legacyAlpha_modded"); }
+    @Test public void testClassicOne() { doTest("classic_one", false); }
+    @Test public void testClassicTwo() { doTest("classic_two", false); }
+    @Test public void testAlphaLegacyVanilla() { doTest("legacyAlpha_vanilla", false); }
+    @Test public void testAlphaLegacyModded() { doTest("legacyAlpha_modded", true); }
 
-    // Non-version-specific tasks
-    @Test public void testSupportVersionsTask() { doTest("supported_versions"); }
-    @Test public void testCleanupTask() { doTest("cleanup"); }
+    // Tests for tasks outside the main toolchain
+    @Test public void testSupportVersionsTask() { doTest("supported_versions", false); }
+    @Test public void testCleanupTask() { doTest("cleanup", false); }
 
-    public void doTest(String name) {
+    public void doTest(String name, boolean ruby) {
         TestObject test = getTest(name);
         System.out.println("Test is: " + test.name());
-        TestSetup.start(test);
+        TestSetup.start(test, ruby);
         execute(test);
     }
 

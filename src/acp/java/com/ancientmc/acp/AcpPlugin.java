@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.compile.JavaCompile;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
 import org.gradle.jvm.toolchain.JavaToolchainService;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.List;
 public class AcpPlugin implements Plugin<Project> {
 
     @Override
-    public void apply(Project project) {
+    public void apply(@NotNull Project project) {
         String minecraftVersion = Util.getMinecraftVersion(project);
         AcpExtension extension = project.getExtensions().create("acp", AcpExtension.class, project);
 

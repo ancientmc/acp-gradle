@@ -1,17 +1,13 @@
 package com.ancientmc.acp.util;
 
-import net.neoforged.srgutils.IMappingFile;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.internal.os.OperatingSystem;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class full of miscellaneous utilities.
@@ -26,19 +22,6 @@ public class Util {
     public static String getMinecraftVersion(Project project) {
         String versionProperty = project.getProperties().get("minecraft_version").toString();
         return versionProperty.equals("a1.2.6-legacy") ? "a1.2.6" : versionProperty;
-    }
-
-    /**
-     * Gets a map of class names from the SRG file. The key is the obfuscated name, while the value is the mapped name.
-     * @param srg The SRG file.
-     * @return The class map.
-     * @throws IOException exception
-     */
-    public static Map<String, String> getClassMap(File srg) throws IOException {
-        Map<String, String> map = new HashMap<>();
-        IMappingFile mapping = IMappingFile.load(srg);
-        mapping.getClasses().forEach(cls -> map.put(cls.getOriginal(), cls.getMapped()));
-        return map;
     }
 
     /**

@@ -15,6 +15,7 @@ import java.util.*;
 
 /**
  * Compiles the game using Java's Compiler API.
+ * @author moist-mason
  */
 public class JavaCompileStep extends Step {
 
@@ -62,8 +63,7 @@ public class JavaCompileStep extends Step {
         List<String> options = Arrays.asList(
                 "-g:none", "-source", "8", "-target", "8",
                 "-classpath", classpath, "-Xlint:none",
-                "-d", outputDirectory.getAbsolutePath()
-        );
+                "-d", outputDirectory.getAbsolutePath());
         System.setProperty("java.library.path", nativesDirectory.getAbsolutePath());
         log(classpath, options);
         compiler.getTask(null, manager, null, options, null, sources).call();

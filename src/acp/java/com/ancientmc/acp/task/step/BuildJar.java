@@ -11,10 +11,8 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Collection;
 
 /**
@@ -25,17 +23,17 @@ public class BuildJar extends Step {
     /**
      * The class directory.
      */
-    protected File classDirectory;
+    private File classDirectory;
 
     /**
      * The resource directory.
      */
-    protected File resourceDirectory;
+    private File resourceDirectory;
 
     /**
      * The output JAR.
      */
-    protected File output;
+    private File output;
 
     public BuildJar(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);
@@ -67,7 +65,7 @@ public class BuildJar extends Step {
 
     // TODO: make this look less like shit. Can any other library do this in less lines?
     public void addEntry(JarArchiveOutputStream out, File directory, File file) {
-        try (FileInputStream in = new FileInputStream(file)) {
+        try (InputStream in = Files.newInputStream(file.toPath())) {
             String path = getPath(directory, file);
             logger.file(project, "Entry -> {}", path);
             out.putArchiveEntry(new JarArchiveEntry(path));
@@ -99,4 +97,3 @@ public class BuildJar extends Step {
         return this;
     }
 }
-

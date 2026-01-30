@@ -72,7 +72,7 @@ public abstract class BuildMod extends AcpTask {
         extractReobfClasses.exec();
 
         Step makeModdedHashes = new MakeHashes(project, logger, "Generating modded hashes")
-                .setClassDirectory(project.file(Paths.DIR_MODDED_CLASSES))
+                .setSourceDirectory(project.file(Paths.DIR_MODDED_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.MODDED_HASH_FILE))
                 .setCondition(true);

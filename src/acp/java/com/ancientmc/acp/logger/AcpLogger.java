@@ -92,6 +92,7 @@ public class AcpLogger {
 
     public String formatStackTrace(StackTraceElement[] elements) {
         List<String> list = new ArrayList<>();
+
         for (StackTraceElement e : elements) {
             list.add(e.toString());
         }
