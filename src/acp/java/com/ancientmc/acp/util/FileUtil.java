@@ -27,8 +27,8 @@ public class FileUtil {
      */
     public static void download(AcpLogger logger, URL input, File output) throws IOException {
         createDirectory(output.getParentFile());
-        logger.functions().download(input, output);
         FileUtils.copyURLToFile(input, output);
+        logger.functions().download(input, output);
     }
 
     public static void copy(Project project, AcpLogger logger, Object input, File output, List<String> exclusions) throws IOException {

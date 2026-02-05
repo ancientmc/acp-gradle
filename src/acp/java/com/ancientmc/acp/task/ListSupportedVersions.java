@@ -2,9 +2,9 @@ package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.Util;
+import org.gradle.api.Project;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.TaskAction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,21 +14,16 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Lists the supported versions for the AncientCoderPack in the console.
- */
+/** Lists the supported versions for the AncientCoderPack in the console. */
 public abstract class ListSupportedVersions extends AcpTask {
 
-    @TaskAction
-    public void exec() {
-        setLogger();
-
+    @Override
+    public void function(Project project) {
         try {
             String xmlUrl = getXmlUrl().get();
             List<String> versions = getVersions(Util.getUrl(xmlUrl));
 
             log(versions);
-            logger.write();
         } catch (IOException e) {
             throw new AcpException("Version XML parsing error.", logger, getProject(), e);
         }
@@ -56,9 +51,7 @@ public abstract class ListSupportedVersions extends AcpTask {
         versions.forEach(ver -> logger.console(getProject(), "{}", ver));
     }
 
-    /**
-     * Ensures the legacy alpha version is listed last. Otherwise, it shows up in a weird spot in the list.
-     */
+    /** Ensures the legacy alpha version is listed last. Otherwise, it shows up in a weird spot in the list. */
     private static class LegacyAlphaLastComparator implements Comparator<String> {
 
         @Override

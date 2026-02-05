@@ -3,11 +3,11 @@ package com.ancientmc.acp.task;
 import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Util;
+import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputDirectory;
-import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,21 +20,17 @@ import java.net.URL;
  */
 public abstract class DownloadModLoader extends AcpTask {
 
-    @TaskAction
-    public void exec() {
-        setLogger();
-
-        String version = getVersion().get();
-        String loader = getModLoader().get();
-        File directory = getOutputDir().getAsFile().get();
-        String repo = Util.getAncientMcMaven();
-
+    @Override
+    public void function(Project project) {
         try {
+            String version = getVersion().get();
+            String loader = getModLoader().get();
+            File directory = getOutputDir().getAsFile().get();
+            String repo = Util.getAncientMcMaven();
 
             URL url = getURL(repo, version, loader);
-            File output = new File(directory, "modloader.lzma");
+            File output = project.file(directory.getAbsolutePath() + "modloader.lzma");
             FileUtil.download(logger, url, output);
-            logger.write();
         } catch (IOException e) {
             throw new AcpException("Mod loader download error: ", logger, getProject(), e);
         }
@@ -66,21 +62,15 @@ public abstract class DownloadModLoader extends AcpTask {
         };
     }
 
-    /**
-     * The Minecraft version.
-     */
+    /** The Minecraft version. */
     @Input
     public abstract Property<String> getVersion();
 
-    /**
-     * The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge).
-     */
+    /** The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge). */
     @Input
     public abstract Property<String> getModLoader();
 
-    /**
-     * The output directory for LZMA mod patches (cfg\modpatches).
-     */
+    /** The output directory for LZMA mod patches (cfg\modpatches). */
     @OutputDirectory
     public abstract DirectoryProperty getOutputDir();
 }

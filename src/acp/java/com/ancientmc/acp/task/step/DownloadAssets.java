@@ -39,7 +39,7 @@ public class DownloadAssets extends Step {
     public void action() throws IOException {
         FileUtil.createDirectory(output);
 
-        logger.file(project, "Json index -> {}", indexUrl.getPath());
+        logger.file(project, "Json index -> {}", indexUrl.toString());
         JsonObject index = Json.get(indexUrl);
         List<Asset> assets = getAssets(index);
 

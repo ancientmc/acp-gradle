@@ -3,7 +3,6 @@ package com.ancientmc.acp.task;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
-import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -20,11 +19,8 @@ public abstract class Clean extends AcpTask {
     private static final FileFilter TEMP_FILTER = (File file1) -> !file1.getName().equals("client.jar") && !file1.getName().endsWith(".json");
     private static final FileFilter RUN_FILTER = (File file2) -> !file2.getName().contains("resources") && !file2.getName().contains("bin");
 
-    @TaskAction
-    public void exec() {
-        Project project = getProject();
-        setLogger();
-
+    @Override
+    public void function(Project project) {
         getUnfilteredPaths().forEach(path -> {
             try {
                 File[] files = project.file(path).listFiles();
@@ -48,8 +44,6 @@ public abstract class Clean extends AcpTask {
                 throw new RuntimeException(e);
             }
         });
-
-        logger.write();
     }
 
     public void deleteFiles(Project project, String path, File[] files) throws IOException {

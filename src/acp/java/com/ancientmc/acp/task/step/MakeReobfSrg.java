@@ -43,7 +43,7 @@ public class MakeReobfSrg extends Step {
         }
 
         writer.close();
-        FileUtils.forceDelete(temp);
+        Files.delete(temp.toPath());
     }
 
     public MakeReobfSrg setInput(File input) {

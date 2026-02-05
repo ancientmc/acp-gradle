@@ -4,7 +4,6 @@ import com.ancientmc.acp.AcpExtension;
 import com.ancientmc.acp.task.step.*;
 import com.ancientmc.acp.util.*;
 import org.gradle.api.Project;
-import org.gradle.api.tasks.TaskAction;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -15,14 +14,12 @@ import java.util.Arrays;
  */
 public abstract class Initialize extends AcpTask {
 
-    @TaskAction
-    public void exec() {
-        Project project = getProject();
-        AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
-        String version = Util.getMinecraftVersion(project);
-        setLogger();
-
+    @Override
+    public void function(Project project) {
         try {
+            AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
+            String version = Util.getMinecraftVersion(project);
+
             Step startupMessage = new StartupMessage(project, version, logger)
                     .setCondition(!project.file(Paths.DIR_CFG).exists() && !project.file(Paths.DIR_RUN).exists());
             startupMessage.exec();
@@ -40,7 +37,7 @@ public abstract class Initialize extends AcpTask {
             extractAcpData.exec();
 
             Step downloadVersionManifest = new DownloadFile(project, logger, "Downloading version manifest")
-                    .setInput(Util.getUrl("https://raw.githubusercontent.com/ancientmc/AcpGen/refs/heads/classic/data/versions/version_manifest.json"))
+                    .setInput(Util.getUrl("https://raw.githubusercontent.com/ancientmc/ancientmc-maven/refs/heads/maven/net/minecraft/versions/ancientmc_manifest.json"))
                     .setOutput(project.file(Paths.VERSION_MANIFEST))
                     .setCondition(!project.file(Paths.VERSION_MANIFEST).exists());
             downloadVersionManifest.exec();
@@ -85,8 +82,6 @@ public abstract class Initialize extends AcpTask {
                     .setOutput(project.file(Paths.DIR_SRC + "acp/client/"))
                     .setCondition(!project.file(Paths.DIR_SRC + "acp/client/Start.java").exists());
             copyStart.exec();
-
-            logger.write();
         } catch (IOException e) {
             throw new AcpException("Initialization error.", logger, project, e);
         }

@@ -5,7 +5,6 @@ import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
-import org.gradle.api.tasks.TaskAction;
 
 import java.util.Arrays;
 
@@ -15,11 +14,8 @@ import java.util.Arrays;
  */
 public abstract class Decompile extends AcpTask {
 
-    @TaskAction
-    public void exec() {
-        Project project = getProject();
-        setLogger();
-
+    @Override
+    public void function(Project project) {
         Step splitJar = new JavaExecStep(project, logger, "Splitting the JAR")
                 .setConfiguration("jarsplitter")
                 .setMainClass("net.neoforged.jarsplitter.ConsoleTool")
@@ -124,7 +120,5 @@ public abstract class Decompile extends AcpTask {
                 .setOutput(project.file(Paths.VANILLA_HASH_FILE))
                 .setCondition(!project.file(Paths.VANILLA_HASH_FILE).exists());
         makeVanillaHashes.exec();
-
-        logger.write();
     }
 }

@@ -5,7 +5,6 @@ import com.ancientmc.acp.task.step.*;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
-import org.gradle.api.tasks.TaskAction;
 
 import java.util.Arrays;
 
@@ -15,12 +14,10 @@ import java.util.Arrays;
  */
 public abstract class BuildMod extends AcpTask {
 
-    @TaskAction
-    public void exec() {
-        Project project = getProject();
+    @Override
+    public void function(Project project) {
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
         String lzmaPath = Paths.DIR_BUILD_MODDED + "patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
-        setLogger();
 
         Step moddedCompile = new JavaCompileStep(project, logger, "Compiling the game")
                 .setSourceDirectory(project.file(Paths.DIR_SRC))
@@ -86,7 +83,5 @@ public abstract class BuildMod extends AcpTask {
                 .setArchiveDirectory(project.file(Paths.DIR_BUILD_MODDED + "archives/" + extension.getModName().get() + "/"))
                 .setCondition(true);
         makeArchives.exec();
-
-        logger.write();
     }
 }
