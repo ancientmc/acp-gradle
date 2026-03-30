@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.FileUtil;
 import org.apache.commons.compress.archivers.jar.JarArchiveEntry;
@@ -11,28 +12,27 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Collection;
 
 /**
- * Builds the intermediate JAR containing obfuscated class files. The JAR is just an archive so we use Compress-IO to build it.
+ * Builds the intermediate JAR containing obfuscated class files. The JAR is just an archive so we use Compress-IO to
+ * build it.
+ * @author moist-mason
  */
 public class BuildJar extends Step {
 
-    /**
-     * The class directory.
-     */
+    /** The class directory. */
     private File classDirectory;
 
-    /**
-     * The resource directory.
-     */
+    /** The resource directory. */
     private File resourceDirectory;
 
-    /**
-     * The output JAR.
-     */
+    /** The output JAR. */
     private File output;
 
     public BuildJar(Project project, AcpLogger logger, String message) {
@@ -43,9 +43,9 @@ public class BuildJar extends Step {
     public void action() throws IOException {
         FileUtil.createDirectory(output.getParentFile());
 
-        logger.file(project, "Class directory -> {}", classDirectory.getAbsolutePath());
-        logger.file(project, "Resource directory -> {}", resourceDirectory.getAbsolutePath());
-        logger.file(project, "Output -> {}", output.getAbsolutePath());
+        logger.toFile("Class directory -> {}", classDirectory.getAbsolutePath());
+        logger.toFile("Resource directory -> {}", resourceDirectory.getAbsolutePath());
+        logger.toFile("Output -> {}", output.getAbsolutePath());
 
         JarArchiveOutputStream out = new JarArchiveOutputStream(new FileOutputStream(output));
         Collection<File> classes = FileUtils.listFiles(classDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
@@ -67,14 +67,14 @@ public class BuildJar extends Step {
     public void addEntry(JarArchiveOutputStream out, File directory, File file) {
         try (InputStream in = Files.newInputStream(file.toPath())) {
             String path = getPath(directory, file);
-            logger.file(project, "Entry -> {}", path);
+            logger.toFile("Entry -> {}", path);
             out.putArchiveEntry(new JarArchiveEntry(path));
             IOUtils.copy(in, out);
             in.close();
             out.closeArchiveEntry();
             out.flush();
         } catch (IOException e) {
-            throw new AcpException(e.getMessage(), logger, project, e);
+            throw new AcpException(e.getMessage(), logger, e);
         }
     }
 

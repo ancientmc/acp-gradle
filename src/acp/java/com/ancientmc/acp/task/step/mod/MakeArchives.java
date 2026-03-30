@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.mod;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.FileUtil;
 import net.neoforged.srgutils.IMappingFile;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -21,31 +22,26 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Builds the archive files containing compiled mod classes, modifications of existing Minecraft classes, and mod
+ * resources.
+ * @author moist-mason
+ */
 public class MakeArchives extends Step {
 
-    /**
-     * The TSRG file.
-     */
+    /** The TSRG file. */
     private File srg;
 
-    /**
-     * The directory containing our obfuscated class files (build/modding/reobfClasses/)
-     */
+    /** The directory containing the obfuscated class files (build/modding/reobfClasses/) */
     private File obfDirectory;
 
-    /**
-     * The directory containing our resources (src/main/resources/).
-     */
+    /** The directory containing the resources (src/main/resources/). */
     private File resourceDirectory;
 
-    /**
-     * The directory containing our hash files.
-     */
+    /** The directory containing the hash files. */
     private File hashDirectory;
 
-    /**
-     * The directory where the ZIP and TAR archives get put into.
-     */
+    /** The directory where the ZIP and TAR archives get put into. */
     private File archiveDirectory;
 
     public MakeArchives(Project project, AcpLogger logger, String message) {
@@ -93,8 +89,7 @@ public class MakeArchives extends Step {
     }
 
     /**
-     * Gets a map of the text file containing the hashes.
-     * The key is the class name, while the value is the hash.
+     * Gets a map of the text file containing the hashes. The key is the class name, while the value is the hash.
      */
     public static Map<String, String> getHashMap(File hashFile) throws IOException {
         Map<String, String> map = new HashMap<>();

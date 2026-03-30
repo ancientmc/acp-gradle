@@ -21,6 +21,7 @@ public class AcpTest {
     public static final TestRegistry REGISTRY = new TestRegistry(new File("test_data/tests.json"));
 
     // Individual versions
+    @Test public void testPreclassicOne() { doTest("preclassic_one", false); }
     @Test public void testClassicOne() { doTest("classic_one", false); }
     @Test public void testClassicTwo() { doTest("classic_two", false); }
     @Test public void testAlphaLegacyVanilla() { doTest("legacyAlpha_vanilla", false); }

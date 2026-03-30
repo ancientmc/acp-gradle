@@ -5,7 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -16,8 +19,9 @@ import java.util.Map;
 
 /**
  * Utility class for JSON parsing, mainly Minecraft's version JSON.
+ * @author moist-mason
  */
-public class Json {
+public final class Json {
 
     /**
      * Utility method for easily converting a JSON file into a JSON object parsable by Gson.
@@ -60,14 +64,15 @@ public class Json {
             }
         }
 
-        return null;
+        return Util.getUrl("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
     }
 
     /**
-     * Gets a list of the libraries that will be added as dependencies.
-     * All the libraries are formatted as maven paths (group.sub:name:version).
-     * @param jsons The JSON files that the libraries are parsed from. Two JSONS are parsed: Minecraft's Version JSON created by
-     *              Mojang, and a jar dependencies JSON file for libraries that are stored in the Minecraft JAR file (usually sound libraries).
+     * Gets a list of the libraries that will be added as dependencies. All the libraries are formatted as maven paths
+     * (group.sub:name:version).
+     * @param jsons The JSON files that the libraries are parsed from. Two JSONS are parsed: Minecraft's Version JSON
+     * created by Mojang, and a jar dependencies JSON file for libraries that are stored in the Minecraft JAR file
+     * (usually sound libraries).
      * @return The list of libraries.
      * @throws IOException exception.
      */
@@ -87,9 +92,9 @@ public class Json {
         return libraries;
     }
 
-
     /**
-     * Gets a map of tools needed by ACP for its functions. The key is the gradle configuration for the tool, and the value is the tool's maven path.
+     * Gets a map of tools needed by ACP for its functions. The key is the Gradle configuration for the tool, and the
+     * value is the tool's maven path.
      * @param json The JSON file the tools are parsed from. Stored in the ACP directory as 'gradle/tools.json'.
      * @return The map of tools.
      * @throws IOException exception.
@@ -123,8 +128,7 @@ public class Json {
             JsonObject downloads = entry.getAsJsonObject().getAsJsonObject("downloads");
 
             if (downloads.has("classifiers")) {
-                String os = Util.getOsName();
-                JsonObject natives = downloads.getAsJsonObject("classifiers").getAsJsonObject("natives-" + os);
+                JsonObject natives = downloads.getAsJsonObject("classifiers").getAsJsonObject("natives-" + Os.current().getName());
 
                 if (natives != null) {
                     URL url = Util.getUrl(natives.get("url").getAsString());
@@ -148,10 +152,9 @@ public class Json {
         return Util.getUrl(jsonObj.getAsJsonObject("assetIndex").get("url").getAsString());
     }
 
-
     /**
-     * This is called when a version's asset index's collection of hash values are filled. This isn't the case for older versions.
-     * OmniArchive uses empty JSON files for versions with no sounds (and therefore no assets to pull from).
+     * This is called when a version's asset index's collection of hash values are filled. This isn't the case for older
+     * versions. OmniArchive uses empty JSON files for versions with no sounds (and therefore no assets to pull from).
      * @param json The version JSON file.
      * @return true if the asset index file has objects.
      */
@@ -164,8 +167,8 @@ public class Json {
     /**
      * Gets the URL for Minecraft's JAR file(s).
      * @param json The Minecraft Version JSON.
-     * @param side The game side. Acceptable inputs are "client" and "server", though older versions may not have the server JAR in their
-     *             JSONs.
+     * @param side The game side. Acceptable inputs are "client" and "server", though older versions may not have the
+     * server JAR in their JSONs.
      * @return The URL to the JAR file.
      * @throws IOException exception.
      */

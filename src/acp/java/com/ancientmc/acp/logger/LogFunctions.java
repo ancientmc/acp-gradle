@@ -1,7 +1,6 @@
 package com.ancientmc.acp.logger;
 
 import com.ancientmc.acp.util.FileUtil;
-import org.gradle.api.Project;
 
 import java.io.File;
 import java.net.URL;
@@ -12,19 +11,11 @@ import java.net.URL;
  */
 public class LogFunctions {
 
-    /**
-     * ACP's logger.
-     */
+    /** ACP's logger. */
     private final AcpLogger logger;
 
-    /**
-     * The gradle project.
-     */
-    private final Project project;
-
-    public LogFunctions(AcpLogger logger, Project project) {
+    public LogFunctions(AcpLogger logger) {
         this.logger = logger;
-        this.project = project;
     }
 
     /**
@@ -37,14 +28,24 @@ public class LogFunctions {
         success(output.exists(), "Downloaded successfully");
     }
 
+    /**
+     * Used to print the input and output of a copied path.
+     * @param input The copy input path.
+     * @param output The copy output path.
+     */
     public void copy(File input, File output) {
         fileToFile(input, output);
         success(output.exists(), "Copied successfully");
     }
 
+    /**
+     * Used during file extraction.
+     * @param input The input archive.
+     * @param output The output directory.
+     */
     public void extract(File input, File output) {
         fileToFile(input, output);
-        success(!FileUtil.directoryCondition(output), "Extracted successfully");
+        success(!FileUtil.isDirectoryEmpty(output), "Extracted successfully");
     }
 
     /**
@@ -56,30 +57,28 @@ public class LogFunctions {
         io(input.getAbsolutePath(), output.getAbsolutePath());
     }
 
-
     /**
      * Used during library resolution.
      * @param dependency The name of a dependency being resolved.
      */
     public void resolve(String dependency) {
-        logger.file(project, "Resolve -> {}", dependency);
+        logger.toFile("Resolve -> {}", dependency);
     }
 
     /**
      * Used to log the input and outputs of an IO-based function.
+     * @param input The input path.
+     * @param output The output path.
      */
     private void io(String input, String output) {
-        logger.file(project, "Input -> {}", input);
-        logger.file(project, "Output -> {}", output);
+        logger.toFile("Input -> {}", input);
+        logger.toFile("Output -> {}", output);
     }
 
-
-    /**
-     * Prints the message if the success condition is true.
-     */
+    /** Prints the message if the success condition is true. */
     private void success(boolean condition, String message) {
         if (condition) {
-            logger.file(project, message);
+            logger.toFile(message);
         }
     }
 }

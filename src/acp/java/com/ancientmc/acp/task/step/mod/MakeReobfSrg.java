@@ -1,22 +1,25 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.mod;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import net.neoforged.srgutils.IMappingFile;
-import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
+/**
+ * Makes the SRG file needed for reobfuscating the class files.
+ * @author moist-mason
+ */
 public class MakeReobfSrg extends Step {
-    protected File input;
+    private File input;
 
-    protected File output;
+    private File output;
 
     public MakeReobfSrg(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);
@@ -25,9 +28,9 @@ public class MakeReobfSrg extends Step {
     @Override
     public void action() throws IOException {
         File temp = project.file(Paths.DIR_TEMP + "temp.srg");
-        logger.functions().fileToFile(input, output);
         IMappingFile.load(input).reverse().write(temp.toPath(), IMappingFile.Format.SRG, false);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(output));
+        logger.functions().fileToFile(input, output);
+        BufferedWriter writer = Files.newBufferedWriter(output.toPath());
         List<String> lines = Files.readAllLines(temp.toPath());
 
         /*

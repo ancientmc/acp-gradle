@@ -18,14 +18,14 @@ import java.util.List;
 public abstract class ListSupportedVersions extends AcpTask {
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         try {
             String xmlUrl = getXmlUrl().get();
             List<String> versions = getVersions(Util.getUrl(xmlUrl));
 
             log(versions);
         } catch (IOException e) {
-            throw new AcpException("Version XML parsing error.", logger, getProject(), e);
+            throw new AcpException("Version XML parsing error.", logger, e);
         }
     }
 
@@ -47,8 +47,8 @@ public abstract class ListSupportedVersions extends AcpTask {
     }
 
     public void log(List<String> versions) {
-        logger.console(getProject(), "{} supported versions", Integer.toString(versions.size()));
-        versions.forEach(ver -> logger.console(getProject(), "{}", ver));
+        logger.toConsole("{} supported versions", Integer.toString(versions.size()));
+        versions.forEach(ver -> logger.toConsole("{}", ver));
     }
 
     /** Ensures the legacy alpha version is listed last. Otherwise, it shows up in a weird spot in the list. */

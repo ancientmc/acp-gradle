@@ -1,11 +1,9 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.FileUtil;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Project;
 
 import java.io.BufferedWriter;
@@ -16,24 +14,24 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Makes hashes of resources and compiled classes. Used to compare file changes for generating archives for mod
+ * distribution.
+ * @author moist-mason
+ * @see com.ancientmc.acp.task.step.mod.MakeArchives
+ */
 public class MakeHashes extends Step {
 
-    /**
-     * The source directory.
-     */
-    private File sourceDirectory;
+    /** The compiled class directory. */
+    private File classDirectory;
 
-    /**
-     * The resource directory.
-     */
+    /** The resource directory. */
     private File resourceDirectory;
 
-    /**
-     * The output hash file.
-     */
+    /** The output hash file. */
     private File output;
 
     public MakeHashes(Project project, AcpLogger logger, String message) {
@@ -42,14 +40,14 @@ public class MakeHashes extends Step {
 
     @Override
     public void action() throws IOException {
-        Map<String, String> sources = getHashMap(sourceDirectory);
+        Map<String, String> sources = getHashMap(classDirectory);
         Map<String, String> resources = getHashMap(resourceDirectory);
         write(sources, resources);
     }
 
     public Map<String, String> getHashMap(File directory) {
-        Collection<File> files = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-        Map<String, String> map = new HashMap<>();
+        Collection<File> files = FileUtil.directoryTree(directory);
+        Map<String, String> map = new LinkedHashMap<>();
 
         files.forEach(file -> {
             String hash = getHash(file);
@@ -64,7 +62,7 @@ public class MakeHashes extends Step {
 
     public void write(Map<String, String> sources, Map<String, String> resources) throws IOException {
         FileUtil.createDirectory(output.getParentFile());
-        logger.file(project, "Hash file -> {}", output.getAbsolutePath());
+        logger.toFile("Hash file -> {}", output.getAbsolutePath());
 
         try (BufferedWriter writer = Files.newBufferedWriter(output.toPath())) {
             for (Map.Entry<String, String> src : sources.entrySet()) {
@@ -80,8 +78,8 @@ public class MakeHashes extends Step {
     }
 
     public void writeLine(BufferedWriter writer, Map.Entry<String, String> entry) throws IOException {
-        logger.file(project, "File -> {}", entry.getKey());
-        logger.file(project, "Hash -> {}", entry.getValue());
+        logger.toFile("File -> {}", entry.getKey());
+        logger.toFile("Hash -> {}", entry.getValue());
         writer.write(entry.getKey() + " " + entry.getValue() + "\n");
         writer.flush();
     }
@@ -92,12 +90,12 @@ public class MakeHashes extends Step {
             byte[] bytes = md.digest(Files.readAllBytes(file.toPath()));
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
-            throw new AcpException("Hash generation error: ", logger, project, e);
+            throw new AcpException("Hash generation error: ", logger, e);
         }
     }
 
-    public MakeHashes setSourceDirectory(File sourceDirectory) {
-        this.sourceDirectory = sourceDirectory;
+    public MakeHashes setClassDirectory(File classDirectory) {
+        this.classDirectory = classDirectory;
         return this;
     }
 

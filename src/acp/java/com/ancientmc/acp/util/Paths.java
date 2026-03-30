@@ -4,11 +4,9 @@ package com.ancientmc.acp.util;
  * File containing all paths used by ACP.
  * @author moist-mason
  */
-public class Paths {
+public final class Paths {
 
-    /**
-     * Directories
-     */
+    /** Directories */
     public static final String DIR_CFG = "cfg/";
     public static final String DIR_INJECT = DIR_CFG + "inject/";
     public static final String DIR_TEMP = DIR_CFG + "temp/";
@@ -30,9 +28,7 @@ public class Paths {
     public static final String DIR_MODDED_CLASSES = DIR_BUILD_MODDED + "classes/deobf/";
     public static final String DIR_MODDED_PATCHES = DIR_BUILD_MODDED + "patches/";
 
-    /**
-     * ACP files.
-     */
+    /** ACP files. */
     public static final String ACP_DATA = DIR_CFG + "data.zip";
     public static final String TOOLS_JSON = "gradle/tools.json";
     public static final String TSRG = DIR_CFG + "cuneiform.tsrg";
@@ -40,9 +36,7 @@ public class Paths {
     public static final String VANILLA_HASH_FILE = DIR_BUILD_MODDED + "hashes/vanilla.md5";
     public static final String MODDED_HASH_FILE = DIR_BUILD_MODDED + "hashes/modded.md5";
 
-    /**
-     * Minecraft files.
-     */
+    /** Minecraft files. */
     public static final String VERSION_MANIFEST = DIR_TEMP + "version_manifest.json";
     public static final String JSON = DIR_TEMP + "version.json";
     public static final String CLIENT_JAR = DIR_TEMP + "client.jar";

@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -12,23 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Step used to execute Java-based tools needed during decompilation.
+ * Step used to execute Java-based tools.
+ * @author moist-mason
  */
 public class JavaExecStep extends Step {
 
-    /**
-     * The configuration for our tool being executed.
-     */
+    /** The configuration for our tool being executed. */
     protected Configuration configuration;
 
-    /**
-     * The main class of the tool being executed.
-     */
+    /** The main class of the tool being executed. */
     protected String mainClass;
 
-    /**
-     * The tool's command line arguments.
-     */
+    /** The tool's command line arguments. */
     protected List<String> args;
 
     public JavaExecStep(Project project, AcpLogger logger, String message) {
@@ -57,10 +53,10 @@ public class JavaExecStep extends Step {
     }
 
     public void log(String tool, String out) {
-        logger.file(project, "Tool -> {}", tool);
-        logger.file(project, "Output ->");
-        List<String> elements = Arrays.asList(out.split("\n"));
-        elements.forEach(e -> logger.file(project, "\t\t" + e));
+        logger.toFile("Tool -> {}", tool);
+        logger.toFile("Output ->");
+        List<String> elements = List.of(out.split("\n"));
+        elements.forEach(e -> logger.toFile("\t\t" + e));
     }
 
     public JavaExecStep setConfiguration(String configuration) {
@@ -79,9 +75,9 @@ public class JavaExecStep extends Step {
     }
 
     /**
-     * The makeDiffPatches step as part of the BuildMod task crashes the process unless we ignore the exit value. We don't want to do this
-     * for all JavaExec steps, so for each JavaExec we check for the args, and only call the JavaExec.setIgnoreExitValue method if there's a match
-     * with the makeDiffPatches step.
+     * The makeDiffPatches step as part of the BuildMod task crashes the process unless we ignore the exit value. We
+     * don't want to do this for all JavaExec steps, so for each JavaExec we check for the args, and only call the
+     * JavaExec.setIgnoreExitValue method if there's a match with the makeDiffPatches step.
      */
     public static boolean isMakeDiffPatchesStep(List<String> args) {
         return args.equals(Arrays.asList("--diff", Paths.DIR_VANILLA_SRC, Paths.DIR_SRC, "--output", Paths.DIR_MODDED_PATCHES + "/diff/"));

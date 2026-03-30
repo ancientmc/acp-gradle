@@ -12,44 +12,34 @@ import java.io.IOException;
  */
 public abstract class Step {
 
-    /**
-     * The message that is printed in the console upon the step's execution.
-     */
+    /** The message that is printed in the console upon the step's execution. */
     protected String message;
 
-    /**
-     * The gradle project.
-     */
+    /** The Gradle project. */
     protected Project project;
 
-    /**
-     * The condition that determines if a step is executed.
-     */
+    /** The condition that determines if a step is executed. */
     protected boolean condition;
 
-    /**
-     * ACP's logger.
-     */
+    /** ACP's logger. */
     protected AcpLogger logger;
 
     /**
-     * Main execution method for all inheritors of the Step class. If the condition is met, the message is printed and the
-     * action is performed.
+     * Main execution method for all inheritors of the Step class. If the condition is met, the message is printed and
+     * the action is performed.
      */
     public void exec() {
         try {
             if (condition) {
-                logger.console(project, message);
+                logger.toConsole(message);
                 action();
             }
         } catch (IOException e) {
-            throw new AcpException(e.getMessage(), logger, project, e);
+            throw new AcpException(e.getMessage(), logger, e);
         }
     }
 
-    /**
-     * Performs the main action for this step.
-     */
+    /** Performs the main action for this step. */
     public abstract void action() throws IOException;
 
     protected Step setCore(Project project, AcpLogger logger, String message) {

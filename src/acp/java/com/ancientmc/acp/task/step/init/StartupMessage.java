@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.init;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.AcpException;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
@@ -13,12 +14,11 @@ import java.util.jar.Manifest;
 
 /**
  * Prints the startup message upon ACP's initialization.
+ * @author moist-mason
  */
 public class StartupMessage extends Step {
 
-    /**
-     * The Minecraft version.
-     */
+    /** The Minecraft version. */
     private final String minecraftVersion;
 
     public StartupMessage(Project project, String minecraftVersion, AcpLogger logger) {
@@ -31,9 +31,7 @@ public class StartupMessage extends Step {
     @Override
     public void action() { } // blank because nothing besides the message printing actually happens.
 
-    /**
-     * @return The startup message used upon booting the ACP initializer for the first time.
-     */
+    /** @return The startup message used upon booting the ACP initializer for the first time. */
     private String getStartupMessage() {
         List<String> lines = Arrays.asList("\nAncient Coder Pack",
                 "Copyright (c) AncientMC",
@@ -43,22 +41,15 @@ public class StartupMessage extends Step {
         return String.join("\n", lines) + "\n";
     }
 
-    /**
-     * @return The ACP Gradle version by parsing the plugin's JAR manifest.
-     */
+    /** @return The ACP Gradle version by parsing the plugin JAR's manifest. */
     private String getPluginVersion() {
         try {
-            Plugin<?> plugin = project.getPlugins().stream().filter(p -> p.getClass().getName().contains("acp")).findAny().orElse(null);
-
-            if (plugin != null) {
-                URLClassLoader loader = (URLClassLoader) plugin.getClass().getClassLoader();
-                Manifest manifest = new Manifest(loader.findResource("META-INF/MANIFEST.MF").openStream());
-                return manifest.getMainAttributes().getValue("Implementation-Version");
-            }
-
-            return "unknown";
+            Plugin<?> plugin = project.getPlugins().stream().filter(p -> p.getClass().getName().contains("acp")).findAny().orElseThrow();
+            URLClassLoader loader = (URLClassLoader) plugin.getClass().getClassLoader();
+            Manifest manifest = new Manifest(loader.findResource("META-INF/MANIFEST.MF").openStream());
+            return manifest.getMainAttributes().getValue("Implementation-Version");
         } catch (IOException e) {
-            throw new AcpException("Manifest parsing error", logger, project, e);
+            throw new AcpException("Manifest parsing error", logger, e);
         }
     }
 }

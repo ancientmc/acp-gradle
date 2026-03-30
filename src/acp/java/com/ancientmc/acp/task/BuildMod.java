@@ -1,7 +1,10 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.task.step.common.*;
+import com.ancientmc.acp.task.step.mod.MakeArchives;
+import com.ancientmc.acp.task.step.mod.MakeReobfSrg;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
 import org.gradle.api.tasks.SourceSetContainer;
@@ -9,13 +12,14 @@ import org.gradle.api.tasks.SourceSetContainer;
 import java.util.Arrays;
 
 /**
- * Builds the mod's files for distribution: DiffPatches, LZMA binary patches, and ZIPs/TARs containing compiled classes.
+ * Builds the mod's files for distribution: DiffPatches, LZMA binary patches, and ZIPs/TARs containing compiled
+ * classes.
  * @author moist-mason
  */
 public abstract class BuildMod extends AcpTask {
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
         String lzmaPath = Paths.DIR_BUILD_MODDED + "patches/bin/" + extension.getModName().get() + "-" + project.getVersion() + ".lzma";
 
@@ -69,7 +73,7 @@ public abstract class BuildMod extends AcpTask {
         extractReobfClasses.exec();
 
         Step makeModdedHashes = new MakeHashes(project, logger, "Generating modded hashes")
-                .setSourceDirectory(project.file(Paths.DIR_MODDED_CLASSES))
+                .setClassDirectory(project.file(Paths.DIR_MODDED_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.MODDED_HASH_FILE))
                 .setCondition(true);

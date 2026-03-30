@@ -20,13 +20,13 @@ public abstract class Clean extends AcpTask {
     private static final FileFilter RUN_FILTER = (File file2) -> !file2.getName().contains("resources") && !file2.getName().contains("bin");
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         getUnfilteredPaths().forEach(path -> {
             try {
                 File[] files = project.file(path).listFiles();
 
                 if (files != null) {
-                    deleteFiles(project, path, files);
+                    deleteFiles(path, files);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -38,7 +38,7 @@ public abstract class Clean extends AcpTask {
                 File[] files = project.file(path).listFiles(filter);
 
                 if (files != null) {
-                    deleteFiles(project, path, files);
+                    deleteFiles(path, files);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -46,18 +46,18 @@ public abstract class Clean extends AcpTask {
         });
     }
 
-    public void deleteFiles(Project project, String path, File[] files) throws IOException {
+    public void deleteFiles(String path, File[] files) throws IOException {
         if (files.length > 0) {
-            logger.console(project, "Deleting {} files in path " + path, Integer.toString(files.length));
+            logger.toConsole("Deleting {} files in path " + path, Integer.toString(files.length));
         }
 
         for (File file : files) {
-            delete(project, file);
+            delete(file);
         }
     }
 
-    public void delete(Project project, File file) throws IOException {
-        logger.file(project, "Delete -> {}", file.getAbsolutePath());
+    public void delete(File file) throws IOException {
+        logger.toFile("Delete -> {}", file.getAbsolutePath());
 
         if (file.isDirectory()) {
             FileUtils.deleteDirectory(file);
@@ -66,20 +66,19 @@ public abstract class Clean extends AcpTask {
         }
 
         if (!file.exists()) {
-            logger.file(project, "Deleted");
+            logger.toFile("Deleted");
         }
     }
 
-    /**
-     * @return a list of every path whose content will be entirely deleted.
-     */
+    /** @return a list of every path whose contents will be entirely deleted. */
     public static List<String> getUnfilteredPaths() {
         return List.of(Paths.DIR_RESOURCES, Paths.DIR_BUILD_MODDED);
     }
 
     /**
-     * For some paths we want to only delete certain files or directories, not the whole thing. This calls a map where the key is a directory path,
-     * and its value is the corresponding file filter that only lets us use what we want to keep.
+     * For some paths we want to only delete certain files or directories, not the whole thing. This calls a map where
+     * the key is a directory path, and its value is the corresponding file filter that only lets us use what we want to
+     * keep.
      * @return The inputs.
      */
     public static Map<String, FileFilter> getFilteredPaths() {

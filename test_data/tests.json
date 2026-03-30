@@ -1,6 +1,16 @@
 {
   "tests": [
     {
+      "name": "preclassic_one",
+      "version": "rd-132211",
+      "loader": "vanilla",
+      "tasks": [
+        { "name": "decompile" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    },
+    {
       "name": "classic_one",
       "version": "c0.0.13a_03",
       "loader": "vanilla",

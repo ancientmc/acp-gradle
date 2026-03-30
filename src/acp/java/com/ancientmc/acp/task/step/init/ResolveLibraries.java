@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.init;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
@@ -15,19 +16,17 @@ import java.util.List;
 public class ResolveLibraries extends Step {
 
     /**
-     * The list of Minecraft's libraries, formatted via maven path (group.sub:name:version)
-     * The list is obtained via a method in the Json utilities class.
+     * The list of Minecraft's libraries, formatted via maven path (group.sub:name:version) The list is obtained via a
+     * method in the Json utilities class.
      * @see Json#getLibraries(List)
      */
     private List<String> libraries;
 
-    /**
-     * A list of all of Minecraft's libraries get parsed through and resolved via a Gradle listener.
-     */
     public ResolveLibraries(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);
     }
 
+    /** A list of all of Minecraft's libraries get parsed through and resolved via a Gradle listener. */
     @Override
     public void action() {
         DependencySet dependencies = project.getConfigurations().named("implementation").get().getDependencies();

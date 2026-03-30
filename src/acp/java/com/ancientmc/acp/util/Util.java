@@ -2,22 +2,21 @@ package com.ancientmc.acp.util;
 
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
-import org.gradle.internal.os.OperatingSystem;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 
 /**
  * Class full of miscellaneous utilities.
+ * @author moist-mason
  */
-public class Util {
+public final class Util {
 
     /**
-     * Gets the minecraft version from the version property. If the developer is using the legacy Alpha 1.2.6
-     * build, "a1.2.6" is the returned string.
-     * @param project The gradle project.
+     * Gets the minecraft version from the version property. If the developer is using the legacy Alpha 1.2.6 build,
+     * "a1.2.6" is the returned string.
+     * @param project The Gradle project.
      */
     public static String getMinecraftVersion(Project project) {
         String versionProperty = project.getProperties().get("minecraft_version").toString();
@@ -35,37 +34,19 @@ public class Util {
         String[] split = path.split(":");
         String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
         String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
-        return Util.getUrl(repo + newPath);
+        return getUrl(repo + newPath);
     }
 
     /**
-     * Checks if a project configuration is empty, i.e. if its dependencies haven't been installed during the configuration phase.
-     * @param project The gradle project.
+     * Checks if a project configuration is empty, i.e. if its dependencies haven't been installed during the
+     * configuration phase.
+     * @param project The Gradle project.
      * @param name The name of the configuration.
      * @return true if the configuration(s) is empty.
      */
-    public static boolean dependencyCondition(Project project, String name) {
+    public static boolean areDependenciesPresent(Project project, String name) {
         Configuration cfg = project.getConfigurations().named(name).get();
         return cfg.getDependencies().isEmpty();
-    }
-
-    /**
-     * Gets a shortened version of the operating system's name. This is used in getting the native URLs,
-     * as different versions for library natives are needed depending on the operating system.
-     * @see Json#getNativeUrls(File)
-     */
-    public static String getOsName() {
-        OperatingSystem os = OperatingSystem.current();
-
-        if (os.isWindows()) {
-            return "windows";
-        } else if (os.isMacOsX()) {
-            return "osx";
-        } else if (os.isLinux() || os.isUnix()) {
-            return "linux";
-        }
-
-        return "unknown";
     }
 
     /**

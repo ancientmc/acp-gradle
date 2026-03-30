@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.init;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
 import com.ancientmc.acp.util.Util;
@@ -10,25 +11,25 @@ import org.gradle.api.Project;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * This step downloads the asset files. Instead of downloading the asset hashes in their pure forms, it goes the extra mile
- * and converts those hash files into the actual resource files used by the game.
+ * This step downloads the asset files. Instead of downloading the asset hashes in their pure forms, it goes the extra
+ * mile and converts those hash files into the actual resource files used by the game.
  * @author moist-mason
  */
 public class DownloadAssets extends Step {
 
     /**
-     * The URL for the index file containing a map of resource files and their hash values.
-     * The URL is retrieved from a method in the Json utilities class.
+     * The URL for the index file containing a map of resource files and their hash values. The URL is retrieved from a
+     * method in the {@link Json} utilities class.
      * @see Json#getAssetIndexUrl(File)
      */
     private URL indexUrl;
 
-    /**
-     * The output file containing the resources: "run/resources" in the ACP workspace.
-     */
+    /** The output directory containing the resources: "run/resources" in the ACP workspace. */
     private File output;
 
     public DownloadAssets(Project project, AcpLogger logger, String message) {
@@ -39,12 +40,12 @@ public class DownloadAssets extends Step {
     public void action() throws IOException {
         FileUtil.createDirectory(output);
 
-        logger.file(project, "Json index -> {}", indexUrl.toString());
+        logger.toFile("Json index -> {}", indexUrl.toString());
         JsonObject index = Json.get(indexUrl);
         List<Asset> assets = getAssets(index);
 
         if (!assets.isEmpty()) {
-            logger.file(project, "Asset size -> {}", Integer.toString(assets.size()));
+            logger.toFile("Asset size -> {}", Integer.toString(assets.size()));
             download(assets, output);
         }
     }
@@ -94,9 +95,7 @@ public class DownloadAssets extends Step {
      */
     public record Asset(String name, String hash, boolean omniArchive) {
 
-        /**
-         * @return the URL of this asset's hash.
-         */
+        /** @return the URL of this asset's hash. */
         public URL getUrl() {
             String path = hash.substring(0, 2) + '/' + hash;
             String domain = omniArchive ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";

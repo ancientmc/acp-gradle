@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.init;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Json;
 import org.gradle.api.Project;
@@ -23,30 +24,26 @@ public class ExtractNatives extends Step {
      */
     private List<URL> urls;
 
-    /**
-     * The output directory that will contain the native files.
-     */
+    /** The output directory that will contain the native files. */
     private File output;
 
     public ExtractNatives(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);
     }
 
-    /**
-     * To extract the natives, we first download the JAR files in the URLS. Then for each file, we extract the native libraries
-     * from their JAR files into the output folder.
-     */
     @Override
     public void action() throws IOException {
         List<File> jars = new ArrayList<>();
         FileUtil.createDirectory(output);
 
+        // Downloads native JARS
         for (URL url : urls) {
             String path = url.getPath().substring(url.getPath().lastIndexOf('/') + 1);
             FileUtil.download(logger, url, new File(output, path));
             jars.add(new File(output, path));
         }
 
+        // Extracts the JARs
         for (File jar : jars) {
             FileUtil.extract(project, logger, jar, output);
         }

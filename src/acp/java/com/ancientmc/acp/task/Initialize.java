@@ -1,7 +1,11 @@
 package com.ancientmc.acp.task;
 
 import com.ancientmc.acp.AcpExtension;
-import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.task.step.common.CopyFile;
+import com.ancientmc.acp.task.step.common.DownloadFile;
+import com.ancientmc.acp.task.step.common.ExtractFile;
+import com.ancientmc.acp.task.step.init.*;
 import com.ancientmc.acp.util.*;
 import org.gradle.api.Project;
 
@@ -15,7 +19,7 @@ import java.util.Arrays;
 public abstract class Initialize extends AcpTask {
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         try {
             AcpExtension extension = project.getExtensions().getByType(AcpExtension.class);
             String version = Util.getMinecraftVersion(project);
@@ -50,12 +54,12 @@ public abstract class Initialize extends AcpTask {
 
             Step resolveLibraries = new ResolveLibraries(project, logger, "Resolving Minecraft libraries")
                     .setLibraries(Json.getLibraries(Arrays.asList(project.file(Paths.JSON), project.file(Paths.DIR_CFG + "jardep.json"))))
-                    .setCondition(Util.dependencyCondition(project, "runtimeClasspath"));
+                    .setCondition(Util.areDependenciesPresent(project, "runtimeClasspath"));
             resolveLibraries.exec();
 
             Step resolveTools = new ResolveTools(project, logger, "Resolving ACP tools")
                     .setTools(Json.getTools(project.file(Paths.TOOLS_JSON)))
-                    .setCondition(Util.dependencyCondition(project, "fernflower"));
+                    .setCondition(Util.areDependenciesPresent(project, "fernflower"));
             resolveTools.exec();
 
             Step extractNatives = new ExtractNatives(project, logger, "Extracting natives")
@@ -68,7 +72,7 @@ public abstract class Initialize extends AcpTask {
                     .setIndexUrl(Json.getAssetIndexUrl(project.file(Paths.JSON)))
                     .setOutput(project.file(Paths.DIR_ASSETS))
                     .setCondition(Json.areAssetsPresent(project.file(Paths.JSON)) &&
-                            FileUtil.directoryCondition(project.file(Paths.DIR_ASSETS)));
+                            FileUtil.isDirectoryEmpty(project.file(Paths.DIR_ASSETS)));
             downloadAssets.exec();
 
             Step downloadClient = new DownloadFile(project, logger, "Downloading client JAR")
@@ -83,7 +87,7 @@ public abstract class Initialize extends AcpTask {
                     .setCondition(!project.file(Paths.DIR_SRC + "acp/client/Start.java").exists());
             copyStart.exec();
         } catch (IOException e) {
-            throw new AcpException("Initialization error.", logger, project, e);
+            throw new AcpException("Initialization error.", logger, e);
         }
     }
 }

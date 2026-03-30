@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
@@ -14,14 +15,10 @@ import java.net.URL;
  */
 public class DownloadFile extends Step {
 
-    /**
-     * The input URL.
-     */
+    /** The input URL. */
     private URL input;
 
-    /**
-     * The downloaded file.
-     */
+    /** The downloaded file. */
     private File output;
 
     public DownloadFile(Project project, AcpLogger logger, String message) {

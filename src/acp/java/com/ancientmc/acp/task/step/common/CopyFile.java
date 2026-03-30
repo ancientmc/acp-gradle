@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.FileUtil;
 import org.gradle.api.Project;
 
@@ -15,19 +16,13 @@ import java.util.List;
  */
 public class CopyFile extends Step {
 
-    /**
-     * The input file getting copied.
-     */
+    /** The input file getting copied. */
     private File input;
 
-    /**
-     * The output directory that the input is copied into.
-     */
+    /** The output directory that the input is copied into. */
     private File output;
 
-    /**
-     * Paths and files excluded from being copied.
-     */
+    /** Paths and files excluded from being copied. */
     private List<String> exclusions;
 
     public CopyFile(Project project, AcpLogger logger, String message) {

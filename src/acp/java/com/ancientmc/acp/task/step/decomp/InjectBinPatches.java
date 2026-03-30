@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.decomp;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.Step;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -15,30 +16,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Injects LZMA files found within a specified directory into the Minecraft JAR.
- * Binary injection is done via Minecraft Forge's Binary Patcher. Multiple LZMA files can be injected, as this task
- * makes temporary JAR files for each implemented LZMA.
+ * Injects LZMA files found within a specified directory into the Minecraft JAR. Binary injection is done via Minecraft
+ * Forge's Binary Patcher. Multiple LZMA files can be injected, as this task makes temporary JAR files for each
+ * implemented LZMA.
+ * @author moist-mason
  */
 public class InjectBinPatches extends Step {
+
+    /** The base input JAR. */
+    private File input;
+
+    /** The base output JAR. */
+    private File output;
+
+    /** The patch directory containing the LZMA files. */
+    private File patchDirectory;
 
     public InjectBinPatches(Project project, AcpLogger logger, String message) {
         setCore(project, logger, message);
     }
-
-    /**
-     * The base input JAR.
-     */
-    private File input;
-
-    /**
-     * The base output JAR.
-     */
-    private File output;
-
-    /**
-     * The patch directory containing the LZMA files.
-     */
-    private File patchDirectory;
 
     @Override
     public void action() throws IOException {
@@ -60,8 +56,8 @@ public class InjectBinPatches extends Step {
     }
 
     /**
-     * Gets a filtered list of LZMA files from the patch directory. It is filtered to only include LZMAs, and
-     * compared so that the mod loader LZMA (Risugami or Forge) is injected first.
+     * Gets a filtered list of LZMA files from the patch directory. It is filtered to only include LZMAs, and compared
+     * so that the mod loader LZMA (Risugami or Forge) is injected first.
      * @param directory The patch directory.
      * @return The LZMA list.
      */
@@ -73,8 +69,9 @@ public class InjectBinPatches extends Step {
     }
 
     /**
-     * Gets the currently iterated input JAR. If the index value of the current LZMA in the LZMA list getting injected is 0, that indicates that no injection has ocurred,
-     * meaning the input is simply the original vanilla jar input. If not, a temporary file is created with the current index value of the LZMA.
+     * Gets the currently iterated input JAR. If the index value of the current LZMA in the LZMA list getting injected
+     * is 0, that indicates that no injection has ocurred, meaning the input is simply the original vanilla jar input.
+     * If not, a temporary file is created with the current index value of the LZMA.
      * @param input The vanilla input JAR file (${version}-slim.jar).
      * @param files The list of LZMA patch files.
      * @param lzma The currently iterated LZMA.
@@ -86,9 +83,10 @@ public class InjectBinPatches extends Step {
     }
 
     /**
-     * Similar to getCurrentInput(), we want to find the currently iterated value of the jar getting output.
-     * If the index value in the lZMA list of the current LZMA getting injected is one less than the total size of the LZMA list,
-     * that means that all LZMA files have been injected, and the final output can be returned. Otherwise, a new temp file is returned.
+     * Similar to getCurrentInput(), we want to find the currently iterated value of the jar getting output. If the
+     * index value in the lZMA list of the current LZMA getting injected is one less than the total size of the LZMA
+     * list, that means that all LZMA files have been injected, and the final output can be returned. Otherwise, a new
+     * temp file is returned.
      * @param output The final output JAR file containing mod classes (${version}-mod.jar).
      * @param files The list of LZMA patch files.
      * @param lzma The currently iterated LZMA.
@@ -100,8 +98,8 @@ public class InjectBinPatches extends Step {
     }
 
     /**
-     * We want to compare the LZMA files to ensure that the ModLoader LZMA is the first element in the list, and therefore is injected
-     * first. This comparator does that and gets called above for sorting.
+     * We want to compare the LZMA files to ensure that the ModLoader LZMA is the first element in the list, and
+     * therefore is injected first. This comparator does that and gets called above for sorting.
      */
     private static class LzmaComparator implements Comparator<File> {
         @Override

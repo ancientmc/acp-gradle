@@ -1,6 +1,7 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.decomp;
 
 import com.ancientmc.acp.logger.AcpLogger;
+import com.ancientmc.acp.task.step.common.JavaExecStep;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -13,16 +14,15 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * ACP uses AutoRenamingTool as its program to deobfuscate Minecraft's source code. The issue with ART is that it does not allow
- * package mapping, which becomes a problem when the classes for old ModLoader by Risugami have no packages. This class uses SpecialSource,
- * which does allow package mapping, to remap any unpackaged default classes to the "minecraft/src/" namespace. This is done by generating a temporary
- * SRG (not TSRG) file.
+ * ACP uses AutoRenamingTool as its program to deobfuscate Minecraft's source code. The issue with ART is that it does
+ * not allow package mapping, which becomes a problem when the classes for old ModLoader by Risugami have no packages.
+ * This class uses SpecialSource, which does allow package mapping, to remap any unpackaged default classes to the
+ * "minecraft/src/" namespace. This is done by generating a temporary SRG (not TSRG) file.
+ * @author moist-mason
  */
 public class RepackageDefaults extends JavaExecStep {
 
-    /**
-     * The TSRG file, used to figure out the namespace to assign in the generated package SRG.
-     */
+    /** The TSRG file, used to figure out the namespace to assign in the generated package SRG. */
     protected File tsrg;
 
     public RepackageDefaults(Project project, AcpLogger logger, String message) {
@@ -34,9 +34,7 @@ public class RepackageDefaults extends JavaExecStep {
         super.action();
     }
 
-    /**
-     * Writes the SRG file.
-     */
+    /** Writes the SRG file. */
     public File getSrg() {
         File srg = project.file(Paths.DIR_TEMP + "pkg.srg");
 
@@ -50,8 +48,8 @@ public class RepackageDefaults extends JavaExecStep {
     }
 
     /**
-     * We have to check the TSRG to see which package namespace is in use. Old versions used the "com/mojang/minecraft" namespace,
-     * while newer ones use "net/minecraft".
+     * We have to check the TSRG to see which package namespace is in use. Old versions used the "com/mojang/minecraft"
+     * namespace, while newer ones use "net/minecraft".
      * @return The ../src/ package, dependent on the version.
      */
     public String getPackage() throws IOException {

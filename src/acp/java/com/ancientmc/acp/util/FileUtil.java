@@ -17,14 +17,8 @@ import java.util.List;
  * Utility class for file-related functions.
  * @author moist-mason
  */
-public class FileUtil {
+public final class FileUtil {
 
-    /**
-     * Downloads a file from a URL, and creates the parent directory if needed.
-     * @param input The source URL.
-     * @param output The target file.
-     * @throws IOException exception.
-     */
     public static void download(AcpLogger logger, URL input, File output) throws IOException {
         createDirectory(output.getParentFile());
         FileUtils.copyURLToFile(input, output);
@@ -65,11 +59,6 @@ public class FileUtil {
         copy(project, project.zipTree(archive), target, inclusions, exclusions);
     }
 
-    /**
-     * Checks if a directory exists, and creates it if not.
-     * @param directory The directory being created.
-     * @throws IOException exception
-     */
     public static void createDirectory(File directory) throws IOException {
         if (!directory.exists()) {
             Files.createDirectories(directory.toPath());
@@ -80,16 +69,12 @@ public class FileUtil {
      * @param directory The input directory.
      * @return true if the directory either does not exist or its contents are empty.
      */
-    public static boolean directoryCondition(File directory) {
-        return !directory.exists() || isDirectoryEmpty(directory);
+    public static boolean isDirectoryEmpty(File directory) {
+        Collection<File> files = directoryTree(directory);
+        return !directory.exists() || files.isEmpty();
     }
 
-    /**
-     * @param directory The input directory.
-     * @return true if the directory is empty.
-     */
-    private static boolean isDirectoryEmpty(File directory) {
-        Collection<File> files = FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
-        return files.isEmpty();
+    public static Collection<File> directoryTree(File directory) {
+        return FileUtils.listFiles(directory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY);
     }
 }

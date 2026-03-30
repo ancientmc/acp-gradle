@@ -1,6 +1,9 @@
 package com.ancientmc.acp.task;
 
-import com.ancientmc.acp.task.step.*;
+import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.task.step.common.*;
+import com.ancientmc.acp.task.step.decomp.InjectBinPatches;
+import com.ancientmc.acp.task.step.decomp.RepackageDefaults;
 import com.ancientmc.acp.util.FileUtil;
 import com.ancientmc.acp.util.Paths;
 import org.gradle.api.Project;
@@ -15,7 +18,7 @@ import java.util.Arrays;
 public abstract class Decompile extends AcpTask {
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         Step splitJar = new JavaExecStep(project, logger, "Splitting the JAR")
                 .setConfiguration("jarsplitter")
                 .setMainClass("net.neoforged.jarsplitter.ConsoleTool")
@@ -67,36 +70,38 @@ public abstract class Decompile extends AcpTask {
         Step unzip = new ExtractFile(project, logger, "Unzipping Minecraft's sources")
                 .setInput(project.file(Paths.FINAL_JAR))
                 .setOutput(project.file(Paths.DIR_SRC))
-                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_SRC + "com/mojang/minecraft/"))
-                        || FileUtil.directoryCondition(project.file(Paths.DIR_SRC + "net/minecraft/")));
+                .setCondition(FileUtil.isDirectoryEmpty(project.file(Paths.DIR_SRC + "com/mojang/minecraft/"))
+                        || FileUtil.isDirectoryEmpty(project.file(Paths.DIR_SRC + "net/minecraft/")));
         unzip.exec();
 
-        Step patch = new JavaExecStep(project, logger, "Patching source files")
-                .setConfiguration("diffpatch")
-                .setMainClass("codechicken.diffpatch.DiffPatch")
-                .setArgs(Arrays.asList("--patch", Paths.DIR_SRC, Paths.DIR_PATCHES, "--output", Paths.DIR_SRC,
-                        "--reject", Paths.DIR_TEMP + "patch_rejects/"))
-                .setCondition(true); // condition ???
-        patch.exec();
+        if (project.file(Paths.DIR_PATCHES).exists()) {
+            Step patch = new JavaExecStep(project, logger, "Patching source files")
+                    .setConfiguration("diffpatch")
+                    .setMainClass("codechicken.diffpatch.DiffPatch")
+                    .setArgs(Arrays.asList("--patch", Paths.DIR_SRC, Paths.DIR_PATCHES, "--output", Paths.DIR_SRC,
+                            "--reject", Paths.DIR_TEMP + "patch_rejects/"))
+                    .setCondition(true); // condition ???
+            patch.exec();
+        }
 
         Step extractResources = new ExtractFile(project, logger, "Extracting JAR resources")
                 .setInput(project.file(Paths.EXTRA_JAR))
                 .setOutput(project.file(Paths.DIR_RESOURCES))
                 .setExclusions(Arrays.asList("com/jcraft/**", "paulscode/**", "META-INF/**"))
-                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_RESOURCES)));
+                .setCondition(FileUtil.isDirectoryEmpty(project.file(Paths.DIR_RESOURCES)));
         extractResources.exec();
 
         Step backupSrc = new CopyFile(project, logger, "Backing up source files")
                 .setInput(project.file(Paths.DIR_SRC))
                 .setOutput(project.file(Paths.DIR_VANILLA_SRC))
                 .setExclusions("acp/")
-                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_SRC)));
+                .setCondition(FileUtil.isDirectoryEmpty(project.file(Paths.DIR_VANILLA_SRC)));
         backupSrc.exec();
 
         Step backupResources = new CopyFile(project, logger, "Backing up JAR resources")
                 .setInput(project.file(Paths.DIR_RESOURCES))
                 .setOutput(project.file(Paths.DIR_VANILLA_RESOURCES))
-                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_RESOURCES)));
+                .setCondition(FileUtil.isDirectoryEmpty(project.file(Paths.DIR_VANILLA_RESOURCES)));
         backupResources.exec();
 
         Step vanillaCompile = new JavaCompileStep(project, logger, "Recompiling the game")
@@ -104,7 +109,7 @@ public abstract class Decompile extends AcpTask {
                 .setClasspathCollection(project.getExtensions().getByType(SourceSetContainer.class).named("main").get().getCompileClasspath())
                 .setNativesDirectory(project.file(Paths.DIR_NATIVES))
                 .setOutputDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
-                .setCondition(FileUtil.directoryCondition(project.file(Paths.DIR_VANILLA_CLASSES)));
+                .setCondition(FileUtil.isDirectoryEmpty(project.file(Paths.DIR_VANILLA_CLASSES)));
         vanillaCompile.exec();
 
         Step buildVanillaJar = new BuildJar(project, logger, "Rebuilding vanilla JAR")
@@ -115,7 +120,7 @@ public abstract class Decompile extends AcpTask {
         buildVanillaJar.exec();
 
         Step makeVanillaHashes = new MakeHashes(project, logger, "Generating vanilla hashes")
-                .setSourceDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
+                .setClassDirectory(project.file(Paths.DIR_VANILLA_CLASSES))
                 .setResourceDirectory(project.file(Paths.DIR_VANILLA_RESOURCES))
                 .setOutput(project.file(Paths.VANILLA_HASH_FILE))
                 .setCondition(!project.file(Paths.VANILLA_HASH_FILE).exists());

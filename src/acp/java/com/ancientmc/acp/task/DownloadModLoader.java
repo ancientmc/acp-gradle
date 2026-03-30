@@ -14,14 +14,14 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
- * Downloads the LZMA for the ModLoader into a specified folder. The LZMA will get injected later
- * via the injectModPatches task during setup.
+ * Downloads the LZMA for the ModLoader into a specified folder. The LZMA will get injected later via the
+ * injectModPatches step during setup.
  * @author moist-mason
  */
 public abstract class DownloadModLoader extends AcpTask {
 
     @Override
-    public void function(Project project) {
+    public void action(final Project project) {
         try {
             String version = getVersion().get();
             String loader = getModLoader().get();
@@ -32,7 +32,7 @@ public abstract class DownloadModLoader extends AcpTask {
             File output = project.file(directory.getAbsolutePath() + "modloader.lzma");
             FileUtil.download(logger, url, output);
         } catch (IOException e) {
-            throw new AcpException("Mod loader download error: ", logger, getProject(), e);
+            throw new AcpException("Mod loader download error: ", logger, e);
         }
     }
 
@@ -40,9 +40,10 @@ public abstract class DownloadModLoader extends AcpTask {
      * Gets the URL for the ModLoader LZMA in the AncientMC repo.
      * @param repo The URL for the AncientMC repo.
      * @param version The Minecraft version.
-     * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge).
+     * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft
+     * Forge).
      * @return The URL for the ModLoader LZMA.
-    */
+     */
     private URL getURL(String repo, String version, String loader) {
         String ml = getModLoaderPath(loader);
         String mavenPath = ml + ":" + version;
@@ -51,14 +52,15 @@ public abstract class DownloadModLoader extends AcpTask {
 
     /**
      * Gets the ModLoader maven path.
-     * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft Forge).
+     * @param loader The ModLoader type. Acceptable options are "risugami" (Risugami's ModLoader) or "forge" (Minecraft
+     * Forge).
      * @return The maven path.
      */
     private String getModLoaderPath(String loader) {
         return switch (loader) {
             case "forge" -> "net.minecraftforge:forge";
             case "risugami" -> "risugami:modloader";
-            default -> throw new AcpException("Unrecognized mod loader", logger, getProject(), new IOException(""));
+            default -> throw new AcpException("Unrecognized mod loader", logger, new IOException(""));
         };
     }
 

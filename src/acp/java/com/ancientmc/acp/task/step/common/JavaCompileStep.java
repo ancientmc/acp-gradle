@@ -1,12 +1,11 @@
-package com.ancientmc.acp.task.step;
+package com.ancientmc.acp.task.step.common;
 
 import com.ancientmc.acp.logger.AcpLogger;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
+import com.ancientmc.acp.task.step.Step;
+import com.ancientmc.acp.util.FileUtil;
+import com.ancientmc.acp.util.Os;
 import org.gradle.api.Project;
 import org.gradle.api.file.FileCollection;
-import org.gradle.internal.os.OperatingSystem;
 
 import javax.tools.*;
 import java.io.File;
@@ -19,24 +18,16 @@ import java.util.*;
  */
 public class JavaCompileStep extends Step {
 
-    /**
-     * The source directory.
-     */
+    /** The source directory. */
     private File sourceDirectory;
 
-    /**
-     * The classpath containing JAR libraries.
-     */
+    /** The classpath containing JAR libraries. */
     private FileCollection classpathCollection;
 
-    /**
-     * The directory containing native libraries.
-     */
+    /** The directory containing native libraries. */
     private File nativesDirectory;
 
-    /**
-     * The output directory for our classes.
-     */
+    /** The output directory for our classes. */
     private File outputDirectory;
 
     public JavaCompileStep(Project project, AcpLogger logger, String message) {
@@ -70,10 +61,10 @@ public class JavaCompileStep extends Step {
     }
 
     public void log(String classpath, List<String> options) {
-        logger.file(project, "Source directory -> {}", sourceDirectory.getAbsolutePath());
-        logger.file(project, "Classpath -> {}", classpath);
-        logger.file(project, "Output directory -> {}", outputDirectory.getAbsolutePath());
-        logger.file(project, "Options -> {}", String.join(" ", options));
+        logger.toFile("Source directory -> {}", sourceDirectory.getAbsolutePath());
+        logger.toFile("Classpath -> {}", classpath);
+        logger.toFile("Output directory -> {}", outputDirectory.getAbsolutePath());
+        logger.toFile("Options -> {}", String.join(" ", options));
     }
 
     /**
@@ -83,8 +74,9 @@ public class JavaCompileStep extends Step {
      * @return The sources, excluding the "acp/client" package path.
      */
     public Iterable<? extends JavaFileObject> getSources(StandardJavaFileManager manager, File sourceDirectory) {
-        Collection<File> sources = FileUtils.listFiles(sourceDirectory, TrueFileFilter.INSTANCE, DirectoryFileFilter.DIRECTORY)
-                .stream().filter(file -> !file.getParentFile().getParentFile().getName().equals("acp")).toList();
+        Collection<File> sources = FileUtil.directoryTree(sourceDirectory)
+                .stream().filter(file -> !file.getParentFile().getParentFile().getName().equals("acp"))
+                .toList();
         return manager.getJavaFileObjects(sources.toArray(new File[0]));
     }
 
@@ -96,7 +88,7 @@ public class JavaCompileStep extends Step {
     public String getClasspath(FileCollection classpathCollection) {
         List<String> list = new ArrayList<>();
         classpathCollection.forEach(file -> list.add(file.getAbsolutePath()));
-        String delimiter = OperatingSystem.current().isWindows() ? ";" : ":";
+        String delimiter = Os.current().equals(Os.WINDOWS) ? ";" : ":";
         return String.join(delimiter, list);
     }
 

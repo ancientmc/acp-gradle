@@ -3,14 +3,25 @@ All written by moist-mason, hence the use of first person.
 CURRENT [0.4.0]
 - Logging
 	- Ensure that most exceptions call the AcpException class, so that they appear in logs if something arises.
-- General
-	- Figure out how to fix the dependency resolving messages from showing in logs, even if the dependencies are actually resolved.
-		- UPDATE 12/15: Dependency resolution needs to happen, so any condition that prevents the ResolveLibraries or ResolveTools steps will make
-		Java processes fail. I will continue to find a workaround but this may actually be a necessary evil.
+	- Create a series of exception tests in the testing framework.
 
-FUTURE [1.0]
+FUTURE [0.5.x]
 - General
+    - This repository will be deprecated, and the plugin source will be merged with the original AncientCoderPack repository.
+    The reason is because two separate repositories for the MDK and the plugin are getting annoying, and I would rather merge them
+    for more convenient testing, dependency updating, etc. I have a vague idea of how this will work, and I do think it will be a positive
+    change. This will begin to happen once 0.4.0 is released.
+
+    - Move away from the Gradle API. The crux of my problem with it is that the task execution involving steps is sloppy, although it's not awful.
+    I'd rather do something more refined, though.
+
 	- Rework of the ModLoader download system. Instead of LZMA I am considering using a DiffPatch system, which is
     what NeoForge uses. This will allow the ModLoader text to be more readable, and will be especially important as future versions of Minecraft,
     which rely on Forge, become supported by ACP. This will make the RepackageDefaults class obsolete.
+
     - Include Reobfuscation SRGs (in .srg) format in the AcpGen data ZIPs, and remove the MakeReobfSrg step.
+
+    - Add step to re-add OpenGL constants into the source code. In general, compilers seem to obscure constants.
+    I've realized (mainly by looking at that leaked Beta 1.2_02 JAR) that there are likely many constants in Minecraft's codebase that have been hidden
+    from the obfuscated jars due to the compiler making them useless. This is a bigger issue that involves looking at other decompilers, so for now the time being
+    I will only focus on OpenGL's constants. This will likely involve a JSON file containing the constants and adding them after decompilation.
