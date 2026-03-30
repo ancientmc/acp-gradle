@@ -44,7 +44,7 @@ public abstract class DownloadModLoader extends AcpTask {
      * Forge).
      * @return The URL for the ModLoader LZMA.
      */
-    private URL getURL(String repo, String version, String loader) {
+    private URL getURL(String repo, String version, String loader) throws IOException {
         String ml = getModLoaderPath(loader);
         String mavenPath = ml + ":" + version;
         return Util.toMavenUrl(repo, mavenPath, "lzma");

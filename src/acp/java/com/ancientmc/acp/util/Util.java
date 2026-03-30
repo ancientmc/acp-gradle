@@ -31,7 +31,7 @@ public final class Util {
      * @param ext The file extension.
      * @return The maven URL.
      */
-    public static URL toMavenUrl(String repo, String path, String ext) {
+    public static URL toMavenUrl(String repo, String path, String ext) throws IOException {
         String[] split = path.split(":");
         String file = split[1] + "-" + split[2] + (split.length > 3 ? "-" + split[3] : "") + "." + ext;
         String newPath = split[0].replace('.', '/') + "/" + split[1] + "/" + split[2] + "/" + file;
