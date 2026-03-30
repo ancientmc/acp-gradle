@@ -90,7 +90,7 @@ public class MakeHashes extends Step {
             byte[] bytes = md.digest(Files.readAllBytes(file.toPath()));
             return new BigInteger(1, bytes).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
-            throw new AcpException("Hash generation error: ", logger, e);
+            throw new AcpException("Hash generation error.", logger, e);
         }
     }
 

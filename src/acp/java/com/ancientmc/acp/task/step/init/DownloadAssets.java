@@ -96,7 +96,7 @@ public class DownloadAssets extends Step {
     public record Asset(String name, String hash, boolean omniArchive) {
 
         /** @return the URL of this asset's hash. */
-        public URL getUrl() {
+        public URL getUrl() throws IOException {
             String path = hash.substring(0, 2) + '/' + hash;
             String domain = omniArchive ? "https://meta.omniarchive.uk/resources/" : "https://resources.download.minecraft.net/";
             return Util.getUrl(domain + path);

@@ -68,6 +68,30 @@
       "tasks": [
         { "name":  "supportedVersions" }
       ]
+    },
+    {
+      "name": "throw_wrongModloader",
+      "version": "a1.2.6-legacy",
+      "loader": "forge",
+      "tasks": [
+        { "name": "downloadModLoader" },
+        { "name": "decompile" },
+        { "name": "injectMod" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
+    },
+    {
+      "name": "throw_unknownModloader",
+      "version": "a1.2.6-legacy",
+      "loader": "fabric",
+      "tasks": [
+        { "name": "downloadModLoader" },
+        { "name": "decompile" },
+        { "name": "injectMod" },
+        { "name": "runClient" },
+        { "name": "buildMod" }
+      ]
     }
   ]
 }

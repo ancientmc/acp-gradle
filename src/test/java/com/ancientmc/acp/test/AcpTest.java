@@ -31,6 +31,10 @@ public class AcpTest {
     @Test public void testSupportVersionsTask() { doTest("supported_versions", false); }
     @Test public void testCleanupTask() { doTest("cleanup", false); }
 
+    // Tests for exception throwing and logging. These are supposed to fail.
+    @Test public void testThrowWrongModLoader() { doTest("throw_wrongModloader", false); }
+    @Test public void testThrowUnknownModLoader() { doTest("throw_unknownModloader", false); }
+
     public void doTest(String name, boolean ruby) {
         TestObject test = getTest(name);
         System.out.println("Test is: " + test.name());

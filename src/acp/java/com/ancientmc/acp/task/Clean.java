@@ -1,5 +1,6 @@
 package com.ancientmc.acp.task;
 
+import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -29,7 +30,7 @@ public abstract class Clean extends AcpTask {
                     deleteFiles(path, files);
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new AcpException(e.getMessage(), logger, e);
             }
         });
 
@@ -41,7 +42,7 @@ public abstract class Clean extends AcpTask {
                     deleteFiles(path, files);
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new AcpException(e.getMessage(), logger, e);
             }
         });
     }

@@ -2,6 +2,7 @@ package com.ancientmc.acp.task.step.decomp;
 
 import com.ancientmc.acp.logger.AcpLogger;
 import com.ancientmc.acp.task.step.common.JavaExecStep;
+import com.ancientmc.acp.util.AcpException;
 import com.ancientmc.acp.util.Paths;
 import org.apache.commons.io.FileUtils;
 import org.gradle.api.Project;
@@ -41,7 +42,7 @@ public class RepackageDefaults extends JavaExecStep {
         try {
             FileUtils.write(srg, "PK: . " + getPackage(), Charset.defaultCharset());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new AcpException("Default class repackaging error.", logger, e);
         }
 
         return srg;

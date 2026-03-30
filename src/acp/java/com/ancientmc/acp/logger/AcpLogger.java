@@ -65,21 +65,26 @@ public class AcpLogger {
      * @param message The error message.
      */
     public void error(Throwable throwable, String message) {
-        // TODO: Not sure this works. To test, devise ways to force exceptions.
+        // TODO: Works, but make more tests.
+        List<String> elements = formatStackTrace(throwable.getStackTrace());
 
         log(true, message, throwable.getLocalizedMessage());
-        log(true, "Stack trace -> {}", formatStackTrace(throwable.getStackTrace()));
+        log(true, "Stacktrace:");
+
+        for (String e : elements) {
+            log(true, e);
+        }
+
         file.write();
     }
 
-    private String formatStackTrace(StackTraceElement[] elements) {
-        List<String> list = new ArrayList<>();
-
+    private List<String> formatStackTrace(StackTraceElement[] elements) {
+        List<String> list = new LinkedList<>();
         for (StackTraceElement e : elements) {
             list.add(e.toString());
         }
 
-        return String.join("\n", list);
+        return list;
     }
 
     public LogFunctions functions() {

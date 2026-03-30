@@ -32,7 +32,7 @@ public abstract class DownloadModLoader extends AcpTask {
             File output = project.file(directory.getAbsolutePath() + "modloader.lzma");
             FileUtil.download(logger, url, output);
         } catch (IOException e) {
-            throw new AcpException("Mod loader download error: ", logger, e);
+            throw new AcpException("Modloader download error.", logger, e);
         }
     }
 
@@ -60,7 +60,7 @@ public abstract class DownloadModLoader extends AcpTask {
         return switch (loader) {
             case "forge" -> "net.minecraftforge:forge";
             case "risugami" -> "risugami:modloader";
-            default -> throw new AcpException("Unrecognized mod loader", logger, new IOException(""));
+            default -> throw new AcpException("Unrecognized mod loader: " + loader, logger, new IllegalArgumentException());
         };
     }
 

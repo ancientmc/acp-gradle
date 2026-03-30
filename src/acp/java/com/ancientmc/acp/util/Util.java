@@ -3,6 +3,7 @@ package com.ancientmc.acp.util;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -54,12 +55,8 @@ public final class Util {
      * @param path The path for the URL.
      * @return The URL.
      */
-    public static URL getUrl(String path) {
-        try {
-            return URI.create(path).toURL();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+    public static URL getUrl(String path) throws IOException {
+        return URI.create(path).toURL();
     }
 
     /**
